@@ -118,4 +118,19 @@ app.*.symbols
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
 
+.idea/
+
+# Ignorar ficheiros de projetos do IntelliJ/Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Ignorar ficheiros do VS Code
+.vscode/
+
+# Ignorar logs de SO
+.DS_Store
+Thumbs.db
+
 CLAUDE*
