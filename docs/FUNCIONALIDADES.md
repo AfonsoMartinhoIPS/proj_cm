@@ -18,7 +18,7 @@ Ecrã inicial exibido no arranque da aplicação. Apresenta o logótipo e nome e
 **O que implementar:**
 - Exibir logótipo e nome da aplicação
 - Verificar se existe sessão ativa (token Firebase válido)
-- Redirecionar para ecrã de login se sem sessão, ou para ecrã principal se sessão ativa
+- Redirecionar para Onboarding se primeira vez sem sessão, para Login se já registado mas sem sessão, ou para ecrã principal se sessão ativa
 - Duração mínima de ~1,5 segundos para garantir experiência visual coerente
 
 **Tratamento de erros:**
@@ -26,7 +26,46 @@ Ecrã inicial exibido no arranque da aplicação. Apresenta o logótipo e nome e
 
 ---
 
-### 2. Autenticação
+### 2. Onboarding *(primeira interação — ocorre antes do registo)*
+
+**Descrição:**
+Wizard multi-step apresentado na primeira vez que o utilizador abre a app, antes de criar conta. Recolhe dados pessoais e o objetivo de saúde do utilizador, calcula automaticamente os objetivos nutricionais diários e permite ao utilizador confirmar ou ajustar os valores antes de prosseguir para o registo.
+
+**O que implementar:**
+
+*Step 1 — Dados pessoais:*
+- Campos: nome de utilizador, idade, peso (kg), altura (cm), sexo (masculino / feminino)
+- Validação local: todos os campos obrigatórios, valores numéricos positivos
+
+*Step 2 — Objetivo de saúde:*
+- Opções: Perder peso / Manter peso / Ganhar massa muscular
+- Seleção visual (cards ou botões ilustrados)
+
+*Step 3 — Cálculo automático de objetivos:*
+- TMB calculada com fórmula Mifflin-St Jeor:
+  - Homem: `TMB = 10 × peso + 6.25 × altura − 5 × idade + 5`
+  - Mulher: `TMB = 10 × peso + 6.25 × altura − 5 × idade − 161`
+- Calorias diárias = TMB × fator de atividade (1.2 sedentário → 1.9 muito ativo)
+- Ajuste por objetivo: −300 kcal (perder) / +300 kcal (ganhar) / 0 (manter)
+- Macros: proteína = 2.0g × peso; gordura = 25% calorias ÷ 9; hidratos = restante ÷ 4; água = 35ml × peso
+- Exibir valores calculados de forma clara
+
+*Step 4 — Confirmação e ajuste:*
+- Mostrar todos os objetivos calculados
+- Permitir ao utilizador ajustar manualmente qualquer valor
+- Botão "Criar conta" → navegar para RegisterScreen com os dados pré-preenchidos
+
+*Dados guardados:*
+- Objetivos confirmados guardados no Firestore (`users/{uid}`) após registo bem-sucedido
+- Dados de onboarding (peso, altura, objetivo) também guardados no perfil
+
+**Tratamento de erros:**
+- Campos inválidos → validação local antes de avançar cada step
+- Utilizador pode navegar para o step anterior sem perder dados
+
+---
+
+### 4. Autenticação
 
 **Descrição:**
 Registo e autenticação de utilizadores via Firebase Authentication. O utilizador cria conta com email e palavra-passe, e na sessão seguinte inicia sessão com as mesmas credenciais. A sessão é persistida localmente, pelo que não é necessário voltar a autenticar em cada abertura da app.
@@ -62,7 +101,7 @@ Registo e autenticação de utilizadores via Firebase Authentication. O utilizad
 
 ---
 
-### 3. Navegação
+### 5. Navegação
 
 **Descrição:**
 Estrutura de navegação com barra inferior para acesso às secções principais e navegação em pilha (stack) para ecrãs de detalhe, garantindo que o utilizador pode sempre regressar ao ponto de origem.
@@ -88,7 +127,7 @@ Estrutura de navegação com barra inferior para acesso às secções principais
 
 ---
 
-### 4. Perfil e Definições
+### 6. Perfil e Definições
 
 **Descrição:**
 Ecrã com informação do utilizador autenticado e configuração de objetivos nutricionais diários.
@@ -106,7 +145,7 @@ Ecrã com informação do utilizador autenticado e configuração de objetivos n
 
 ---
 
-### 5. Créditos
+### 7. Créditos
 
 **Descrição:**
 Ecrã acessível a partir do perfil com identificação dos autores, unidade curricular e ano letivo.

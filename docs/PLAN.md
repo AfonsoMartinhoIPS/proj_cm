@@ -38,11 +38,12 @@ Problema: apps de nutrição não têm preços, apps de compras não têm nutri�
 
 #### Documentação
 - [x] Definir ideia e funcionalidades (`FUNCIONALIDADES.md`)
-- [ ] Definir navegação e ecrãs (`NAVIGATION.md`)
-  - [ ] Mapa de todos os ecrãs e ligações entre eles
-  - [ ] Fluxo de autenticação (splash → login/registo → main)
-  - [ ] Fluxo de cada tab (Refeições, Produtos, Histórico, Perfil)
-  - [ ] Ecrãs de detalhe e modais (bottom sheets, dialogs)
+- [x] Definir navegação e ecrãs (`NAVIGATION.md`)
+  - [x] Mapa de todos os ecrãs e ligações entre eles
+  - [x] Fluxo de autenticação (splash → onboarding → registo → login → home)
+  - [x] Fluxo de cada tab (Home, Refeições, Produtos, Scan)
+  - [x] Perfil acessível via avatar na Home
+  - [x] Fórmula de cálculo de objetivos (onboarding)
 - [ ] Criar mockups dos ecrãs principais (`MOCKUPS.md`)
   - [ ] SplashScreen
   - [ ] LoginScreen / RegisterScreen
