@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/screens/home/home_screen.dart';
-import 'package:projeto/screens/products/search_screen.dart';
-import 'package:projeto/screens/profile/profile_screen.dart';
-import 'package:projeto/screens/scanner/scan_screen.dart';
-import 'package:projeto/widgets/main_shell.dart';
+import 'package:projeto/presentation/screens/home/home_screen.dart';
+import 'package:projeto/presentation/screens/products/search_screen.dart';
+import 'package:projeto/presentation/screens/profile/profile_screen.dart';
+import 'package:projeto/presentation/screens/scanner/scan_screen.dart';
+import 'package:projeto/presentation/widgets/main_shell.dart';
 
 class AppRoute {
   final String path;
