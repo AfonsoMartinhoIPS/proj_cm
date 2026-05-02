@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'scan.dart';
-//import 'produtos.dart';
-//import 'meals.dart';
+import 'products.dart';
+import 'meals.dart';
+import 'perfil.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,27 +17,27 @@ class _HomeState extends State<Home> {
 
  
   void _onTabTapped(int index) {
-    /*if (index == 1) { 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const Products()),
-      );
-      if (index == 3) { 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const Meals()),
-      );*/
-    if (index == 3) { 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const Scanner()),
-      );
-    } else {
-      setState(() {
-        _currentIndex = index;
-      });
-    }
+  setState(() {
+    _currentIndex = index;
+  });
+
+  if (index == 1) { 
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Meals()), 
+    );
+  } else if (index == 2) { 
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Products()), 
+    );
+  } else if (index == 3) { 
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Scanner()),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -57,38 +58,48 @@ class _HomeState extends State<Home> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Cabeçalho: 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Bom dia, Ana',
-                        style: TextStyle(
-                          color: offWhite,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Segunda-feira, 21 Abr',
-                        style: TextStyle(color: textMuted, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: cardGreen,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: accentGreen, width: 2),
-                    ),
-                    child: const Icon(Icons.person, color: offWhite),
-                  ),
-                ],
-              ),
+              // Cabeçalho: 
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Bom dia, Ana',
+          style: TextStyle(
+            color: offWhite,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          'Segunda-feira, 21 Abr',
+          style: TextStyle(color: textMuted, fontSize: 13),
+        ),
+      ],
+    ),
+    // ALTERAÇÃO AQUI: Envolvemos o Container com GestureDetector
+    GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PerfilPage()),
+        );
+      },
+      child: Container(
+        width: 45,
+        height: 45,
+        decoration: BoxDecoration(
+          color: cardGreen,
+          shape: BoxShape.circle,
+          border: Border.all(color: accentGreen, width: 2),
+        ),
+        child: const Icon(Icons.person, color: offWhite),
+      ),
+    ),
+  ],
+),
 
               const SizedBox(height: 24),
 

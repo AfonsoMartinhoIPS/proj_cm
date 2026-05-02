@@ -1,18 +1,53 @@
 import 'package:flutter/material.dart';
+import 'home.dart';
+import 'meals.dart';
+import 'products.dart';
 
-class Scanner extends StatelessWidget {
+class Scanner extends StatefulWidget {
   const Scanner({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    const primaryGreen = Color(0xFF344E41);
-    const lightSage = Color(0xFFA3B18A);
-    const offWhite = Color(0xFFDAD7CD);
-    const darkOverlay = Color(0xFF0D1A10);
-    const darkInput = Color(0xFF2C4035);
-    const borderGreen = Color(0xFF4A6B54);
-    const textMuted = Color(0xFF6B8C74);
+  State<Scanner> createState() => _ScannerState();
+}
 
+class _ScannerState extends State<Scanner> {
+  final Color primaryGreen = const Color(0xFF344E41);
+  final Color lightSage = const Color(0xFFA3B18A);
+  final Color offWhite = const Color(0xFFDAD7CD);
+  final Color darkOverlay = const Color(0xFF0D1A10);
+  final Color darkInput = const Color(0xFF2C4035);
+  final Color borderGreen = const Color(0xFF4A6B54);
+  final Color textMuted = const Color(0xFF6B8C74);
+
+  int _currentIndex = 3;
+
+  void _onTabTapped(int index) {
+    if (index == _currentIndex) return; 
+
+    setState(() {
+      _currentIndex = index;
+    });
+
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Home()),
+      );
+    } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Meals()),
+      );
+    } else if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Products()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primaryGreen,
       appBar: AppBar(
@@ -23,16 +58,16 @@ class Scanner extends StatelessWidget {
           child: OutlinedButton(
             onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: borderGreen),
+              side: BorderSide(color: borderGreen),
               padding: EdgeInsets.zero,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Icon(Icons.arrow_back, color: lightSage, size: 18),
+            child: Icon(Icons.arrow_back, color: lightSage, size: 18),
           ),
         ),
-        title: const Text(
+        title: Text(
           'Scan Barcode',
-          style: TextStyle(color: offWhite, fontSize: 16, fontWeight: FontWeight.w600),
+          style: TextStyle(color: offWhite, fontSize: 16, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -50,17 +85,13 @@ class Scanner extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  //  Widget da Câmara
-                  const Icon(Icons.videocam_off, color: borderGreen, size: 40),
-                  
-                  // Mira do Scanner
+                  Icon(Icons.videocam_off, color: borderGreen, size: 40),
                   _buildScannerOverlay(lightSage),
                 ],
               ),
             ),
           ),
 
-          // Texto de Instrução
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
             child: Text(
@@ -70,37 +101,36 @@ class Scanner extends StatelessWidget {
             ),
           ),
 
-          // Botão de Inserção Manual
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: OutlinedButton(
               onPressed: () {},
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: borderGreen),
+                side: BorderSide(color: borderGreen),
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text(
+              child: Text(
                 'Inserir código manualmente',
                 style: TextStyle(color: lightSage, fontSize: 14),
               ),
             ),
           ),
           
-          const Spacer(), // Empurra o conteúdo para cima
+          const Spacer(), 
         ],
       ),
-      // Barra de Navegação Inferior
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
         backgroundColor: darkInput,
-        currentIndex: 3, 
         type: BottomNavigationBarType.fixed,
         selectedItemColor: lightSage,
         unselectedItemColor: textMuted,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: 'Refeições'),
-          BottomNavigationBarItem(icon: Icon(Icons.inventory_2), label: 'Produtos'),
+          BottomNavigationBarItem(icon: Icon(Icons.inventory_2_outlined), label: 'Produtos'),
           BottomNavigationBarItem(icon: Icon(Icons.qr_code_scanner), label: 'Scan'),
         ],
       ),
