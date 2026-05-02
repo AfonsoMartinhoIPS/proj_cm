@@ -44,37 +44,37 @@ Problema: apps de nutrição não têm preços, apps de compras não têm nutri�
   - [x] Fluxo de cada tab (Home, Refeições, Produtos, Scan)
   - [x] Perfil acessível via avatar na Home
   - [x] Fórmula de cálculo de objetivos (onboarding)
-- [ ] Criar mockups dos ecrãs principais (`MOCKUPS.md`)
-  - [ ] SplashScreen
-  - [ ] LoginScreen / RegisterScreen
-  - [ ] RefeicoeScreen (tab principal)
-  - [ ] ProdutosScreen (scanner + pesquisa + guardados)
-  - [ ] ProductDetailScreen
-  - [ ] RegisterPriceScreen / PriceListScreen
-  - [ ] HistoricoScreen (dia / semana / mês)
-  - [ ] PerfilScreen + EditGoalsScreen
-- [ ] Definir schema da base de dados (`DATABASE.md`)
-  - [ ] Coleção `users/{uid}` (perfil + objetivos + notificações)
-  - [ ] Subcoleção `products/{productId}` (produtos guardados)
-  - [ ] Subcoleção `nutrition_logs/{logId}` (refeições + água)
-  - [ ] Subcoleção `shopping_prices/{priceId}` (preços em loja)
-  - [ ] Tipos de cada campo e valores possíveis
-  - [ ] Regras de segurança Firestore (só o próprio utilizador lê/escreve)
-- [ ] Definir APIs e estratégia de fetching (`API.md`)
-  - [ ] OpenFoodFacts: endpoint por barcode + endpoint de pesquisa
-  - [ ] USDA FoodData Central: endpoint de pesquisa + chave API
-  - [ ] Estratégia de fallback (OFF → USDA se poucos resultados)
-  - [ ] Campos a extrair de cada API e mapeamento para o modelo `Product`
-  - [ ] Tratamento de erros de rede e campos em falta
-- [ ] Definir arquitetura e estrutura de pastas (`ARCHITECTURE.md`)
-  - [ ] Estrutura de pastas completa (`lib/`)
-  - [ ] Camada `data`: datasources, models, repository impls
-  - [ ] Camada `domain`: entities, repository interfaces, use cases
-  - [ ] Camada `presentation`: screens, providers (Riverpod), widgets
-  - [ ] Lista de dependências (`pubspec.yaml`) com versões
+- [x] Criar mockups dos ecrãs principais (`MOCKUPS.md`)
+  - [x] SplashScreen
+  - [x] LoginScreen / RegisterScreen
+  - [x] RefeicoeScreen (tab principal)
+  - [x] ProdutosScreen (scanner + pesquisa + guardados)
+  - [x] ProductDetailScreen
+  - [x] RegisterPriceScreen / PriceListScreen
+  - [x] HistoricoScreen (dia / semana / mês)
+  - [x] PerfilScreen + EditGoalsScreen
+- [x] Definir schema da base de dados (`DATABASE.md`)
+  - [x] Coleção `users/{uid}` (perfil + objetivos + notificações)
+  - [x] Subcoleção `products/{productId}` (produtos guardados)
+  - [x] Subcoleção `nutrition_logs/{logId}` (refeições + água)
+  - [x] Subcoleção `shopping_prices/{priceId}` (preços em loja)
+  - [x] Tipos de cada campo e valores possíveis
+  - [x] Regras de segurança Firestore (só o próprio utilizador lê/escreve)
+- [x] Definir APIs e estratégia de fetching (`API.md`)
+  - [x] OpenFoodFacts: endpoint por barcode + endpoint de pesquisa
+  - [x] USDA FoodData Central: endpoint de pesquisa + chave API
+  - [x] Estratégia de fallback (OFF → USDA se poucos resultados)
+  - [x] Campos a extrair de cada API e mapeamento para o modelo `Product`
+  - [x] Tratamento de erros de rede e campos em falta
+- [x] Definir arquitetura e estrutura de pastas (`ARCHITECTURE.md`)
+  - [x] Estrutura de pastas completa (`lib/`)
+  - [x] Camada `data`: datasources, models, repository impls
+  - [x] Camada `domain`: entities, repository interfaces, use cases
+  - [x] Camada `presentation`: screens, providers (Riverpod), widgets
+  - [x] Lista de dependências (`pubspec.yaml`) com versões
 
 #### Setup do Projeto
-- [ ] Criar projeto Flutter (`flutter create nutriscan`)
+- [x] Criar projeto Flutter (`flutter create nutriscan`)
 - [ ] Configurar Firebase
   - [ ] Criar projeto no Firebase Console
   - [ ] Ativar Firebase Auth (email + password)
@@ -85,16 +85,16 @@ Problema: apps de nutrição não têm preços, apps de compras não têm nutri�
   - [ ] `firebase_core`, `firebase_auth`, `cloud_firestore`
   - [ ] `flutter_riverpod`, `riverpod_annotation`
   - [ ] `dio`
-  - [ ] `go_router`
+  - [x] `go_router`
   - [ ] `mobile_scanner`
   - [ ] `flutter_local_notifications`
   - [ ] `fl_chart`
   - [ ] `cached_network_image`
   - [ ] `intl`
   - [ ] `equatable`
-- [ ] Criar estrutura de pastas (`core/`, `data/`, `domain/`, `presentation/`)
-- [ ] Configurar tema global (cores, tipografia, espaçamentos)
-- [ ] Configurar `go_router` com rotas e redirecionamento por estado de sessão
+- [x] Criar estrutura de pastas (`core/`, `data/`, `domain/`, `presentation/`)
+- [x] Configurar tema global (cores, tipografia, espaçamentos)
+- [x] Configurar `go_router` com rotas e redirecionamento por estado de sessão
 
 #### Implementação Inicial
 - [ ] SplashScreen
@@ -113,9 +113,9 @@ Problema: apps de nutrição não têm preços, apps de compras não têm nutri�
   - [ ] `createUserWithEmailAndPassword`
   - [ ] Guardar perfil em Firestore (`users/{uid}`)
   - [ ] Tratar erros: email já usado, sem rede
-- [ ] MainShell
-  - [ ] BottomNavigationBar com 4 tabs (Refeições, Produtos, Histórico, Perfil)
-  - [ ] `IndexedStack` para preservar estado entre tabs
+- [x] MainShell
+  - [x] BottomNavigationBar com 4 tabs (Refeições, Produtos, Histórico, Perfil)
+  - [x] `IndexedStack` para preservar estado entre tabs
 - [ ] PerfilScreen
   - [ ] Exibir nome e email do utilizador autenticado
   - [ ] Formulário de objetivos (calorias, proteína, hidratos, gordura, água)
@@ -125,10 +125,10 @@ Problema: apps de nutrição não têm preços, apps de compras não têm nutri�
 - [ ] CreditsScreen
   - [ ] Nome e número de cada elemento do grupo
   - [ ] Unidade curricular, instituição, ano letivo
-- [ ] Esqueletos dos ecrãs restantes (sem lógica, só estrutura visual)
-  - [ ] RefeicoeScreen
-  - [ ] ProdutosScreen (3 sub-tabs)
-  - [ ] HistoricoScreen (3 sub-tabs)
+- [x] Esqueletos dos ecrãs restantes (sem lógica, só estrutura visual)
+  - [x] RefeicoeScreen
+  - [x] ProdutosScreen (3 sub-tabs)
+  - [x] HistoricoScreen (3 sub-tabs)
 
 ---
 
