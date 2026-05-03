@@ -15,7 +15,10 @@ class MainShell extends StatelessWidget {
       (route) => route.path == '/' ? location == '/' : location.startsWith(route.path),
     );
 
+    final currentRoute = currentIndex >= 0 ? bottomNavRoutes[currentIndex] : null;
+
     return Scaffold(
+      appBar: AppBar(title: Text(currentRoute?.label ?? '')),
       body: child,
       bottomNavigationBar: BottomNavbar(
         currentIndex: currentIndex.clamp(0, bottomNavRoutes.length - 1),

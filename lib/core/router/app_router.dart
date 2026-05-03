@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto/presentation/screens/home/home_screen.dart';
-import 'package:projeto/presentation/screens/products/search_screen.dart';
+import 'package:projeto/presentation/screens/products/products_screen.dart';
 import 'package:projeto/presentation/screens/profile/profile_screen.dart';
 import 'package:projeto/presentation/screens/scanner/scan_screen.dart';
 import 'package:projeto/presentation/widgets/main_shell.dart';
@@ -21,10 +21,10 @@ class AppRoute {
 }
 
 final List<AppRoute> bottomNavRoutes = [
-  AppRoute(path: '/',        label: 'Home',     icon: Icons.home,          screen: const HomeScreen()),
-  AppRoute(path: '/search',  label: 'Meals',    icon: Icons.restaurant,    screen: const SearchScreen()),
-  AppRoute(path: '/profile', label: 'Products', icon: Icons.shopping_cart, screen: const ProfileScreen()),
-  AppRoute(path: '/scan',    label: 'Scan',     icon: Icons.flip_outlined, screen: const ScanScreen()),
+  AppRoute(path: '/',         label: 'Home',     icon: Icons.home,          screen: const HomeScreen()),
+  AppRoute(path: '/meals',  label: 'Meals',  icon: Icons.restaurant,        screen: const ProfileScreen()),
+  AppRoute(path: '/products', label: 'Products', icon: Icons.search,        screen: const ProductsScreen()),
+  AppRoute(path: '/scan',     label: 'Scan',     icon: Icons.qr_code,       screen: const ScanScreen()),
 ];
 
 final appRouter = GoRouter(

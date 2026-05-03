@@ -3,7 +3,8 @@ import 'package:projeto/data/models/nutriments_model.dart';
 import 'package:projeto/domain/entities/product.dart';
 
 class ProductModel {
-  static Product fromDoc(DocumentSnapshot doc) {
+  static Product? fromDoc(DocumentSnapshot doc) {
+    if (!doc.exists) return null;
     final map = doc.data() as Map<String, dynamic>;
     return Product(
       barcode: doc.id,
@@ -20,6 +21,7 @@ class ProductModel {
       novaGroup: map['novaGroup'] as int?,
       nutriments: NutrimentsModel.fromMap(map['nutriments'] as Map<String, dynamic>? ?? {}),
       source: map['source'] as String? ?? 'openfoodfacts',
+      fetchedAt: (map['fetchedAt'] as Timestamp?)?.toDate(),
     );
   }
 

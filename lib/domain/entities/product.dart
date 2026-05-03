@@ -15,6 +15,7 @@ class Product {
   final int? novaGroup;
   final Nutriments nutriments;
   final String source; // "openfoodfacts" | "usda" | "manual"
+  final DateTime? fetchedAt;
 
   const Product({
     required this.barcode,
@@ -31,5 +32,6 @@ class Product {
     this.novaGroup,
     required this.nutriments,
     required this.source,
+    required this.fetchedAt,
   });
 }

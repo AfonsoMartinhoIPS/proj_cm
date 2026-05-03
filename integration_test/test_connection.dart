@@ -18,7 +18,7 @@ void main() {
   testWidgets('save and fetch product from Firestore', (tester) async {
     ProductRepository repo = ProductRepositoryImpl();
 
-    const product = Product(
+    Product product = Product(
       barcode: '1234567890123',
       name: 'Test Product',
       brand: 'Test Brand',
@@ -30,6 +30,7 @@ void main() {
         proteinPer100g: 5,
       ),
       source: 'test',
+      fetchedAt: DateTime.now(),
     );
 
     await repo.save(product);
