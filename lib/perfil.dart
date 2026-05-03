@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:proj_cm/creditos.dart';
 
-
-// import 'settings.dart';
+import 'settings.dart';
 import 'meals.dart';
 import 'products.dart';
 import 'scan.dart';
@@ -15,7 +15,6 @@ class PerfilPage extends StatefulWidget {
 }
 
 class _PerfilPageState extends State<PerfilPage> {
- 
   final Color primaryGreen = const Color(0xFF344E41);
   final Color secondaryGreen = const Color(0xFF3A5A40);
   final Color accentGreen = const Color(0xFFA3B18A);
@@ -25,17 +24,17 @@ class _PerfilPageState extends State<PerfilPage> {
   final Color darkBg = const Color(0xFF2C4035);
   final Color buttonGreen = const Color(0xFF588157);
 
-int _currentIndex = 1;
+  int _currentIndex = 1;
 
   void _onTabTapped(int index) {
-    if (index == _currentIndex) return; 
+    if (index == _currentIndex) return;
 
     setState(() {
       _currentIndex = index;
     });
 
     if (index == 0) {
-      Navigator.pushReplacement( 
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Home()),
       );
@@ -44,23 +43,17 @@ int _currentIndex = 1;
         context,
         MaterialPageRoute(builder: (context) => const Products()),
       );
-      
     } else if (index == 2) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const Meals()),
       );
-    }else if (index == 3) {
+    } else if (index == 3) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const Scanner()),
       );
     }
-  }
-
-  void _goToSettings() {
- 
-    print("Navegar para Settings"); 
   }
 
   @override
@@ -93,7 +86,7 @@ int _currentIndex = 1;
                 children: [
                   // Cartão de Informação do Utilizador
                   _buildUserHeader(),
-                  
+
                   const SizedBox(height: 20),
 
                   // Secção de Objetivos Diários
@@ -104,7 +97,14 @@ int _currentIndex = 1;
                   // Botão Definições
                   _buildMenuButton(
                     label: 'Definições',
-                    onPressed: _goToSettings,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Settings(),
+                        ),
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 15),
@@ -113,7 +113,12 @@ int _currentIndex = 1;
                   _buildMenuButton(
                     label: 'Créditos',
                     onPressed: () {
-                      print("Créditos clicados");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Creditos(),
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -131,9 +136,18 @@ int _currentIndex = 1;
         unselectedItemColor: textDim,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: 'Refeições'),
-          BottomNavigationBarItem(icon: Icon(Icons.inventory_2_outlined), label: 'Produtos'),
-          BottomNavigationBarItem(icon: Icon(Icons.qr_code_scanner), label: 'Scan'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant),
+            label: 'Refeições',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2_outlined),
+            label: 'Produtos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.qr_code_scanner),
+            label: 'Scan',
+          ),
         ],
       ),
     );
@@ -161,7 +175,11 @@ int _currentIndex = 1;
               children: [
                 Text(
                   'Ana Ferreira',
-                  style: TextStyle(color: textLight, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: textLight,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
                   'ana@email.com',
@@ -174,10 +192,10 @@ int _currentIndex = 1;
                     const SizedBox(width: 8),
                     _buildTag('Editar Perfil', isAction: true),
                   ],
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -191,10 +209,7 @@ int _currentIndex = 1;
         border: isAction ? Border.all(color: borderGreen) : null,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(
-        text,
-        style: TextStyle(color: textLight, fontSize: 10),
-      ),
+      child: Text(text, style: TextStyle(color: textLight, fontSize: 10)),
     );
   }
 
@@ -221,7 +236,7 @@ int _currentIndex = 1;
               _buildGoalItem('125g', 'proteína'),
               _buildGoalItem('62kg', 'peso atual'),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -230,13 +245,23 @@ int _currentIndex = 1;
   Widget _buildGoalItem(String value, String label) {
     return Column(
       children: [
-        Text(value, style: TextStyle(color: accentGreen, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: TextStyle(
+            color: accentGreen,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         Text(label, style: TextStyle(color: textDim, fontSize: 11)),
       ],
     );
   }
 
-  Widget _buildMenuButton({required String label, required VoidCallback onPressed}) {
+  Widget _buildMenuButton({
+    required String label,
+    required VoidCallback onPressed,
+  }) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -245,7 +270,9 @@ int _currentIndex = 1;
           backgroundColor: buttonGreen,
           foregroundColor: textLight,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           elevation: 0,
         ),
         child: Text(
