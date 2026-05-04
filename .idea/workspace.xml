@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="68f31386-6f1e-42b1-8103-f492653ab553" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/projeto.iml" beforeDir="false" afterPath="$PROJECT_DIR$/projeto.iml" afterDir="false" />
-    </list>
+    <list default="true" id="68f31386-6f1e-42b1-8103-f492653ab553" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -63,7 +61,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "doc",
     "last_opened_file_path": "C:/Users/danie/OneDrive/Ambiente de Trabalho/uni/Licenciatura/2ºano/2ºsemestre/CM/3tentativa/proj_cm",
     "settings.editor.selected.configurable": "dart.settings",
     "show.migrate.to.gradle.popup": "false"

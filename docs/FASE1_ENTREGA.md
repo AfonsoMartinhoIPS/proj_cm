@@ -223,8 +223,6 @@ Scan (tab direto)
 <div style="page-break-after: always;"></div>
 
 ## 7. Wireframes / Mockups
-
-> **[PLACEHOLDER — Inserir imagens do Figma]**
 >
 > ![Splash Screen](/assets/images/splash.png) 
 > ![Onboarding](/assets/images/registo.png)
