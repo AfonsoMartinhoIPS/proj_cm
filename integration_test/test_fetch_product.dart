@@ -18,7 +18,7 @@ void main() {
   testWidgets('Fetch product from OpenFoodAPI', (tester) async {
     ProductRepository productRepository = ProductRepositoryImpl();
 
-    Product? product = await productRepository.getByBarcode('5600954501087');
+    Product? product = await productRepository.getByBarcode('7892840816773');
     logger.d("Product fetched: ${product?.name}");
 
     expect(product, isNotNull);

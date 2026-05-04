@@ -12,13 +12,10 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     final currentIndex = bottomNavRoutes.indexWhere(
-      (route) => route.path == '/' ? location == '/' : location.startsWith(route.path),
+      (r) => r.path == '/' ? location == '/' : location.startsWith(r.path),
     );
 
-    final currentRoute = currentIndex >= 0 ? bottomNavRoutes[currentIndex] : null;
-
     return Scaffold(
-      appBar: AppBar(title: Text(currentRoute?.label ?? '')),
       body: child,
       bottomNavigationBar: BottomNavbar(
         currentIndex: currentIndex.clamp(0, bottomNavRoutes.length - 1),
