@@ -17,26 +17,28 @@
 
 ## 1. Conceito
 
-**NutriScan** é uma aplicação móvel que une dois domínios habitualmente separados: **rastreio nutricional** e **comparação de preços em supermercado**.
+**NutriScan** é uma aplicação móvel de rastreio nutricional que permite ao utilizador conhecer o que come, controlar o progresso face aos seus objetivos e tomar decisões mais informadas no dia a dia.
 
 1. O utilizador digitaliza produtos alimentares pelo código de barras e obtém a ficha nutricional completa.
 2. Regista o que come ao longo do dia e acompanha o progresso face aos seus objetivos.
-3. Em paralelo, pode registar os preços que viu em diferentes lojas e comparar qual a opção mais barata por kg/L.
+3. Acede ao histórico da sua alimentação para identificar padrões ao longo do tempo.
+
+Como funcionalidade complementar, o utilizador pode também anotar preços vistos em loja diretamente na ficha de um produto, facilitando comparações futuras sem sair da app.
 
 **Problema que resolve:**
-- As apps de nutrição não têm preços.
-- Utilizar inúmeras apps para atingir um objetivo único é fragmentado e pouco prático.
-- NutriScan junta ambos numa só experiência, simples e integrada.
+- Conhecer o valor nutricional dos alimentos de forma rápida, sem pesquisa manual.
+- Ter um registo diário centralizado da alimentação, incluindo água.
+- Utilizar inúmeras apps separadas para atingir um objetivo único é fragmentado e pouco prático.
 
 
 <div style="page-break-after: always;"></div>
 
 ## 2. Público-alvo
 
-Pessoas que querem simultaneamente **comer melhor** e **gastar menos** no supermercado.
+Pessoas que querem **comer de forma mais consciente** e ter controlo sobre a sua alimentação diária.
 
 Perfis típicos:
-- Jovens adultos e estudantes com orçamento controlado
+- Jovens adultos e estudantes que querem adotar hábitos mais saudáveis
 - Pessoas com objetivos de saúde (perda de peso, ganho de massa muscular, manutenção)
 - Utilizadores que fazem as suas compras e querem tomar decisões mais informadas
 - Pessoas com dietas específicas que precisam de controlar macronutrientes
@@ -112,11 +114,8 @@ Estratégia: pesquisa OpenFoodFacts primeiro; se sem resultados, consulta USDA. 
 Produtos já digitalizados ou pesquisados, com pesquisa local para filtrar rapidamente.  
 Indicador de fonte (OpenFoodFacts / USDA / Manual).
 
-#### Registo de preços em loja
-A partir de qualquer produto, o utilizador pode registar o preço visto numa loja:
-- Nome da loja, preço (€), quantidade/volume da embalagem
-- Cálculo automático de **preço por kg/L** para comparação justa entre embalagens de tamanhos diferentes
-- Destaque do preço mais barato
+#### Notas pessoais
+Na ficha de cada produto o utilizador pode adicionar notas livres — onde comprou, o preço que viu, observações sobre o sabor, ou qualquer outra informação relevante para si.
 
 
 ### Refeições
@@ -164,12 +163,11 @@ Vista retrospetiva da alimentação com três modos:
 
 | Aspeto | Porquê é diferente |
 |--------|-------------------|
-| **Nutrição + preços na mesma app** | Um só local, organizado e fácil de utilizar |
 | **Dupla fonte de dados nutricional** | OpenFoodFacts (embalados) + USDA (genéricos), cobre praticamente qualquer alimento |
 | **Onboarding com cálculo científico** | Objetivos calculados automaticamente com fórmula Mifflin-St Jeor, não valores genéricos |
 | **Registo de água integrado** | Visão completa de ingestão diária, não apenas alimentos sólidos |
-| **Preço por kg/L automático** | Comparação justa entre embalagens de tamanhos diferentes |
 | **Histórico multi-escala** | Dia / semana / mês — identifica padrões ao longo do tempo |
+| **Notas livres por produto** | O utilizador pode anotar o que quiser na ficha do produto — preços, observações, preferências |
 
 
 <div style="page-break-after: always;"></div>
@@ -212,7 +210,6 @@ Refeições
 Produtos
   ├─ Lista de produtos guardados
   ├─ [produto] ──→ ProductDetailScreen
-  │                   └─→ RegisterPriceScreen ──→ PriceListScreen
   └─ [+ Adicionar] ──→ SearchScreen ──→ ProductDetailScreen
 
 Scan (tab direto)
@@ -269,18 +266,16 @@ users/
     ├─ goals/
     │     calories, protein, carbs, fat, water
     │
-    ├─ products/
+    ├─ saved_products/
     │     {barcode}/
     │       ├─ name, brand, imageUrl
     │       ├─ ingredientsText
     │       ├─ nutriscoreGrade, novaGroup
     │       ├─ source ("openfoodfacts" | "usda" | "manual")
+    │       ├─ savedAt, notes
     │       ├─ nutriments/
     │       │     caloriesPer100g, proteinPer100g, carbsPer100g,
     │       │     fatPer100g, fiberPer100g, saltPer100g, ...
-    │       └─ prices/
-    │             {priceId}/
-    │               storeName, price, quantity, pricePerKg, addedAt
     │
     └─ logs/
           {date}/         ← formato "YYYY-MM-DD"
@@ -298,6 +293,7 @@ users/
 |----------|-----------|
 | `AppUser` | Perfil do utilizador + objetivos nutricionais diários |
 | `Product` | Produto alimentar com dados nutricionais por 100g |
+| `SavedProduct` | Produto guardado pelo utilizador, com data de adição e notas pessoais |
 | `NutritionLog` | Registo diário: refeições + água consumida |
 | `MealEntry` | Entrada individual numa refeição (produto + porção) |
 | `Nutriments` | Valores nutricionais por 100g (calorias, proteína, hidratos, etc.) |

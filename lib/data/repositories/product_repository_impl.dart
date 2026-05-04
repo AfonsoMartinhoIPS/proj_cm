@@ -3,7 +3,9 @@ import 'package:projeto/core/database/firestore_paths.dart';
 import 'package:projeto/core/utils/logger.dart';
 import 'package:projeto/data/datasiources/open_food_facts_datasource.dart';
 import 'package:projeto/data/models/product_model.dart';
+import 'package:projeto/data/models/saved_product_model.dart';
 import 'package:projeto/domain/entities/product.dart';
+import 'package:projeto/domain/entities/saved_product.dart';
 import 'package:projeto/domain/repositories/product_repository.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
@@ -40,5 +42,42 @@ class ProductRepositoryImpl implements ProductRepository {
     await _db
         .doc(FirestorePaths.product(product.barcode))
         .set(ProductModel.toMap(product), SetOptions(merge: true));
+  }
+
+  @override
+  Future<List<SavedProduct>> getSavedProducts(String uid) async {
+    final snapshot = await _db
+        .collection(FirestorePaths.savedProducts(uid))
+        .orderBy('savedAt', descending: true)
+        .get();
+    return snapshot.docs
+        .map((doc) => SavedProductModel.fromDoc(doc))
+        .whereType<SavedProduct>()
+        .toList();
+  }
+
+  @override
+  Future<SavedProduct?> getSavedProduct(String uid, String barcode) async {
+    final doc = await _db.doc(FirestorePaths.savedProduct(uid, barcode)).get();
+    return SavedProductModel.fromDoc(doc);
+  }
+
+  @override
+  Future<void> saveForUser(String uid, SavedProduct savedProduct) async {
+    await _db
+        .doc(FirestorePaths.savedProduct(uid, savedProduct.product.barcode))
+        .set(SavedProductModel.toMap(savedProduct), SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> updateNotes(String uid, String barcode, String? notes) async {
+    await _db
+        .doc(FirestorePaths.savedProduct(uid, barcode))
+        .update(SavedProductModel.notesUpdate(notes));
+  }
+
+  @override
+  Future<void> deleteSaved(String uid, String barcode) async {
+    await _db.doc(FirestorePaths.savedProduct(uid, barcode)).delete();
   }
 }

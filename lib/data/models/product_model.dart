@@ -3,11 +3,10 @@ import 'package:projeto/data/models/nutriments_model.dart';
 import 'package:projeto/domain/entities/product.dart';
 
 class ProductModel {
-  static Product? fromDoc(DocumentSnapshot doc) {
-    if (!doc.exists) return null;
-    final map = doc.data() as Map<String, dynamic>;
+  static Product? fromMap(String barcode, Map<String, dynamic> map) {
+    if (map['name'] == null) return null;
     return Product(
-      barcode: doc.id,
+      barcode: barcode,
       name: map['name'] as String,
       brand: map['brand'] as String?,
       displayQuantity: map['displayQuantity'] as String?,
@@ -23,6 +22,12 @@ class ProductModel {
       source: map['source'] as String? ?? 'openfoodfacts',
       fetchedAt: (map['fetchedAt'] as Timestamp?)?.toDate(),
     );
+  }
+
+  static Product? fromDoc(DocumentSnapshot doc) {
+    if (!doc.exists) return null;
+    final map = doc.data() as Map<String, dynamic>;
+    return fromMap(doc.id, map);
   }
 
   static Map<String, dynamic> toMap(Product product) {
