@@ -1,10 +1,11 @@
-# NutriScan — Entrega Intercalar (Fase 1)
+# NutriScan - Entrega  (Fase 1)
 
 **Unidade Curricular:** Computação Móvel  
 **Docentes:** Professor Bruno Pereira · Professora Paula Miranda  
 **Data de entrega:** 4 de maio de 2026  
 
 **Grupo:**
+
 | Nome | Número |
 |------|--------|
 | Samuel Silva | 202200315 |
@@ -340,7 +341,8 @@ data/           ← implementações, modelos, datasources (APIs + Firestore)
 
 ## 11. Repositório Git
 
-> **[PLACEHOLDER — Inserir link do repositório]**
+> https://github.com/AfonsoMartinhoIPS/proj_cm.git
+
 
 O repositório encontra-se configurado com:
 - Estrutura de projeto Flutter inicializada
