@@ -223,19 +223,15 @@ Scan (tab direto)
 <div style="page-break-after: always;"></div>
 
 ## 7. Wireframes / Mockups
-
-> **[PLACEHOLDER — Inserir imagens do Figma]**
 >
-> Ecrãs a incluir:
-> - Splash Screen
-> - Onboarding (4 passos)
-> - Login / Registo
-> - Home (resumo do dia)
-> - Refeições (diário do dia)
-> - Produtos (lista + detalhe)
-> - Scanner
-> - Histórico (dia / semana / mês)
-> - Perfil + Definições
+> ![Splash Screen](/assets/images/splash.png) 
+> ![Onboarding](/assets/images/registo.png)
+> ![Login / Registo](/assets/images/login.png)
+> ![Home](/assets/images/main.png)
+> ![Refeições](/assets/images/refeicao.png)
+> ![Produtos](/assets/images/produto.png)
+> ![Scanner](/assets/images/scan.png)
+> ![Perfil + Definições](/assets/images/perfil.png)
 
 
 <div style="page-break-after: always;"></div>
