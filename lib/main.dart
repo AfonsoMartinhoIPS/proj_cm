@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
-import 'splash.dart'; 
+import 'package:projeto/core/core.dart';
+import 'package:projeto/core/router/app_router.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDatabase();
+
+  runApp(const App());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false, // lab1 remove a faixa de debug
+    return MaterialApp.router(
       title: 'NutriScan',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF344E41)),
-        useMaterial3: true,
-      ),
-      home: const Scaffold(
-        body:  Splash(),
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      routerConfig: appRouter,
     );
   }
 }

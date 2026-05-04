@@ -1,6 +1,6 @@
 {
-    "name": "proj_cm",
-    "short_name": "proj_cm",
+    "name": "projeto",
+    "short_name": "projeto",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
