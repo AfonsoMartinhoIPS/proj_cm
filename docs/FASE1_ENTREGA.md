@@ -223,31 +223,53 @@ Scan (tab direto)
 <div style="page-break-after: always;"></div>
 
 ## 7. Wireframes / Mockups
->
-> ![Splash Screen](/assets/images/splash.png) 
-> ![Onboarding](/assets/images/registo.png)
-> ![Login / Registo](/assets/images/login.png)
-> ![Home](/assets/images/main.png)
-> ![Refeições](/assets/images/refeicao.png)
-> ![Produtos](/assets/images/produto.png)
-> ![Scanner](/assets/images/scan.png)
-> ![Perfil + Definições](/assets/images/perfil.png)
+
+> Link para o projeto Figma: https://www.figma.com/design/V25ivJxTlUHjLLWmyU0g6W/Proj_CM?node-id=0-1&p=f&t=9hxaCJ1dY5zSZxIG-0
+
+
+**Splash:**
+![Splash Screen](assets/images/splash.png) 
+
+**Onboarding**
+![Onboarding](assets/images/registo.png)
+
+**Login / Registo:**
+![Login / Registo](assets/images/login.png)
+
+**Home:**
+![Home](assets/images/main.png)
+
+**Refeições:**
+![Refeições](assets/images/refeicao.png)
+
+**Produtos:**
+![Produtos](assets/images/produto.png)
+
+**Scanner:**
+![Scanner](assets/images/scan.png)
+
+**Perfil + Definições**
+![Perfil + Definições](assets/images/perfil.png)
 
 
 <div style="page-break-after: always;"></div>
 
 ## 8. UI Implementada
 
-Estado atual da implementação de interface:
+Alguns exemplos do estado atual da implementação de interface:
 
-> **[PLACEHOLDER — Screenshots da app em execução]**
+**Login:**
 
-Ecrãs já com layout implementado:
-- Home Screen
-- Products Screen
-- Scan Screen
-- Profile Screen
-- Main Shell (bottom navigation bar)
+![alt text](assets/images/login_inapp.png)
+
+**Onboarding**
+![alt text](assets/images/onboarding_inapp.png)
+
+**Dashboard**
+![alt text](assets/images/dashboard_inapp.png)
+
+**Produtos**
+![alt text](assets/images/productos_inapp.png)
 
 
 <div style="page-break-after: always;"></div>
