@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projeto/core/database/firestore_paths.dart';
+import 'package:projeto/core/utils/logger.dart';
 import 'package:projeto/data/models/app_user_model.dart';
 import 'package:projeto/domain/entities/app_user.dart';
 import 'package:projeto/domain/repositories/user_repository.dart';
@@ -9,20 +10,28 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<AppUser?> getUser(String uid) async {
+    logger.d('Fetching user from Firestore: $uid');
     final doc = await _db.doc(FirestorePaths.user(uid)).get();
-    if (!doc.exists) return null;
+    if (!doc.exists) {
+      logger.w('User doc not found for uid: $uid');
+      return null;
+    }
+    logger.d('User fetched successfully: $uid');
     return AppUserModel.fromDoc(doc);
   }
 
   @override
   Future<void> saveUser(AppUser user) async {
+    logger.d('Saving user to Firestore: ${user.uid} (${user.email})');
     await _db
         .doc(FirestorePaths.user(user.uid))
         .set(AppUserModel.toMap(user), SetOptions(merge: true));
+    logger.d('User saved successfully: ${user.uid}');
   }
 
   @override
   Future<void> updateGoals(String uid, NutritionGoals goals) async {
+    logger.d('Updating goals for user: $uid');
     await _db.doc(FirestorePaths.user(uid)).update({
       'goals': {
         'calories': goals.calories,
@@ -32,5 +41,6 @@ class UserRepositoryImpl implements UserRepository {
         'water': goals.water,
       },
     });
+    logger.d('Goals updated for user: $uid');
   }
 }

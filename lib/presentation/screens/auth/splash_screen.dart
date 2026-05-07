@@ -1,26 +1,29 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto/core/theme/app_colors.dart';
+import 'package:projeto/presentation/providers/auth_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Timer(const Duration(seconds: 3), () {
-      if (mounted) context.go('/welcome');
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(authProvider, (_, next) {
+      next.when(
+        data: (user) async {
+          await Future.delayed(const Duration(seconds: 1)); // minimum splash time
+          if (user != null) {
+            context.go('/');
+          } else {
+            context.go('/welcome');
+          }
+        },
+        error: (_, _) => context.go('/welcome'),
+        loading: () {},
+      );
     });
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(

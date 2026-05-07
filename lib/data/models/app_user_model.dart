@@ -26,11 +26,11 @@ class AppUserModel {
       'email': u.email,
       'createdAt': FieldValue.serverTimestamp(),
       'goals': {
-        'calories': u.goals.calories,
-        'protein': u.goals.protein,
-        'carbs': u.goals.carbs,
-        'fat': u.goals.fat,
-        'water': u.goals.water,
+        'calories': u.goals?.calories,
+        'protein': u.goals?.protein,
+        'carbs': u.goals?.carbs,
+        'fat': u.goals?.fat,
+        'water': u.goals?.water,
       },
     };
   }

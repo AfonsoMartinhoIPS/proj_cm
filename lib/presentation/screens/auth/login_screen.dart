@@ -1,19 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto/core/theme/app_colors.dart';
+import 'package:projeto/presentation/providers/auth_provider.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void submit() {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preenche o email e a password')),
+      );
+      return;
+    }
+
+    ref.read(authProvider.notifier).login(email, password);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
+    ref.listen(authProvider, (_, next) {
+      next.whenOrNull(
+        data: (user) {
+          if (user != null) context.go('/');
+        },
+        error: (e, _) => ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        ),
+      );
+    });
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => context.pop(),
+        // ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -53,18 +97,20 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 40),
               _label('Email'),
               const SizedBox(height: 8),
-              const TextField(
+              TextField(
+                controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                style: TextStyle(color: AppColors.onBackground),
-                decoration: InputDecoration(hintText: 'ana@email.com'),
+                style: const TextStyle(color: AppColors.onBackground),
+                decoration: const InputDecoration(hintText: 'ana@email.com'),
               ),
               const SizedBox(height: 20),
               _label('Password'),
               const SizedBox(height: 8),
-              const TextField(
+              TextField(
+                controller: passwordController,
                 obscureText: true,
-                style: TextStyle(color: AppColors.onBackground),
-                decoration: InputDecoration(hintText: '••••••••'),
+                style: const TextStyle(color: AppColors.onBackground),
+                decoration: const InputDecoration(hintText: '••••••••'),
               ),
               Align(
                 alignment: Alignment.centerRight,
@@ -75,8 +121,10 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: () => context.go('/'),
-                child: const Text('Entrar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                onPressed: authState.isLoading ? null : submit,
+                child: authState.isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Entrar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 32),
               Row(

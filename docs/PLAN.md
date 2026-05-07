@@ -75,16 +75,16 @@ Problema: apps de nutrição não têm preços, apps de compras não têm nutri�
 
 #### Setup do Projeto
 - [x] Criar projeto Flutter (`flutter create nutriscan`)
-- [ ] Configurar Firebase
-  - [ ] Criar projeto no Firebase Console
-  - [ ] Ativar Firebase Auth (email + password)
-  - [ ] Criar base de dados Firestore
-  - [ ] Configurar `firebase_options.dart` (FlutterFire CLI)
-  - [ ] Adicionar `google-services.json` (Android) e `GoogleService-Info.plist` (iOS)
-- [ ] Adicionar dependências ao `pubspec.yaml`
-  - [ ] `firebase_core`, `firebase_auth`, `cloud_firestore`
+- [X] Configurar Firebase
+  - [X] Criar projeto no Firebase Console
+  - [x] Ativar Firebase Auth (email + password)
+  - [x] Criar base de dados Firestore
+  - [x] Configurar `firebase_options.dart` (FlutterFire CLI)
+  
+- [x] Adicionar dependências ao `pubspec.yaml`
+  - [x] `firebase_core`, `firebase_auth`, `cloud_firestore`
   - [ ] `flutter_riverpod`, `riverpod_annotation`
-  - [ ] `dio`
+  - [x] `dio`
   - [x] `go_router`
   - [ ] `mobile_scanner`
   - [ ] `flutter_local_notifications`

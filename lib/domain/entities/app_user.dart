@@ -19,7 +19,7 @@ class AppUser {
   final String displayName;
   final String email;
   final DateTime createdAt;
-  final NutritionGoals goals;
+  final NutritionGoals? goals;
 
   const AppUser({
     required this.uid,
