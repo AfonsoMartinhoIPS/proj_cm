@@ -1,11 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:projeto/core/utils/logger.dart';
 import 'package:projeto/domain/entities/app_user.dart';
 import 'package:projeto/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-
 
   @override
   String? getCurrentUser() {
@@ -13,13 +11,9 @@ class AuthRepositoryImpl implements AuthRepository {
     return FirebaseAuth.instance.currentUser?.uid;
   }
 
-  /*
-  @returns the uid of the logged in user, or null if login failed
-  */
   @override
   Future<String?> login(String email, String password) async {
     try {
-
       logger.d('Attempting to log in user with email: $email');
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
@@ -27,7 +21,6 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       final User? firebaseUser = credential.user;
-
       if (firebaseUser == null) {
         logger.e('Login failed: No user found in credential.');
         return null;
@@ -36,10 +29,8 @@ class AuthRepositoryImpl implements AuthRepository {
       logger.d('User logged in with UID: ${firebaseUser.uid}');
       return firebaseUser.uid;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-        logger.e('Login failed: Invalid email or password.');
-      }
-      return null;
+      logger.e('Login failed: ${e.message}');
+      rethrow;
     }
   }
 
@@ -50,41 +41,46 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AppUser?> register(
-    String email,
-    String password,
-  ) async {
+  Future<AppUser?> register({
+    required String email,
+    required String password,
+    required String displayName,
+    required DateTime dateOfBirth,
+    required Gender gender,
+    required double weight,
+    required int height,
+  }) async {
     try {
       logger.d('Attempting to register user with email: $email');
       final credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
 
       final User? firebaseUser = credential.user;
-
       if (firebaseUser == null) {
         logger.e('User creation failed');
         return null;
       }
 
+      await firebaseUser.updateDisplayName(displayName);
       logger.d('User created with UID: ${firebaseUser.uid}');
+
       return AppUser(
         uid: firebaseUser.uid,
-        displayName: firebaseUser.displayName ?? 'User',
-        email: firebaseUser.email ?? email,
+        displayName: displayName,
+        email: email,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
+        height: height,
+        weight: weight,
         createdAt: DateTime.now(),
         goals: null,
       );
-
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        logger.e('Registration failed: The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        logger.e('Registration failed: The account already exists for that email.');
-      }
+      logger.e('Registration failed: ${e.message}');
+      rethrow;
     } catch (e) {
-      logger.e(e);
+      logger.e('Registration error: $e');
+      rethrow;
     }
-
-    return null;
   }
 }

@@ -9,6 +9,10 @@ class AppUserModel {
       uid: doc.id,
       displayName: map['displayName'] as String,
       email: map['email'] as String,
+      gender: Gender.values.byName(map['gender'] as String? ?? 'other'),
+      dateOfBirth: (map['dateOfBirth'] as Timestamp).toDate(),
+      height: (map['height'] as num?)!.toInt(),
+      weight: (map['weight'] as num?)!.toDouble(),
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       goals: NutritionGoals(
         calories: (goals['calories'] as num?)?.toDouble() ?? 2000,
@@ -25,6 +29,10 @@ class AppUserModel {
       'displayName': u.displayName,
       'email': u.email,
       'createdAt': FieldValue.serverTimestamp(),
+      'gender': u.gender.name,
+      'dateOfBirth': Timestamp.fromDate(u.dateOfBirth),
+      'height': u.height,
+      'weight': u.weight,
       'goals': {
         'calories': u.goals?.calories,
         'protein': u.goals?.protein,

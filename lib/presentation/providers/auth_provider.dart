@@ -3,6 +3,7 @@ import 'package:projeto/core/utils/logger.dart';
 import 'package:projeto/data/repositories/auth_repository_impl.dart';
 import 'package:projeto/data/repositories/user_repository_impl.dart';
 import 'package:projeto/domain/entities/app_user.dart';
+import 'package:projeto/presentation/providers/onboarding_provider.dart';
 
 
 class AuthNotifier extends AsyncNotifier<AppUser?> {
@@ -53,21 +54,38 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     state = const AsyncValue.data(null);
   }
 
-
-  Future<void> register(String email, String password) async {
-    logger.d('AuthNotifier: register attempt for $email');
+  Future<void> register(OnboardingState onboarding) async {
+    logger.d('AuthNotifier: register attempt for ${onboarding.email}');
     state = const AsyncValue.loading();
     try {
-      final user = await authRepository.register(email, password);
+      final user = await authRepository.register(
+        email: onboarding.email,
+        password: onboarding.password,
+        displayName: onboarding.name,
+        dateOfBirth: onboarding.dateOfBirth ?? DateTime(2000),
+        gender: onboarding.gender,
+        weight: onboarding.weight,
+        height: onboarding.height,
+      );
       if (user == null) {
         logger.w('AuthNotifier: register returned null user');
         state = const AsyncValue.data(null);
         return;
       }
-      // TODO: receive user info and goals from onboarding
-      await userRepository.saveUser(user);
+      final userWithGoals = AppUser(
+        uid: user.uid,
+        displayName: user.displayName,
+        email: user.email,
+        gender: user.gender,
+        dateOfBirth: user.dateOfBirth,
+        height: user.height,
+        weight: user.weight,
+        createdAt: user.createdAt,
+        goals: onboarding.calculatedGoals,
+      );
+      await userRepository.saveUser(userWithGoals);
       logger.d('AuthNotifier: register success, user saved: ${user.uid}');
-      state = AsyncValue.data(user);
+      state = AsyncValue.data(userWithGoals);
     } catch (e, st) {
       logger.e('AuthNotifier: register error', error: e, stackTrace: st);
       state = AsyncValue.error(e, st);
