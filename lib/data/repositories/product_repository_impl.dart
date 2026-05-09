@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projeto/core/database/firestore_paths.dart';
 import 'package:projeto/core/utils/logger.dart';
-import 'package:projeto/data/datasiources/open_food_facts_datasource.dart';
+import 'package:projeto/data/datasources/open_food_facts_datasource.dart';
 import 'package:projeto/data/models/product_model.dart';
 import 'package:projeto/data/models/saved_product_model.dart';
 import 'package:projeto/domain/entities/product.dart';

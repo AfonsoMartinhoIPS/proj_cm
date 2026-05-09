@@ -9,8 +9,8 @@ class OnboardingState {
   final Gender gender;
   final double weight;
   final int height;
-  final String goal; // 'lose', 'maintain', 'gain'
-  final NutritionGoals? calculatedGoals;
+  final Objective? objective;
+  final NutritionGoals? nutritionGoals;
 
   const OnboardingState({
     this.name = '',
@@ -20,8 +20,8 @@ class OnboardingState {
     this.gender = Gender.other,
     this.weight = 70,
     this.height = 170,
-    this.goal = 'maintain',
-    this.calculatedGoals,
+    this.objective = Objective.maintainWeight,
+    this.nutritionGoals,
   });
 
   OnboardingState copyWith({
@@ -32,7 +32,7 @@ class OnboardingState {
     Gender? gender,
     double? weight,
     int? height,
-    String? goal,
+    Objective? objective,
     NutritionGoals? calculatedGoals,
   }) {
     return OnboardingState(
@@ -43,8 +43,8 @@ class OnboardingState {
       gender: gender ?? this.gender,
       weight: weight ?? this.weight,
       height: height ?? this.height,
-      goal: goal ?? this.goal,
-      calculatedGoals: calculatedGoals ?? this.calculatedGoals,
+      objective: objective ?? this.objective,
+      nutritionGoals: calculatedGoals ?? this.nutritionGoals,
     );
   }
 
@@ -84,8 +84,8 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     );
   }
 
-  void setObjective(String goal) {
-    state = state.copyWith(goal: goal);
+  void setObjective(Objective? objective) {
+    state = state.copyWith(objective: objective);
   }
 
   void calculateAndSetGoals() {
@@ -96,10 +96,10 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
 
     final tdee = bmr * 1.55; // moderate activity
 
-    final calories = switch (state.goal) {
-      'lose' => tdee - 500,
-      'gain' => tdee + 300,
-      _      => tdee,
+    final calories = switch (state.objective) {
+      Objective.loseWeight => tdee - 500,
+      Objective.gainWeight => tdee + 300,
+      _                    => tdee,
     };
 
     final goals = NutritionGoals(
@@ -112,6 +112,25 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
 
     state = state.copyWith(calculatedGoals: goals);
   }
+
+  void setGoals({
+    required double calories,
+    required double protein,
+    required double carbs,
+    required double fat,
+    required double water,
+  }) {
+    state = state.copyWith(
+      calculatedGoals: NutritionGoals(
+        calories: calories,
+        protein: protein,
+        carbs: carbs,
+        fat: fat,
+        water: water,
+      ),
+    );
+  }
+
 }
 
 final onboardingProvider = NotifierProvider<OnboardingNotifier, OnboardingState>(

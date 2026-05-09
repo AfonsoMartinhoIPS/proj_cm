@@ -1,5 +1,17 @@
 enum Gender { male, female, other }
 
+enum Objective {
+
+  loseWeight(label: 'Perder peso'),
+  maintainWeight(label: 'Manter peso'),
+  gainWeight(label: 'Ganhar peso');
+
+
+  final String label;
+  const Objective({required this.label});
+
+}
+
 class NutritionGoals {
   final double calories;
   final double protein;
@@ -25,7 +37,8 @@ class AppUser {
   final double weight;
   final String email;
   final DateTime createdAt;
-  final NutritionGoals? goals;
+  final NutritionGoals? nutritionGoals;
+  final Objective? objective;
 
   const AppUser({
     required this.uid,
@@ -36,6 +49,7 @@ class AppUser {
     required this.weight,
     required this.email,
     required this.createdAt,
-    required this.goals,
+    required this.nutritionGoals,
+    required this.objective,
   });
 }

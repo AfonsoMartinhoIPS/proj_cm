@@ -19,7 +19,26 @@ void main() {
     // Sign up a new user
     final email = 'test${DateTime.now().millisecondsSinceEpoch}@example.com';
     final password = 'password';
-    AppUser? user = await authRepository.register(email, password);
+
+    Map<String, dynamic> newUser = {
+      'email': email,
+      'password': password,
+      'displayName': 'Test User',
+      'dateOfBirth': DateTime(1990, 1, 1),
+      'gender': Gender.male,
+      'weight': 70,
+      'height': 180,
+    };
+
+    AppUser? user = await authRepository.register(
+      email: newUser['email'],
+      password: newUser['password'],
+      displayName: newUser['displayName'],
+      dateOfBirth: newUser['dateOfBirth'],
+      gender: Gender.male,
+      weight: 70,
+      height: 180,
+    );
     logger.d("User signed up: ${user?.email}");
 
     expect(user, isNotNull);

@@ -2,25 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto/core/theme/app_colors.dart';
+import 'package:projeto/core/utils/logger.dart';
+import 'package:projeto/domain/entities/app_user.dart';
 import 'package:projeto/presentation/providers/auth_provider.dart';
 
-class SplashScreen extends ConsumerWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  bool _navigated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // ensure provider build kicks off and we react after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkState());
+  }
+
+  void _checkState() {
+    final state = ref.read(authProvider);
+    state.whenOrNull(
+      data: (user) => _navigate(user),
+      error: (_, _) => _navigate(null),
+    );
+  }
+
+  Future<void> _navigate(AppUser? user) async {
+    if (_navigated) return;
+    _navigated = true;
+    await Future.delayed(const Duration(seconds: 1)); // minimum splash time
+    if (!mounted) return;
+    if (user != null) {
+      logger.d('SplashScreen: user session found, navigating to home');
+      //context.go('/');
+    } else {
+      logger.d('SplashScreen: no user session, navigating to welcome');
+      context.go('/welcome');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // catches transitions if build() was still loading when splash mounted
     ref.listen(authProvider, (_, next) {
-      next.when(
-        data: (user) async {
-          await Future.delayed(const Duration(seconds: 1)); // minimum splash time
-          if (user != null) {
-            context.go('/');
-          } else {
-            context.go('/welcome');
-          }
-        },
-        error: (_, _) => context.go('/welcome'),
-        loading: () {},
+      next.whenOrNull(
+        data: (user) => _navigate(user),
+        error: (_, _) => _navigate(null),
       );
     });
 

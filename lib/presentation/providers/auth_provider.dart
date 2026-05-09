@@ -3,6 +3,7 @@ import 'package:projeto/core/utils/logger.dart';
 import 'package:projeto/data/repositories/auth_repository_impl.dart';
 import 'package:projeto/data/repositories/user_repository_impl.dart';
 import 'package:projeto/domain/entities/app_user.dart';
+import 'package:projeto/main.dart';
 import 'package:projeto/presentation/providers/onboarding_provider.dart';
 
 
@@ -10,16 +11,49 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
   AuthRepositoryImpl authRepository = AuthRepositoryImpl();
   UserRepositoryImpl userRepository = UserRepositoryImpl();
 
+
+  Future<AppUser?> _getUser(String uid) async {
+    try {
+
+      logger.d("AuthNotifier: fetching user for uid: $uid");
+      final user = await userRepository.getUser(uid);
+      if (user == null) {
+        logger.w('AuthNotifier: no Firestore doc for uid: $uid');
+        return null;
+      }
+      logger.d('AuthNotifier: user loaded successfully: $uid');
+      return user;
+    } catch (e, st) {
+      logger.e('AuthNotifier: error fetching user', error: e, stackTrace: st);
+      throw e;
+    }
+  }
+
   @override
   Future<AppUser?> build() async {
     logger.d('AuthNotifier: checking existing session');
-    final uid = authRepository.getCurrentUser();
-    if (uid == null) {
-      logger.d('AuthNotifier: no active session');
+    state = const AsyncValue.loading();
+    try {
+      final uid = await authRepository.getCurrentUser();
+      if (uid == null) {
+        logger.d('AuthNotifier: no existing session found');
+        state = const AsyncValue.data(null);
+        return null;
+      }
+      
+      logger.d('AuthNotifier: existing session found, loading user: $uid');
+      final user = await _getUser(uid);
+      state = AsyncValue.data(user);
+      return user;
+      
+    } catch (e, st) {
+      logger.e('AuthNotifier: error during build', error: e, stackTrace: st);
+      state = AsyncValue.error(e, st);
       return null;
     }
-    logger.d('AuthNotifier: session found, loading user $uid');
-    return userRepository.getUser(uid);
+
+    
+    
   }
 
   Future<void> login(String email, String password) async {
@@ -54,10 +88,13 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     state = const AsyncValue.data(null);
   }
 
+
   Future<void> register(OnboardingState onboarding) async {
     logger.d('AuthNotifier: register attempt for ${onboarding.email}');
     state = const AsyncValue.loading();
     try {
+
+      // Register user in FirebaseAuth
       final user = await authRepository.register(
         email: onboarding.email,
         password: onboarding.password,
@@ -72,6 +109,8 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
         state = const AsyncValue.data(null);
         return;
       }
+
+      // Register Firestore user
       final userWithGoals = AppUser(
         uid: user.uid,
         displayName: user.displayName,
@@ -81,7 +120,8 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
         height: user.height,
         weight: user.weight,
         createdAt: user.createdAt,
-        goals: onboarding.calculatedGoals,
+        nutritionGoals: onboarding.nutritionGoals,
+        objective: onboarding.objective,
       );
       await userRepository.saveUser(userWithGoals);
       logger.d('AuthNotifier: register success, user saved: ${user.uid}');

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto/core/theme/app_colors.dart';
 import 'package:projeto/presentation/providers/auth_provider.dart';
+import 'package:projeto/presentation/providers/onboarding_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -12,55 +13,59 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+
   @override
-  Widget build(BuildContext context) {
-    
-    final authState = ref.watch(authProvider);
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
-    TextEditingController nameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-    TextEditingController confirmPasswordController = TextEditingController();
-    
-    submit(){
-      final name = nameController.text.trim();
-      final email = emailController.text.trim();
-      final password = passwordController.text.trim();
-      final confirmPassword = confirmPasswordController.text.trim();
+  void submit() {
+    final name = nameController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
 
-      if(name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty){
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Preenche todos os campos')),
-        );
-        return;
-      }
-
-      if(password != confirmPassword){
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('As passwords não coincidem')),
-        );
-        return;
-      }
-
-      // TODO: Missing onboarding data
-      ref.read(authProvider.notifier).register(email, password);
+    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preenche todos os campos')),
+      );
+      return;
     }
 
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('As passwords não coincidem')),
+      );
+      return;
+    }
+
+    ref.read(onboardingProvider.notifier).setCredentials(email: email, password: password);
+    final onboarding = ref.read(onboardingProvider).copyWith(name: name);
+    ref.read(authProvider.notifier).register(onboarding);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
 
     ref.listen(authProvider, (_, next) {
       next.whenOrNull(
         data: (user) {
-          if (user != null) context.go('/'); //TODO: Should go to login?
+          if (user != null) context.go('/');
         },
         error: (e, _) => ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString())),
         ),
       );
     });
-    
-
-
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -112,17 +117,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ],
               ),
               const SizedBox(height: 40),
-              
-              if (authState.isLoading)
-                const Center(child: CircularProgressIndicator(color: AppColors.primary))
-              else
-                ElevatedButton(
-                  onPressed: () => submit(),
-                  child: authState.isLoading
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : Text('Registar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(height: 25),
+              ElevatedButton(
+                onPressed: authState.isLoading ? null : submit,
+                child: authState.isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Registar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+              const SizedBox(height: 25),
             ],
           ),
         ),

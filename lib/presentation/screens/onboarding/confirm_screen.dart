@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto/core/theme/app_colors.dart';
+import 'package:projeto/domain/entities/app_user.dart';
+import 'package:projeto/presentation/providers/onboarding_provider.dart';
 
-class ConfirmScreen extends StatelessWidget {
+class ConfirmScreen extends ConsumerWidget {
   const ConfirmScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(onboardingProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -36,13 +41,19 @@ class ConfirmScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _dataRow('Nome', 'Ana Ferreira'),
-                    _dataRow('Idade', '26 anos'),
-                    _dataRow('Sexo', 'Feminino'),
-                    _dataRow('Altura', '168 cm'),
-                    _dataRow('Objectivo', 'Perder Peso'),
-                    _dataRow('Calorias', '1580 kcal'),
-                    _dataRow('Atividade', 'Sedentário/a'),
+                    _dataRow('Nome', s.name.isEmpty ? '—' : s.name),
+                    _dataRow('Idade', '${s.age} anos'),
+                    _dataRow('Sexo', _genderLabel(s.gender)),
+                    _dataRow('Altura', '${s.height} cm'),
+                    _dataRow('Peso', '${s.weight.toStringAsFixed(0)} kg'),
+                    _dataRow('Objectivo', s.objective?.label ?? '—'),
+                    if (s.nutritionGoals != null) ...[
+                      _dataRow('Calorias', '${s.nutritionGoals!.calories.toStringAsFixed(0)} kcal'),
+                      _dataRow('Proteína', '${s.nutritionGoals!.protein.toStringAsFixed(0)} g'),
+                      _dataRow('Hidratos', '${s.nutritionGoals!.carbs.toStringAsFixed(0)} g'),
+                      _dataRow('Gordura', '${s.nutritionGoals!.fat.toStringAsFixed(0)} g'),
+                      _dataRow('Água', '${s.nutritionGoals!.water.toStringAsFixed(0)} ml'),
+                    ],
                   ],
                 ),
               ),
@@ -51,11 +62,6 @@ class ConfirmScreen extends StatelessWidget {
                 onPressed: () => context.push('/register'),
                 child: const Text('Criar Conta', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: () => context.push('/onboarding/personal-data'),
-                child: const Text('Editar dados', style: TextStyle(fontSize: 14)),
-              ),
               const SizedBox(height: 20),
             ],
           ),
@@ -63,6 +69,12 @@ class ConfirmScreen extends StatelessWidget {
       ),
     );
   }
+
+  String _genderLabel(Gender g) => switch (g) {
+    Gender.female => 'Feminino',
+    Gender.male   => 'Masculino',
+    Gender.other  => 'Outro',
+  };
 
   static Widget _dataRow(String label, String value) {
     return Padding(

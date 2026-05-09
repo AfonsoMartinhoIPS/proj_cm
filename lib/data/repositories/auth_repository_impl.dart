@@ -73,7 +73,8 @@ class AuthRepositoryImpl implements AuthRepository {
         height: height,
         weight: weight,
         createdAt: DateTime.now(),
-        goals: null,
+        nutritionGoals: null,
+        objective: null,
       );
     } on FirebaseAuthException catch (e) {
       logger.e('Registration failed: ${e.message}');

@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto/core/theme/app_colors.dart';
+import 'package:projeto/domain/entities/app_user.dart';
+import 'package:projeto/presentation/providers/onboarding_provider.dart';
 
-class ObjectivesScreen extends StatefulWidget {
+class ObjectivesScreen extends ConsumerStatefulWidget {
   const ObjectivesScreen({super.key});
 
   @override
-  State<ObjectivesScreen> createState() => _ObjectivesScreenState();
+  ConsumerState<ObjectivesScreen> createState() => _ObjectivesScreenState();
 }
 
-class _ObjectivesScreenState extends State<ObjectivesScreen> {
-  String _objetivoPeso = 'Perder';
+class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
+  
+  Objective _selectedObjective = Objective.loseWeight;
 
+  void _selectObjective(Objective objective) {
+    setState(() {
+      _selectedObjective = objective;
+    });
+  }
+
+  void submit(){
+    ref.read(onboardingProvider.notifier).setObjective(_selectedObjective);
+    context.push('/onboarding/nutrition-goals');
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,12 +57,13 @@ class _ObjectivesScreenState extends State<ObjectivesScreen> {
               const Text('OUTROS',
                   style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 15),
+              // TODO: make these selectable and save the selections
               _buildOptionTile('Melhorar desempenho desportivo', isSelected: true),
               _buildOptionTile('Criar hábitos mais saudáveis', isSelected: false),
               _buildOptionTile('Prevenir doenças relacionadas ao estilo de vida', isSelected: false),
               const SizedBox(height: 40),
               ElevatedButton(
-                onPressed: () => context.push('/onboarding/calculation'),
+                onPressed: () => submit(),
                 child: const Text('Próximo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 20),
@@ -62,18 +78,18 @@ class _ObjectivesScreenState extends State<ObjectivesScreen> {
     return Container(
       decoration: BoxDecoration(color: AppColors.surfaceDark, borderRadius: BorderRadius.circular(12)),
       child: Row(
-        children: ['Perder', 'Manter', 'Ganhar'].map((option) {
-          final selected = _objetivoPeso == option;
+        children: Objective.values.map((option) {
+          final selected = _selectedObjective == option;
           return Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _objetivoPeso = option),
+              onTap: () => _selectObjective(option),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selected ? AppColors.primary : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(option,
+                child: Text(option.label,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: selected ? AppColors.onBackground : AppColors.textMuted,
