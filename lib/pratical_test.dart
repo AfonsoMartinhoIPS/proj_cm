@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+//import 'package:projeto/core/theme/app_colors.dart';
 import 'package:projeto/core/widgets/nutri_text_field.dart';
 import 'package:projeto/core/widgets/nutri_button.dart';
 
@@ -38,10 +38,8 @@ class PraticalTestPage extends StatelessWidget {
             const NutriTextField(
               label: 'Email',
               hintText: 'introduza o seu email',
-              keyboardType: TextInputType.emailAddress,
             ),
             
-            const SizedBox(height: 20),
             
             const NutriTextField(
               label: 'Password',
@@ -62,7 +60,6 @@ class PraticalTestPage extends StatelessWidget {
             // Botão Primário (Elevated)
             NutriButton(
               text: 'LOGIN',
-              style: NutriButtonStyle.primary,
               onPressed: () => debugPrint('Botão Primary Clicado'),
             ),
             
@@ -71,7 +68,6 @@ class PraticalTestPage extends StatelessWidget {
             // Botão Outline
             NutriButton(
               text: 'CRIAR CONTA',
-              style: NutriButtonStyle.outline,
               onPressed: () => debugPrint('Botão Outline Clicado'),
             ),
 

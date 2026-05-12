@@ -1,48 +1,43 @@
 import 'package:flutter/material.dart';
-//import 'package:projeto/core/theme/app_colors.dart';
-
-enum NutriButtonStyle { primary, outline }
+import 'package:projeto/core/theme/app_colors.dart';
+import 'package:projeto/core/constants/app_sizes.dart';
 
 class NutriButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
-  final NutriButtonStyle style;
-  final Widget? icon;
 
   const NutriButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.style = NutriButtonStyle.primary,
-    this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (style == NutriButtonStyle.outline) {
-      return OutlinedButton(
-        onPressed: onPressed,
-        child: _buildChild(),
-      );
-    }
-
-    return ElevatedButton(
-      onPressed: onPressed,
-      child: _buildChild(),
+    return SizedBox(
+      width: double.infinity, 
+      height: 45, 
+      child: Material(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          child: Center(
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.onBackground,
+                fontSize: 12, 
+                fontFamily: 'DM Sans',
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.60,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
-  }
-
-  Widget _buildChild() {
-    if (icon != null) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          icon!,
-          const SizedBox(width: 8),
-          Text(text, style: const TextStyle(fontSize: 16)),
-        ],
-      );
-    }
-    return Text(text, style: const TextStyle(fontSize: 16));
   }
 }

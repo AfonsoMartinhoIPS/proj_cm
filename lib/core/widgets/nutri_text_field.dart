@@ -1,48 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:projeto/core/theme/app_colors.dart';
+import 'package:projeto/core/constants/app_sizes.dart';
+
 
 class NutriTextField extends StatelessWidget {
   final String label;
   final String hintText;
-  final bool obscureText;
-  final TextInputType keyboardType;
   final TextEditingController? controller;
-  final String? Function(String?)? validator;
+  final bool obscureText;
 
   const NutriTextField({
     super.key,
     required this.label,
-    required this.hintText,
-    this.obscureText = false,
-    this.keyboardType = TextInputType.text,
+    this.hintText = "Text_Input",
     this.controller,
-    this.validator,
+    this.obscureText = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label.toUpperCase(),
-          style: const TextStyle(
-            color: AppColors.border, 
-            fontSize: 10, 
-            fontWeight: FontWeight.bold, 
-            letterSpacing: 1,
+        Container(
+          height: 60,
+          decoration: ShapeDecoration(
+            color: AppColors.surfaceDark,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                width: 2.5,
+                color: AppColors.border,
+              ),
+              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          validator: validator,
-          style: const TextStyle(color: AppColors.onBackground),
-          decoration: InputDecoration(
-            hintText: hintText,
-            // other configurations
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: const TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 10,
+                    fontFamily: 'DM Sans',
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.60,
+                  ),
+                ),
+                Expanded(
+                  child: TextFormField(
+                    controller: controller,
+                    obscureText: obscureText,
+                    cursorColor: AppColors.onBackground,
+                    style: const TextStyle(
+                      color: AppColors.onBackground,
+                      fontSize: 15,
+                      fontFamily: 'DM Sans',
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                      hintText: hintText,
+                      hintStyle: const TextStyle(
+                        color: AppColors.textMuted, 
+                        fontSize: 15,
+                      ),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      isCollapsed: true,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],

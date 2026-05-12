@@ -56,7 +56,6 @@ void main() {
           home: Scaffold(
             body: NutriButton(
               text: 'Google',
-              icon: const Icon(Icons.add),
               onPressed: () {},
             ),
           ),
