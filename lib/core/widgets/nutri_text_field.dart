@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projeto/core/theme/app_colors.dart';
 import 'package:projeto/core/constants/app_sizes.dart';
 
-
-class NutriTextField extends StatelessWidget {
+class NutriTextField extends StatefulWidget {
   final String label;
   final String hintText;
   final TextEditingController? controller;
@@ -18,19 +17,48 @@ class NutriTextField extends StatelessWidget {
   });
 
   @override
+  State<NutriTextField> createState() => _NutriTextFieldState();
+}
+
+class _NutriTextFieldState extends State<NutriTextField> {
+  final FocusNode _focusNode = FocusNode();
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose(); 
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final Color highlightColor = AppColors.secondary;
+    final Color activeColor = _isFocused ? highlightColor : AppColors.border;
+    final Color labelColor = _isFocused ? highlightColor : AppColors.textMuted;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           height: 60,
           decoration: ShapeDecoration(
             color: AppColors.surfaceDark,
             shape: RoundedRectangleBorder(
-              side: const BorderSide(
+              side: BorderSide(
                 width: 2.5,
-                color: AppColors.border,
+                color: activeColor,
               ),
               borderRadius: BorderRadius.circular(AppSizes.radiusMd),
             ),
@@ -42,9 +70,9 @@ class NutriTextField extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  label.toUpperCase(),
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
+                  widget.label.toUpperCase(),
+                  style: TextStyle(
+                    color: labelColor, 
                     fontSize: 10,
                     fontFamily: 'DM Sans',
                     fontWeight: FontWeight.w600,
@@ -53,9 +81,10 @@ class NutriTextField extends StatelessWidget {
                 ),
                 Expanded(
                   child: TextFormField(
-                    controller: controller,
-                    obscureText: obscureText,
-                    cursorColor: AppColors.onBackground,
+                    controller: widget.controller,
+                    focusNode: _focusNode, 
+                    obscureText: widget.obscureText,
+                    cursorColor: highlightColor,
                     style: const TextStyle(
                       color: AppColors.onBackground,
                       fontSize: 15,
@@ -65,9 +94,9 @@ class NutriTextField extends StatelessWidget {
                     decoration: InputDecoration(
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
-                      hintText: hintText,
+                      hintText: widget.hintText,
                       hintStyle: const TextStyle(
-                        color: AppColors.textMuted, 
+                        color: AppColors.textMuted,
                         fontSize: 15,
                       ),
                       border: InputBorder.none,

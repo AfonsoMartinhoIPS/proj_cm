@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto/core/theme/app_colors.dart';
 import 'package:projeto/core/widgets/nutri_text_field.dart';
+import 'package:projeto/core/widgets/nutri_button.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -63,10 +64,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () => context.go('/'),
-                child: const Text('Entrar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
+              NutriButton(text: 'Login', onPressed: () => context.go('/'),),
               const SizedBox(height: 32),
               Row(
                 children: [
@@ -105,9 +103,4 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
-
-  static Widget _label(String text) => Text(
-    text.toUpperCase(),
-    style: const TextStyle(color: AppColors.border, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-  );
 }
