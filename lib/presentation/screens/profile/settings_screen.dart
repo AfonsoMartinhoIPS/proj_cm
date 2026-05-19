@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/core/widgets/nutri_back_button.dart'; 
-import 'package:projeto/core/widgets/nutri_toggle.dart'; 
 
 import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_back_button.dart'; 
+import 'package:nutri_scan/presentation/widgets/nutri_toggle.dart'; 
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

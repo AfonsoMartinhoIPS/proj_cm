@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:nutri_scan/core/router/app_router.dart';
 
+//TODO: Rever.
 class BottomNavbar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;

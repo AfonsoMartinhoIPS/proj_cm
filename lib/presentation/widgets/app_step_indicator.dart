@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:nutri_scan/core/theme/app_colors.dart';
 
+//TODO: Rever.
 class AppStepIndicator extends StatelessWidget {
   final String title;
   final bool isDone;

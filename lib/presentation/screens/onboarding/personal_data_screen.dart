@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/core/widgets/nutri_back_button.dart';
 
 import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_back_button.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
 
 class PersonalDataScreen extends StatelessWidget {
   const PersonalDataScreen({super.key});
@@ -13,7 +13,7 @@ class PersonalDataScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: Center( child:  NutriBackButton(onPressed: () => context.pop())),
+        leading: Center(child: NutriBackButton(onPressed: () => context.pop())),
         title: _stepIndicator('1 / 4'),
         centerTitle: true,
       ),
@@ -24,27 +24,43 @@ class PersonalDataScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const Text('Olá! Vamos\nconhecer-te',
-                  style: TextStyle(color: AppColors.onBackground, fontSize: 28, fontWeight: FontWeight.bold)),
+              const Text(
+                'Olá! Vamos\nconhecer-te',
+                style: TextStyle(color: AppColors.onBackground, fontSize: 28, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10),
-              const Text('Precisamos de alguns dados para personalizar a tua experiência.',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+              const Text(
+                'Precisamos de alguns dados para personalizar a tua experiência.',
+                style: TextStyle(color: AppColors.textMuted, fontSize: 14),
+              ),
               const SizedBox(height: 30),
-              _buildInputField(label: 'Nome completo', hint: 'Ana Ferreira'),
+              const NutriTextField(
+                label: 'Nome completo', 
+                hint: 'Ana Ferreira',
+                icon: Icons.person_outline,
+              ),
               const SizedBox(height: 20),
               Row(
-                children: [
-                  Expanded(child: _buildInputField(label: 'Idade', hint: '26')),
-                  const SizedBox(width: 15),
-                  Expanded(child: _buildInputField(label: 'Sexo', hint: 'Feminino')),
+                children: const [
+                  Expanded(
+                    child: NutriTextField(label: 'Idade', hint: '26'),
+                  ),
+                  SizedBox(width: 15),
+                  Expanded(
+                    child: NutriTextField(label: 'Sexo', hint: 'Feminino'),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
               Row(
-                children: [
-                  Expanded(child: _buildInputField(label: 'Peso (kg)', hint: '62')),
-                  const SizedBox(width: 15),
-                  Expanded(child: _buildInputField(label: 'Altura (cm)', hint: '168')),
+                children: const [
+                  Expanded(
+                    child: NutriTextField(label: 'Peso (kg)', hint: '62'),
+                  ),
+                  SizedBox(width: 15),
+                  Expanded(
+                    child: NutriTextField(label: 'Altura (cm)', hint: '168'),
+                  ),
                 ],
               ),
               const SizedBox(height: 40),
@@ -60,41 +76,9 @@ class PersonalDataScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField({required String label, required String hint, bool isSelected = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceDark,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isSelected ? AppColors.secondary : AppColors.border,
-          width: isSelected ? 2 : 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label.toUpperCase(),
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold)),
-          TextField(
-            style: const TextStyle(color: AppColors.onBackground, fontSize: 16),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(color: AppColors.border),
-              border: InputBorder.none,
-              filled: false,
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 5),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
-    child: Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
-  );
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
+        child: Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
+      );
 }

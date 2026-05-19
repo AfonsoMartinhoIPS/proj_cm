@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/core/widgets/nutri_text_field.dart';
-import 'package:projeto/core/widgets/nutri_button.dart';
 import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_button.dart';
 
 
 class LoginScreen extends StatelessWidget {
@@ -56,9 +55,9 @@ class LoginScreen extends StatelessWidget {
               const Text('Inicia sessão para continuar.', textAlign: TextAlign.center,
                   style: TextStyle(color: AppColors.border, fontSize: 14)),
               const SizedBox(height: 40),
-              NutriTextField(label: 'Email', hintText: 'teste@mail.com',),
+              NutriTextField(label: 'Email', hint: 'teste@mail.com',),
               const SizedBox(height: 40), // adicionar padding ao NutriTextField mais tarde
-              NutriTextField(label: 'PassWord', hintText: '*****', obscureText: true,),
+              NutriTextField(label: 'PassWord', hint: '*****', obscureText: true,),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(

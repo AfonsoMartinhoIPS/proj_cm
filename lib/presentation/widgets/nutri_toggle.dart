@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
+//TODO: Rever
 class NutriToggle extends StatelessWidget {
   final String title;
   final String subtitle;

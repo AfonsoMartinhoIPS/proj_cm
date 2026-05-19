@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:projeto/core/widgets/nutri_text_field.dart';
-import 'package:projeto/core/widgets/nutri_button.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_button.dart';
+import 'package:nutri_scan/main.dart';
 
 void main() {
   group('Widgets Reutilizáveis - NutriScan', () {
@@ -13,7 +14,7 @@ void main() {
           home: Scaffold(
             body: NutriTextField(
               label: 'Email',
-              hintText: 'teste@email.com',
+              hint: 'teste@email.com',
             ),
           ),
         ),
@@ -46,31 +47,29 @@ void main() {
       // Reconstrói o widget após a interação
       await tester.pump();
 
-import 'package:nutri_scan/main.dart';
-
-void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const App());
-
       // Verifica se a variável mudou para true
       expect(foiPressionado, isTrue);
     });
 
-    testWidgets('NutriButton deve exibir ícone quando fornecido', (WidgetTester tester) async {
+    testWidgets('NutriButton deve exibir texto secundário quando fornecido', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: NutriButton(
-              text: 'Google',
+              text: 'Já tenho conta',
+              secondaryText: ' Entrar',
               onPressed: () {},
             ),
           ),
         ),
       );
-
-      expect(find.byIcon(Icons.add), findsOneWidget);
-      expect(find.text('Google'), findsOneWidget);
+      expect(find.text('Já tenho conta'), findsOneWidget);
+      expect(find.text(' Entrar'), findsOneWidget);
     });
+  });
+
+  testWidgets('App smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(const App());
+    expect(find.byType(MaterialApp), findsOneWidget);
   });
 }
