@@ -10,7 +10,13 @@ class EstimateScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+                leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            }
+          },
+        ),
         title: _stepIndicator('3 / 4'),
         centerTitle: true,
       ),

@@ -39,7 +39,7 @@ class PersonalDataScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(child: _buildInputField(label: 'Peso (kg)', hint: '62', isSelected: true)),
+                  Expanded(child: _buildInputField(label: 'Peso (kg)', hint: '62')),
                   const SizedBox(width: 15),
                   Expanded(child: _buildInputField(label: 'Altura (cm)', hint: '168')),
                 ],

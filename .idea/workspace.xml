@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="68f31386-6f1e-42b1-8103-f492653ab553" name="Changes" comment="" />
+    <list default="true" id="68f31386-6f1e-42b1-8103-f492653ab553" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/lib/core/theme/app_colors.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/theme/app_colors.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/theme/app_theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/theme/app_theme.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/auth/register_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/auth/register_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/onboarding/calculation_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/onboarding/calculation_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/onboarding/estimate_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/onboarding/estimate_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/onboarding/objectives_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/onboarding/objectives_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/onboarding/personal_data_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/onboarding/personal_data_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/widget_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/test/widget_test.dart" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,9 +46,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="3DH0UzM2jrnBbpbWZyN5AFbnL1J" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1" />
@@ -61,7 +70,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "doc",
+    "git-widget-placeholder": "ComponentLibraryFrontEnd",
     "last_opened_file_path": "C:/Users/danie/OneDrive/Ambiente de Trabalho/uni/Licenciatura/2ºano/2ºsemestre/CM/3tentativa/proj_cm",
     "settings.editor.selected.configurable": "dart.settings",
     "show.migrate.to.gradle.popup": "false"

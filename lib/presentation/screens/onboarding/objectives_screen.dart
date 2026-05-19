@@ -11,13 +11,21 @@ class ObjectivesScreen extends StatefulWidget {
 
 class _ObjectivesScreenState extends State<ObjectivesScreen> {
   String _objetivoPeso = 'Perder';
+  final Set<String> _outrosObjetivos = {};
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            }
+          },
+        ),
         title: _stepIndicator('2 / 4'),
         centerTitle: true,
       ),
@@ -42,9 +50,9 @@ class _ObjectivesScreenState extends State<ObjectivesScreen> {
               const Text('OUTROS',
                   style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 15),
-              _buildOptionTile('Melhorar desempenho desportivo', isSelected: true),
-              _buildOptionTile('Criar hábitos mais saudáveis', isSelected: false),
-              _buildOptionTile('Prevenir doenças relacionadas ao estilo de vida', isSelected: false),
+              _buildOptionTile('Melhorar desempenho desportivo'),
+              _buildOptionTile('Criar hábitos mais saudáveis'),
+              _buildOptionTile('Prevenir doenças relacionadas ao estilo de vida'),
               const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () => context.push('/onboarding/calculation'),
@@ -88,29 +96,41 @@ class _ObjectivesScreenState extends State<ObjectivesScreen> {
     );
   }
 
-  Widget _buildOptionTile(String title, {required bool isSelected}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: isSelected ? AppColors.surface : AppColors.surfaceDark,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: isSelected ? AppColors.secondary : AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(title,
-                style: TextStyle(
-                  color: isSelected ? AppColors.secondary : AppColors.onBackground,
-                  fontSize: 14,
-                )),
-          ),
-          Icon(
-            isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: isSelected ? AppColors.primary : AppColors.border,
-          ),
-        ],
+  Widget _buildOptionTile(String title) {
+    final isSelected = _outrosObjetivos.contains(title);
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            _outrosObjetivos.remove(title);
+          } else {
+            _outrosObjetivos.add(title);
+          }
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.surface : AppColors.surfaceDark,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: isSelected ? AppColors.secondary : AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(title,
+                  style: TextStyle(
+                    color: isSelected ? AppColors.secondary : AppColors.onBackground,
+                    fontSize: 14,
+                  )),
+            ),
+            Icon(
+              isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: isSelected ? AppColors.primary : AppColors.border,
+            ),
+          ],
+        ),
       ),
     );
   }
