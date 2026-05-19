@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:projeto/core/config/app_config.dart';
-import 'package:projeto/domain/entities/nutriments.dart';
-import 'package:projeto/domain/entities/product.dart';
+import 'package:nutri_scan/core/config/app_config.dart';
+import 'package:nutri_scan/domain/entities/nutriments.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
 
 class OpenFoodFactsDatasource {
   static final String _baseUrl = AppConfig.openFoodFactsUseStaging
@@ -17,7 +17,7 @@ class OpenFoodFactsDatasource {
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
-    headers: {'User-Agent': 'NutriScan - Flutter'},
+    headers: {'User-Agent': 'nutri_scan - Flutter'},
   ));
 
   static OpenFoodFactsDatasource instance = OpenFoodFactsDatasource();

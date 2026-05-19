@@ -1,5 +1,5 @@
-import 'package:projeto/domain/entities/meal_entry.dart';
-import 'package:projeto/domain/entities/nutrition_log.dart';
+import 'package:nutri_scan/domain/entities/meal_entry.dart';
+import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 
 abstract class NutritionLogRepository {
   Future<NutritionLog?> getLog(String uid, String date);

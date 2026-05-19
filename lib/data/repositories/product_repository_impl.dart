@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:projeto/core/database/firestore_paths.dart';
-import 'package:projeto/core/utils/logger.dart';
-import 'package:projeto/data/datasiources/open_food_facts_datasource.dart';
-import 'package:projeto/data/models/product_model.dart';
-import 'package:projeto/data/models/saved_product_model.dart';
-import 'package:projeto/domain/entities/product.dart';
-import 'package:projeto/domain/entities/saved_product.dart';
-import 'package:projeto/domain/repositories/product_repository.dart';
+
+import 'package:nutri_scan/core/database/firestore_paths.dart';
+import 'package:nutri_scan/core/utils/logger.dart';
+import 'package:nutri_scan/data/datasiources/open_food_facts_datasource.dart';
+import 'package:nutri_scan/data/models/product_model.dart';
+import 'package:nutri_scan/data/models/saved_product_model.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
+import 'package:nutri_scan/domain/entities/saved_product.dart';
+import 'package:nutri_scan/domain/repositories/product_repository.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
   final _db = FirebaseFirestore.instance;

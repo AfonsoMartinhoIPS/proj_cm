@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:projeto/core/database/firestore_paths.dart';
-import 'package:projeto/data/models/meal_entry_model.dart';
-import 'package:projeto/data/models/nutrition_log_model.dart';
-import 'package:projeto/domain/entities/meal_entry.dart';
-import 'package:projeto/domain/entities/nutrition_log.dart';
-import 'package:projeto/domain/repositories/nutrition_log_repository.dart';
+
+import 'package:nutri_scan/core/database/firestore_paths.dart';
+import 'package:nutri_scan/data/models/meal_entry_model.dart';
+import 'package:nutri_scan/data/models/nutrition_log_model.dart';
+import 'package:nutri_scan/domain/entities/meal_entry.dart';
+import 'package:nutri_scan/domain/entities/nutrition_log.dart';
+import 'package:nutri_scan/domain/repositories/nutrition_log_repository.dart';
 
 class NutritionLogRepositoryImpl implements NutritionLogRepository {
   final _db = FirebaseFirestore.instance;

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/router/app_router.dart';
-import 'package:projeto/presentation/widgets/bottom_navbar.dart';
+
+import 'package:nutri_scan/core/router/app_router.dart';
+import 'package:nutri_scan/presentation/widgets/bottom_navbar.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;

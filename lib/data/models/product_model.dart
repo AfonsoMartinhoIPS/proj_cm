@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:projeto/data/models/nutriments_model.dart';
-import 'package:projeto/domain/entities/product.dart';
+import 'package:nutri_scan/data/models/nutriments_model.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
 
 class ProductModel {
   static Product? fromMap(String barcode, Map<String, dynamic> map) {
