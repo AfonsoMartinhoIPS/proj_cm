@@ -109,13 +109,38 @@ class _ActionButtons extends ConsumerWidget {
   }
 }
 
-class _NotesSection extends StatelessWidget {
+class _NotesSection extends ConsumerWidget {
   const _NotesSection({required this.savedProduct});
 
   final SavedProduct savedProduct;
 
+  void _openAddSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _AddNoteSheet(
+        onSubmit: (text) {
+          final updated = [
+            ...savedProduct.notes,
+            SavedProductNote(text: text, createdAt: DateTime.now()),
+          ];
+          ref.read(savedProductsProvider.notifier).setNotes(savedProduct.barcode, updated);
+        },
+      ),
+    );
+  }
+
+  void _removeNote(WidgetRef ref, int index) {
+    final updated = [...savedProduct.notes]..removeAt(index);
+    ref.read(savedProductsProvider.notifier).setNotes(savedProduct.barcode, updated);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -140,19 +165,40 @@ class _NotesSection extends StatelessWidget {
             const Text('Ainda não adicionaste notas a este produto.',
                 style: TextStyle(color: AppColors.textMuted, fontSize: 13))
           else
-            ...savedProduct.notes.map((note) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(note.text,
-                          style: const TextStyle(color: AppColors.onBackground, fontSize: 13)),
-                      const SizedBox(height: 2),
-                      Text(_fmt(note.createdAt),
-                          style: const TextStyle(color: AppColors.textMuted, fontSize: 10)),
-                    ],
-                  ),
-                )),
+            ...List.generate(savedProduct.notes.length, (i) {
+              final note = savedProduct.notes[i];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(note.text,
+                              style: const TextStyle(color: AppColors.onBackground, fontSize: 13)),
+                          const SizedBox(height: 2),
+                          Text(_fmt(note.createdAt),
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 10)),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: AppColors.textMuted, size: 18),
+                      onPressed: () => _removeNote(ref, i),
+                      tooltip: 'Remover nota',
+                    ),
+                  ],
+                ),
+              );
+            }),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => _openAddSheet(context, ref),
+            icon: const Icon(Icons.add, size: 16),
+            label: const Text('Adicionar nota', style: TextStyle(fontSize: 13)),
+          ),
         ],
       ),
     );
@@ -160,6 +206,74 @@ class _NotesSection extends StatelessWidget {
 
   String _fmt(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+}
+
+/// Bottom sheet for composing a new note. Owns its TextEditingController.
+class _AddNoteSheet extends StatefulWidget {
+  const _AddNoteSheet({required this.onSubmit});
+
+  final void Function(String text) onSubmit;
+
+  @override
+  State<_AddNoteSheet> createState() => _AddNoteSheetState();
+}
+
+class _AddNoteSheetState extends State<_AddNoteSheet> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Escreve algo na nota')),
+      );
+      return;
+    }
+    Navigator.of(context).pop();
+    widget.onSubmit(text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + viewInsets),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('Nova nota',
+              style: TextStyle(color: AppColors.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            maxLines: 3,
+            textInputAction: TextInputAction.newline,
+            style: const TextStyle(color: AppColors.onBackground),
+            decoration: InputDecoration(
+              hintText: 'Ex. Continente 2.49€, bom para pós-treino',
+              hintStyle: const TextStyle(color: AppColors.border),
+              filled: true,
+              fillColor: AppColors.surfaceDark,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _submit,
+            child: const Text('Guardar', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _ProductHeader extends StatelessWidget {
