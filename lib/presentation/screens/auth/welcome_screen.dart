@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:nutri_scan/core/theme/app_colors.dart';
-import 'package:nutri_scan/presentation/widgets/nutri_button.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -37,7 +35,7 @@ class WelcomeScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   children: [
                     TextSpan(text: 'Bem-vindo ao\n', style: TextStyle(color: AppColors.onBackground)),
-                    TextSpan(text: 'nutri_scan', style: TextStyle(color: AppColors.secondary)),
+                    TextSpan(text: 'NutriScan', style: TextStyle(color: AppColors.secondary)),
                   ],
                 ),
               ),
@@ -64,7 +62,10 @@ class WelcomeScreen extends StatelessWidget {
                 child: const Text('Começar agora', style: TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 15),
-              NutriButton(text: 'Já tenho conta ·', onPressed: () => context.push('/login'), secondaryText: ' Entrar', darkTheme: true,),
+              OutlinedButton(
+                onPressed: () => context.push('/login'),
+                child: const Text('Já tenho conta · Entrar'),
+              ),
               const SizedBox(height: 20),
             ],
           ),

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:nutri_scan/core/database/firestore_paths.dart';
 import 'package:nutri_scan/data/models/meal_entry_model.dart';
 import 'package:nutri_scan/data/models/nutrition_log_model.dart';

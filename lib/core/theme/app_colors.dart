@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  AppColors._(); // Private constructor to prevent instantiation
+  AppColors._();
 
   // Backgrounds
-  static const background  = Color(0xFF344E41);
-  static const surface     = Color(0xFF3A5A40);
-  static const surfaceDark = Color(0xFF2C4035);
-  static const surfaceLight = Color(0xFF588157); // Added a lighter surface for potential use
+  static const background   = Color(0xFF344E41);
+  static const surface      = Color(0xFF3A5A40);
+  static const surfaceLight = Color(0xFF588157);
+  static const surfaceDark  = Color(0xFF2C4035);
 
   // Brand
   static const primary     = Color(0xFF588157);
+  static const onPrimary   = Color(0xFFFFFFFF);
   static const secondary   = Color(0xFFA3B18A);
-  static const onPrimary   = Color(0xFFFFFFFF); // Text color that contrasts well with primary
   static const border      = Color(0xFF4A6B54);
   static const error       = Color(0xFFE53935);
 

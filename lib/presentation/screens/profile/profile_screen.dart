@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authProvider).value;
+    
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -18,30 +23,39 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           children: [
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _buildUserHeader(),
-                  const SizedBox(height: 20),
-                  _buildGoalsSection(),
-                  const SizedBox(height: 30),
-                  _menuButton('Definições', onPressed: () => context.push('/settings')),
-                  const SizedBox(height: 15),
-                  _menuButton('Créditos', onPressed: () => context.push('/credits')),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
+            _UserHeader(user: user, onLogout: () => ref.read(authProvider.notifier).logout()),
+            const SizedBox(height: 20),
+            _GoalsSection(user: user),
+            const SizedBox(height: 30),
+            _menuButton('Definições', onPressed: () => context.push('/settings')),
+            const SizedBox(height: 15),
+            _menuButton('Créditos', onPressed: () => context.push('/credits')),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildUserHeader() {
+  Widget _menuButton(String label, {required VoidCallback onPressed}) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+    );
+  }
+}
+
+class _UserHeader extends StatelessWidget {
+  const _UserHeader({required this.user, required this.onLogout});
+
+  final AppUser? user;
+  final VoidCallback onLogout;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -61,16 +75,16 @@ class ProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Ana Ferreira',
-                    style: TextStyle(color: AppColors.onBackground, fontSize: 18, fontWeight: FontWeight.bold)),
-                const Text('ana@email.com', style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
+                Text(user?.displayName ?? 'Sem nome',
+                    style: const TextStyle(color: AppColors.onBackground, fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(user?.email ?? '—', style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    _tag('Perder Peso'),
-                    const SizedBox(width: 8),
-                    _tag('Editar Perfil', isOutlined: true),
-                  ],
+                if (user?.objective != null)
+                  _tag(user!.objective!.label),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: onLogout,
+                  child: const Text('Logout', style: TextStyle(fontSize: 12)),
                 ),
               ],
             ),
@@ -80,19 +94,26 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _tag(String text, {bool isOutlined = false}) {
+  Widget _tag(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isOutlined ? Colors.transparent : AppColors.primary,
-        border: isOutlined ? Border.all(color: AppColors.border) : null,
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(text, style: const TextStyle(color: AppColors.onBackground, fontSize: 10)),
     );
   }
+}
 
-  Widget _buildGoalsSection() {
+class _GoalsSection extends StatelessWidget {
+  const _GoalsSection({required this.user});
+
+  final AppUser? user;
+
+  @override
+  Widget build(BuildContext context) {
+    final goals = user?.nutritionGoals;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -109,9 +130,9 @@ class ProfileScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _goalItem('1 580', 'kcal'),
-              _goalItem('125g', 'proteína'),
-              _goalItem('62kg', 'peso atual'),
+              _goalItem(goals?.calories.toStringAsFixed(0) ?? '—', 'kcal'),
+              _goalItem('${goals?.protein.toStringAsFixed(0) ?? '—'}g', 'proteína'),
+              _goalItem('${user?.weight.toStringAsFixed(0) ?? '—'}kg', 'peso atual'),
             ],
           ),
         ],
@@ -126,13 +147,6 @@ class ProfileScreen extends StatelessWidget {
             style: const TextStyle(color: AppColors.secondary, fontSize: 18, fontWeight: FontWeight.bold)),
         Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
       ],
-    );
-  }
-
-  Widget _menuButton(String label, {required VoidCallback onPressed}) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
     );
   }
 }

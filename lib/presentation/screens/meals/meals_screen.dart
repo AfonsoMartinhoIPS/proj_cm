@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/domain/entities/nutrition_log.dart';
+import 'package:nutri_scan/domain/entities/saved_product.dart';
+import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
+import 'package:nutri_scan/presentation/providers/saved_products_provider.dart';
+import 'package:nutri_scan/presentation/screens/meals/utils/meal_utils.dart';
 
-class MealsScreen extends StatelessWidget {
+class MealsScreen extends ConsumerStatefulWidget {
   const MealsScreen({super.key});
 
   @override
+  ConsumerState<MealsScreen> createState() => _MealsScreenState();
+}
+
+class _MealsScreenState extends ConsumerState<MealsScreen> {
+
+  @override
   Widget build(BuildContext context) {
+
+    final List<NutritionLog> nutritionLogs = ref.watch(nutritionLogsProvider).value ?? [];
+    SavedProduct? savedProduct = ref.watch(savedProductsProvider).value?.firstOrNull;
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -18,43 +33,27 @@ class MealsScreen extends StatelessWidget {
               children: const [
                 Text('Refeições',
                     style: TextStyle(color: AppColors.onBackground, fontSize: 22, fontWeight: FontWeight.bold)),
-                Text('21 Abr', style: TextStyle(color: AppColors.secondary, fontSize: 14)),
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Text('Hoje · 1 124 kcal consumidas',
-                style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
-          ),
-          const SizedBox(height: 20),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
-                _buildMealCard(
-                  title: 'Pequeno-almoço',
-                  totalKcal: '342 kcal',
-                  items: const [
-                    {'name': 'Iogurte grego', 'kcal': '120 kcal'},
-                    {'name': 'Granola', 'kcal': '180 kcal'},
-                  ],
-                ),
-                _buildMealCard(
-                  title: 'Almoço',
-                  totalKcal: '480 kcal',
-                  items: const [
-                    {'name': 'Peito de frango', 'kcal': '220 kcal'},
-                  ],
-                ),
+                // Parse nutrition logs into meal cards
+                ...nutritionLogs.map((log) => _buildMealCard(
+                  title: log.date,
+                  totalKcal: '${log.totalCalories} kcal',
+                  items: log.entries.map((e) => {'name': e.productName, 'kcal': '${calculateCaloriesFromMealEntry(e)} kcal'}).toList(),
+                )),
                 const SizedBox(height: 10),
                 OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {context.push('/meals/add');},
                   child: const Text('+ Adicionar refeição'),
                 ),
-              ],
+              ]
             ),
-          ),
+            )
         ],
       ),
     );
