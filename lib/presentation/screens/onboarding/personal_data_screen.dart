@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:projeto/core/theme/app_colors.dart';
+import 'package:projeto/core/widgets/nutri_back_button.dart';
 
 import 'package:nutri_scan/core/theme/app_colors.dart';
 
@@ -11,7 +13,7 @@ class PersonalDataScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: Center( child:  NutriBackButton(onPressed: () => context.pop())),
         title: _stepIndicator('1 / 4'),
         centerTitle: true,
       ),

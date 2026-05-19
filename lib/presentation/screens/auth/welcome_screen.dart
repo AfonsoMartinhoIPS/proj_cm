@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:projeto/core/theme/app_colors.dart';
+import 'package:projeto/core/widgets/nutri_button.dart';
 
 import 'package:nutri_scan/core/theme/app_colors.dart';
 
@@ -63,10 +65,7 @@ class WelcomeScreen extends StatelessWidget {
                 child: const Text('Começar agora', style: TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 15),
-              OutlinedButton(
-                onPressed: () => context.push('/login'),
-                child: const Text('Já tenho conta · Entrar'),
-              ),
+              NutriButton(text: 'Já tenho conta ·', onPressed: () => context.push('/login'), secondaryText: ' Entrar', darkTheme: true,),
               const SizedBox(height: 20),
             ],
           ),
