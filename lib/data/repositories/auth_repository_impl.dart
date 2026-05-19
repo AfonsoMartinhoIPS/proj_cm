@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:projeto/core/utils/logger.dart';
-import 'package:projeto/domain/entities/app_user.dart';
-import 'package:projeto/domain/repositories/auth_repository.dart';
+import 'package:nutri_scan/core/utils/logger.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
 

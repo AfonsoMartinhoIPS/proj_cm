@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/domain/entities/app_user.dart';
-import 'package:projeto/domain/entities/meal_entry.dart';
-import 'package:projeto/domain/entities/nutrition_log.dart';
-import 'package:projeto/presentation/providers/auth_provider.dart';
-import 'package:projeto/presentation/providers/nutrition_log_provider.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/domain/entities/meal_entry.dart';
+import 'package:nutri_scan/domain/entities/nutrition_log.dart';
+import 'package:nutri_scan/presentation/providers/auth_provider.dart';
+import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 
 // Localization tables. Dart's DateTime returns weekday/month as int;
 // we map manually to avoid pulling in `intl` package for one screen.

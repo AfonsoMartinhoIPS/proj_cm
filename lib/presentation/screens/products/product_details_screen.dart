@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/data/repositories/product_repository_impl.dart';
-import 'package:projeto/domain/entities/product.dart';
-import 'package:projeto/domain/entities/saved_product.dart';
-import 'package:projeto/presentation/providers/saved_products_provider.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/data/repositories/product_repository_impl.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
+import 'package:nutri_scan/domain/entities/saved_product.dart';
+import 'package:nutri_scan/presentation/providers/saved_products_provider.dart';
 
 /// Fetches the full Product from `products/{barcode}` (or API fallback via repo).
 /// `.family` lets each barcode have its own cached entry.
@@ -251,19 +252,14 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
           const Text('Nova nota',
               style: TextStyle(color: AppColors.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-          TextField(
+          NutriTextField(
             controller: _controller,
+            label: 'Nota',
+            hint: 'Ex. Continente 2.49€, bom para pós-treino',
+            icon: Icons.note_alt_outlined,
             autofocus: true,
             maxLines: 3,
             textInputAction: TextInputAction.newline,
-            style: const TextStyle(color: AppColors.onBackground),
-            decoration: InputDecoration(
-              hintText: 'Ex. Continente 2.49€, bom para pós-treino',
-              hintStyle: const TextStyle(color: AppColors.border),
-              filled: true,
-              fillColor: AppColors.surfaceDark,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            ),
           ),
           const SizedBox(height: 16),
           ElevatedButton(

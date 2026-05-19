@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/presentation/providers/onboarding_provider.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
 class NutritionGoalsScreen extends ConsumerStatefulWidget {
   const NutritionGoalsScreen({super.key});
@@ -95,15 +96,15 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                 ),
                 child: Column(
                   children: [
-                    _textField(controller: caloriesController, label: 'Calorias (kcal)', hint: '1580'),
+                    NutriTextField(controller: caloriesController, label: 'Calorias (kcal)', hint: '1580', keyboardType: TextInputType.number),
                     const SizedBox(height: 12),
-                    _textField(controller: proteinController, label: 'Proteína (g)', hint: '150'),
+                    NutriTextField(controller: proteinController, label: 'Proteína (g)', hint: '150', keyboardType: TextInputType.number),
                     const SizedBox(height: 12),
-                    _textField(controller: carbsController, label: 'Hidratos (g)', hint: '210'),
+                    NutriTextField(controller: carbsController, label: 'Hidratos (g)', hint: '210', keyboardType: TextInputType.number),
                     const SizedBox(height: 12),
-                    _textField(controller: fatController, label: 'Gordura (g)', hint: '70'),
+                    NutriTextField(controller: fatController, label: 'Gordura (g)', hint: '70', keyboardType: TextInputType.number),
                     const SizedBox(height: 12),
-                    _textField(controller: waterController, label: 'Água (ml)', hint: '2500'),
+                    NutriTextField(controller: waterController, label: 'Água (ml)', hint: '2500', keyboardType: TextInputType.number),
                   ],
                 ),
               ),
@@ -116,37 +117,6 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _textField({required TextEditingController controller, required String label, required String hint}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label.toUpperCase(),
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold)),
-          TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            style: const TextStyle(color: AppColors.onBackground, fontSize: 16),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(color: AppColors.border),
-              border: InputBorder.none,
-              filled: false,
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 5),
-            ),
-          ),
-        ],
       ),
     );
   }

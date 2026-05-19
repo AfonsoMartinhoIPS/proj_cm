@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:projeto/core/config/app_config.dart';
-import 'package:projeto/domain/entities/nutriments.dart';
-import 'package:projeto/domain/entities/product.dart';
+import 'package:nutri_scan/core/config/app_config.dart';
+import 'package:nutri_scan/domain/entities/nutriments.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
 
 class OpenFoodFactsDatasource {
   static final String _baseUrl = AppConfig.openFoodFactsUseStaging

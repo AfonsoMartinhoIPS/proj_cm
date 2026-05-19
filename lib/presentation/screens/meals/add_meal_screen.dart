@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:projeto/domain/entities/meal_entry.dart';
-import 'package:projeto/domain/entities/product.dart';
+import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/domain/entities/meal_entry.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
 
 class AddMealScreen extends StatelessWidget {
   const AddMealScreen({super.key, this.initialProduct});
@@ -90,8 +91,9 @@ class _AddMealFormState extends ConsumerState<AddMealForm> {
     return Center(
       child: Column(
         children: [
-          TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Nome do produto')),
-          TextField(controller: servingGrams, decoration: const InputDecoration(labelText: 'Quantidade (g)'), keyboardType: TextInputType.number),
+          NutriTextField(controller: nameController, label: 'Nome do produto', hint: 'Ex. Iogurte natural'),
+          const SizedBox(height: 12),
+          NutriTextField(controller: servingGrams, label: 'Quantidade (g)', hint: '100', keyboardType: TextInputType.number),
           DropdownButton<MealType>(
             value: selectedMealType,
             items: MealType.values.map((meal) => DropdownMenuItem(value: meal, child: Text(meal.toString().split('.').last))).toList(),

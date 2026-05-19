@@ -1,5 +1,5 @@
-import 'package:projeto/domain/entities/product.dart';
-import 'package:projeto/domain/entities/saved_product.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
+import 'package:nutri_scan/domain/entities/saved_product.dart';
 
 abstract class ProductRepository {
   Future<Product?> getByBarcode(String barcode);

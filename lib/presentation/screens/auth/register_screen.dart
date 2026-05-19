@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/presentation/providers/auth_provider.dart';
-import 'package:projeto/presentation/providers/onboarding_provider.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/providers/auth_provider.dart';
+import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -88,13 +89,35 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               const Text('Regista-te para começar a monitorizar a tua nutrição.',
                   style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
               const SizedBox(height: 35),
-              _buildInputField(controller: nameController, label: 'Nome Completo', hint: 'Ana Ferreira', icon: Icons.person),
+              NutriTextField(
+                controller: nameController,
+                label: 'Nome Completo',
+                hint: 'Ana Ferreira',
+                icon: Icons.person,
+              ),
               const SizedBox(height: 20),
-              _buildInputField(controller: emailController, label: 'Email', hint: 'exemplo@email.com', icon: Icons.email_outlined),
+              NutriTextField(
+                controller: emailController,
+                label: 'Email',
+                hint: 'exemplo@email.com',
+                icon: Icons.email_outlined,
+              ),
               const SizedBox(height: 20),
-              _buildInputField(controller: passwordController, label: 'Password', hint: '••••••••', icon: Icons.lock_outline, isPassword: true),
+              NutriTextField(
+                controller: passwordController,
+                label: 'Password',
+                hint: '••••••••',
+                icon: Icons.lock_outline,
+                obscureText: true,
+              ),
               const SizedBox(height: 20),
-              _buildInputField(controller: confirmPasswordController, label: 'Confirmar Password', hint: '••••••••', icon: Icons.lock_reset_outlined, isPassword: true),
+              NutriTextField(
+                controller: confirmPasswordController,
+                label: 'Confirmar Password',
+                hint: '••••••••',
+                icon: Icons.lock_reset_outlined,
+                obscureText: true,
+              ),
               const SizedBox(height: 30),
               Row(
                 children: [
@@ -131,40 +154,4 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  Widget _buildInputField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    bool isPassword = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label.toUpperCase(),
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceDark,
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: TextField(
-            controller: controller,
-            obscureText: isPassword,
-            style: const TextStyle(color: AppColors.onBackground),
-            decoration: InputDecoration(
-              icon: Icon(icon, color: AppColors.primary, size: 20),
-              hintText: hint,
-              hintStyle: const TextStyle(color: AppColors.border, fontSize: 14),
-              border: InputBorder.none,
-              filled: false,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }

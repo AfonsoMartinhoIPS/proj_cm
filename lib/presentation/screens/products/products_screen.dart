@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/domain/entities/saved_product.dart';
-import 'package:projeto/presentation/providers/saved_products_provider.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/domain/entities/saved_product.dart';
+import 'package:nutri_scan/presentation/providers/saved_products_provider.dart';
 
 class ProductsScreen extends ConsumerStatefulWidget {
   const ProductsScreen({super.key});
@@ -57,15 +58,12 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-            child: TextField(
+            child: NutriTextField(
               controller: _searchController,
+              label: 'Pesquisar',
+              hint: 'Pesquisar produtos guardados',
+              icon: Icons.search,
               onChanged: (value) => setState(() => _query = value),
-              style: const TextStyle(color: AppColors.onBackground),
-              decoration: const InputDecoration(
-                hintText: 'Pesquisar produtos guardados',
-                prefixIcon: Icon(Icons.search, color: AppColors.textMuted),
-                contentPadding: EdgeInsets.symmetric(vertical: 0),
-              ),
             ),
           ),
           Expanded(

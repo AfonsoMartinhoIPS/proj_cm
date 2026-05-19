@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/presentation/providers/auth_provider.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -95,22 +96,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const Text('Inicia sessão para continuar.', textAlign: TextAlign.center,
                   style: TextStyle(color: AppColors.border, fontSize: 14)),
               const SizedBox(height: 40),
-              _label('Email'),
-              const SizedBox(height: 8),
-              TextField(
+              NutriTextField(
+                label: 'Email',
+                hint: 'ana@email.com',
+                icon: Icons.email_outlined,
                 controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(color: AppColors.onBackground),
-                decoration: const InputDecoration(hintText: 'ana@email.com'),
               ),
               const SizedBox(height: 20),
-              _label('Password'),
-              const SizedBox(height: 8),
-              TextField(
-                controller: passwordController,
+              NutriTextField(
+                label: 'Password',
+                hint: '••••••••',
+                icon: Icons.lock_outline,
                 obscureText: true,
-                style: const TextStyle(color: AppColors.onBackground),
-                decoration: const InputDecoration(hintText: '••••••••'),
+                controller: passwordController,
               ),
               Align(
                 alignment: Alignment.centerRight,
@@ -165,8 +163,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  static Widget _label(String text) => Text(
-    text.toUpperCase(),
-    style: const TextStyle(color: AppColors.border, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-  );
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
-import 'package:projeto/domain/entities/app_user.dart';
-import 'package:projeto/presentation/providers/onboarding_provider.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
 class PersonalDataScreen extends ConsumerStatefulWidget {
   const PersonalDataScreen({super.key});
@@ -106,7 +107,12 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
               const Text('Precisamos de alguns dados para personalizar a tua experiência.',
                   style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
               const SizedBox(height: 30),
-              _textField(controller: nameController, label: 'Nome completo', hint: 'Ana Ferreira'),
+              NutriTextField(
+                controller: nameController,
+                label: 'Nome completo',
+                hint: 'Ana Ferreira',
+                icon: Icons.person_outline,
+              ),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -118,9 +124,9 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(child: _textField(controller: weightController, label: 'Peso (kg)', hint: '62', isNumber: true)),
+                  Expanded(child: NutriTextField(controller: weightController, label: 'Peso (kg)', hint: '62', keyboardType: TextInputType.number)),
                   const SizedBox(width: 15),
-                  Expanded(child: _textField(controller: heightController, label: 'Altura (cm)', hint: '168', isNumber: true)),
+                  Expanded(child: NutriTextField(controller: heightController, label: 'Altura (cm)', hint: '168', keyboardType: TextInputType.number)),
                 ],
               ),
               const SizedBox(height: 40),
@@ -132,42 +138,6 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _textField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    bool isNumber = false,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceDark,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label.toUpperCase(),
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold)),
-          TextField(
-            controller: controller,
-            keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-            style: const TextStyle(color: AppColors.onBackground, fontSize: 16),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(color: AppColors.border),
-              border: InputBorder.none,
-              filled: false,
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 5),
-            ),
-          ),
-        ],
       ),
     );
   }

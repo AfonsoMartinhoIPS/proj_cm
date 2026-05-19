@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:projeto/core/utils/logger.dart';
-import 'package:projeto/data/repositories/nutrition_log_repository_impl.dart';
-import 'package:projeto/domain/entities/app_user.dart';
-import 'package:projeto/domain/entities/meal_entry.dart';
-import 'package:projeto/domain/entities/nutrition_log.dart';
-import 'package:projeto/presentation/providers/auth_provider.dart';
+import 'package:nutri_scan/core/utils/logger.dart';
+import 'package:nutri_scan/data/repositories/nutrition_log_repository_impl.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/domain/entities/meal_entry.dart';
+import 'package:nutri_scan/domain/entities/nutrition_log.dart';
+import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 
 String _dateKey(DateTime d) =>
     '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';

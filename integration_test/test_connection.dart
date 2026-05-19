@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:projeto/core/database/database.dart';
-import 'package:projeto/data/repositories/product_repository_impl.dart';
-import 'package:projeto/domain/entities/nutriments.dart';
-import 'package:projeto/domain/entities/product.dart';
-import 'package:projeto/domain/repositories/product_repository.dart';
+import 'package:nutri_scan/core/database/database.dart';
+import 'package:nutri_scan/data/repositories/product_repository_impl.dart';
+import 'package:nutri_scan/domain/entities/nutriments.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
+import 'package:nutri_scan/domain/repositories/product_repository.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

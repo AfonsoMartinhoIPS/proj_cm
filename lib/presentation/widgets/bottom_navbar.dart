@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projeto/core/router/app_router.dart';
+import 'package:nutri_scan/core/router/app_router.dart';
 
 class BottomNavbar extends StatelessWidget {
   final int currentIndex;

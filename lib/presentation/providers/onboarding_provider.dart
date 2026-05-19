@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:projeto/domain/entities/app_user.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
 
 class OnboardingState {
   final String name;

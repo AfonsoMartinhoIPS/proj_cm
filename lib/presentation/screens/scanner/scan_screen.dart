@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
 
 class ScanScreen extends StatelessWidget {
   const ScanScreen({super.key});
@@ -157,20 +158,15 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
             style: TextStyle(color: AppColors.onBackground, fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
-          TextField(
+          NutriTextField(
             controller: _barcodeController,
-            autofocus: true,
+            label: 'Código de barras',
+            hint: 'Ex. 5601234567890',
+            icon: Icons.qr_code_2,
             keyboardType: TextInputType.number,
+            autofocus: true,
             textInputAction: TextInputAction.search,
             onSubmitted: (_) => _submit(),
-            style: const TextStyle(color: AppColors.onBackground),
-            decoration: InputDecoration(
-              hintText: 'Ex. 5601234567890',
-              hintStyle: const TextStyle(color: AppColors.border),
-              filled: true,
-              fillColor: AppColors.surfaceDark,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            ),
           ),
           const SizedBox(height: 16),
           ElevatedButton(

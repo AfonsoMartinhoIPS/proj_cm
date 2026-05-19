@@ -1,33 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/utils/logger.dart';
-import 'package:projeto/domain/entities/product.dart';
-import 'package:projeto/presentation/providers/auth_provider.dart';
+import 'package:nutri_scan/core/utils/logger.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
+import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 
-import 'package:projeto/presentation/screens/auth/splash_screen.dart';
-import 'package:projeto/presentation/screens/auth/welcome_screen.dart';
-import 'package:projeto/presentation/screens/auth/login_screen.dart';
-import 'package:projeto/presentation/screens/auth/register_screen.dart';
-import 'package:projeto/presentation/screens/meals/add_meal_screen.dart';
+import 'package:nutri_scan/presentation/screens/auth/splash_screen.dart';
+import 'package:nutri_scan/presentation/screens/auth/welcome_screen.dart';
+import 'package:nutri_scan/presentation/screens/auth/login_screen.dart';
+import 'package:nutri_scan/presentation/screens/auth/register_screen.dart';
+import 'package:nutri_scan/presentation/screens/meals/add_meal_screen.dart';
 
-import 'package:projeto/presentation/screens/onboarding/personal_data_screen.dart';
-import 'package:projeto/presentation/screens/onboarding/objectives_screen.dart';
-import 'package:projeto/presentation/screens/onboarding/calculation_screen.dart';
-import 'package:projeto/presentation/screens/onboarding/nutrition_goals_screen.dart';
-import 'package:projeto/presentation/screens/onboarding/confirm_screen.dart';
+import 'package:nutri_scan/presentation/screens/onboarding/personal_data_screen.dart';
+import 'package:nutri_scan/presentation/screens/onboarding/objectives_screen.dart';
+import 'package:nutri_scan/presentation/screens/onboarding/calculation_screen.dart';
+import 'package:nutri_scan/presentation/screens/onboarding/nutrition_goals_screen.dart';
+import 'package:nutri_scan/presentation/screens/onboarding/confirm_screen.dart';
 
-import 'package:projeto/presentation/screens/home/home_screen.dart';
-import 'package:projeto/presentation/screens/meals/meals_screen.dart';
-import 'package:projeto/presentation/screens/products/products_screen.dart';
-import 'package:projeto/presentation/screens/products/product_details_screen.dart';
-import 'package:projeto/presentation/screens/scanner/scan_screen.dart';
+import 'package:nutri_scan/presentation/screens/home/home_screen.dart';
+import 'package:nutri_scan/presentation/screens/meals/meals_screen.dart';
+import 'package:nutri_scan/presentation/screens/products/products_screen.dart';
+import 'package:nutri_scan/presentation/screens/products/product_details_screen.dart';
+import 'package:nutri_scan/presentation/screens/scanner/scan_screen.dart';
 
-import 'package:projeto/presentation/screens/profile/profile_screen.dart';
-import 'package:projeto/presentation/screens/profile/settings_screen.dart';
-import 'package:projeto/presentation/screens/profile/credits_screen.dart';
+import 'package:nutri_scan/presentation/screens/profile/profile_screen.dart';
+import 'package:nutri_scan/presentation/screens/profile/settings_screen.dart';
+import 'package:nutri_scan/presentation/screens/profile/credits_screen.dart';
 
-import 'package:projeto/presentation/widgets/main_shell.dart';
+import 'package:nutri_scan/presentation/widgets/main_shell.dart';
 
 class AppRoute {
   final String path;

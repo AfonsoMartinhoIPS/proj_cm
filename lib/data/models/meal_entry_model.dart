@@ -1,5 +1,5 @@
-import 'package:projeto/domain/entities/meal_entry.dart';
-import 'package:projeto/domain/entities/nutriments.dart';
+import 'package:nutri_scan/domain/entities/meal_entry.dart';
+import 'package:nutri_scan/domain/entities/nutriments.dart';
 
 class MealEntryModel {
   static MealEntry fromMap(Map<String, dynamic> map) {

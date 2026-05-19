@@ -1,4 +1,4 @@
-import 'package:projeto/domain/entities/app_user.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
 
 abstract class AuthRepository {
   String? getCurrentUser();

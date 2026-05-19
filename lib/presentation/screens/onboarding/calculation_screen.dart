@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
 class CalculationScreen extends StatefulWidget {
   const CalculationScreen({super.key});
