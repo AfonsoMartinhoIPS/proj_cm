@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -35,7 +36,7 @@ class WelcomeScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   children: [
                     TextSpan(text: 'Bem-vindo ao\n', style: TextStyle(color: AppColors.onBackground)),
-                    TextSpan(text: 'NutriScan', style: TextStyle(color: AppColors.secondary)),
+                    TextSpan(text: 'nutri_scan', style: TextStyle(color: AppColors.secondary)),
                   ],
                 ),
               ),

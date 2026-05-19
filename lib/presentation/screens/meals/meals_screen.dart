@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
 class MealsScreen extends StatelessWidget {
   const MealsScreen({super.key});

@@ -1,4 +1,4 @@
-import 'package:projeto/domain/entities/nutriments.dart';
+import 'package:nutri_scan/domain/entities/nutriments.dart';
 
 enum MealType { breakfast, lunch, dinner, snack }
 

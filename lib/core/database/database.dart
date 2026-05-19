@@ -1,8 +1,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:projeto/core/config/app_config.dart';
-import 'package:projeto/firebase_options.dart';
+import 'package:nutri_scan/core/config/app_config.dart';
+import 'package:nutri_scan/firebase_options.dart';
 
 Future<void> initializeDatabase() async {
   // Any necessary initialization can be done here.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
 class PersonalDataScreen extends StatelessWidget {
   const PersonalDataScreen({super.key});
@@ -39,7 +40,7 @@ class PersonalDataScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(child: _buildInputField(label: 'Peso (kg)', hint: '62', isSelected: true)),
+                  Expanded(child: _buildInputField(label: 'Peso (kg)', hint: '62')),
                   const SizedBox(width: 15),
                   Expanded(child: _buildInputField(label: 'Altura (cm)', hint: '168')),
                 ],

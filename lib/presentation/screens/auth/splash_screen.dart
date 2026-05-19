@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -29,13 +30,12 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(22),
+                width: 90,
+                height: 90,
+                child: Image.asset(
+                  'assets/icon/icon.png',
+                  fit: BoxFit.contain,
                 ),
-                child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 40),
               ),
               const SizedBox(height: 24),
               RichText(

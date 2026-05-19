@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:projeto/data/models/product_model.dart';
-import 'package:projeto/domain/entities/saved_product.dart';
+
+import 'package:nutri_scan/data/models/product_model.dart';
+import 'package:nutri_scan/domain/entities/saved_product.dart';
 
 class SavedProductModel {
   static SavedProduct? fromDoc(DocumentSnapshot doc) {
