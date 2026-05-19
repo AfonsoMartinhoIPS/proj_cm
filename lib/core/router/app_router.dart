@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto/core/utils/logger.dart';
+import 'package:projeto/domain/entities/product.dart';
 import 'package:projeto/presentation/providers/auth_provider.dart';
 
 import 'package:projeto/presentation/screens/auth/splash_screen.dart';
 import 'package:projeto/presentation/screens/auth/welcome_screen.dart';
 import 'package:projeto/presentation/screens/auth/login_screen.dart';
 import 'package:projeto/presentation/screens/auth/register_screen.dart';
+import 'package:projeto/presentation/screens/meals/add_meal_screen.dart';
 
 import 'package:projeto/presentation/screens/onboarding/personal_data_screen.dart';
 import 'package:projeto/presentation/screens/onboarding/objectives_screen.dart';
@@ -18,6 +20,7 @@ import 'package:projeto/presentation/screens/onboarding/confirm_screen.dart';
 import 'package:projeto/presentation/screens/home/home_screen.dart';
 import 'package:projeto/presentation/screens/meals/meals_screen.dart';
 import 'package:projeto/presentation/screens/products/products_screen.dart';
+import 'package:projeto/presentation/screens/products/product_details_screen.dart';
 import 'package:projeto/presentation/screens/scanner/scan_screen.dart';
 
 import 'package:projeto/presentation/screens/profile/profile_screen.dart';
@@ -119,6 +122,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/profile',  builder: (_, _) => const ProfileScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/credits',  builder: (_, _) => const CreditsScreen()),
+      
+      // meals
+      GoRoute(path: '/meals/add', builder: (context, state) => AddMealScreen(initialProduct: state.extra as Product?,)),
+      GoRoute(
+        path: '/products/:barcode',
+        builder: (context, state) => ProductDetailsScreen(
+          barcode: state.pathParameters['barcode']!,
+        ),
+      ),
 
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),

@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:projeto/core/theme/app_colors.dart';
 
 class ScanScreen extends StatelessWidget {
   const ScanScreen({super.key});
+
+  void _openManualEntry(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // lets the sheet resize for the keyboard
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => const _ManualBarcodeSheet(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
             child: Row(
               children: [
-                const Spacer(),
-                const Text('Scan Barcode',
+                Spacer(),
+                Text('Scan Barcode',
                     style: TextStyle(color: AppColors.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
-                const Spacer(),
+                Spacer(),
               ],
             ),
           ),
@@ -48,7 +61,7 @@ class ScanScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(24),
             child: OutlinedButton(
-              onPressed: () {},
+              onPressed: () => _openManualEntry(context),
               child: const Text('Inserir código manualmente', style: TextStyle(fontSize: 14)),
             ),
           ),
@@ -94,6 +107,77 @@ class ScanScreen extends StatelessWidget {
             right:  !isLeft  ? const BorderSide(color: AppColors.secondary, width: 3) : BorderSide.none,
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Bottom sheet for entering a barcode by hand. Owns its controller so it
+/// is created/disposed with the sheet's lifecycle.
+class _ManualBarcodeSheet extends StatefulWidget {
+  const _ManualBarcodeSheet();
+
+  @override
+  State<_ManualBarcodeSheet> createState() => _ManualBarcodeSheetState();
+}
+
+class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
+  final TextEditingController _barcodeController = TextEditingController();
+
+  @override
+  void dispose() {
+    _barcodeController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final barcode = _barcodeController.text.trim();
+    if (barcode.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Introduz um código de barras')),
+      );
+      return;
+    }
+    Navigator.of(context).pop();             // close sheet first
+    context.push('/products/$barcode');      // open details screen
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Bottom padding picks up keyboard inset so the field stays visible.
+    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + viewInsets),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Inserir código de barras',
+            style: TextStyle(color: AppColors.onBackground, fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _barcodeController,
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.search,
+            onSubmitted: (_) => _submit(),
+            style: const TextStyle(color: AppColors.onBackground),
+            decoration: InputDecoration(
+              hintText: 'Ex. 5601234567890',
+              hintStyle: const TextStyle(color: AppColors.border),
+              filled: true,
+              fillColor: AppColors.surfaceDark,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _submit,
+            child: const Text('Buscar produto', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }

@@ -45,10 +45,11 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<List<SavedProduct>> getSavedProducts(String uid) async {
+  Future<List<SavedProduct>> getSavedProducts(String uid, int count) async {
     final snapshot = await _db
         .collection(FirestorePaths.savedProducts(uid))
         .orderBy('savedAt', descending: true)
+        .limit(count)
         .get();
     return snapshot.docs
         .map((doc) => SavedProductModel.fromDoc(doc))
@@ -65,15 +66,20 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<void> saveForUser(String uid, SavedProduct savedProduct) async {
     await _db
-        .doc(FirestorePaths.savedProduct(uid, savedProduct.product.barcode))
+        .doc(FirestorePaths.savedProduct(uid, savedProduct.barcode))
         .set(SavedProductModel.toMap(savedProduct), SetOptions(merge: true));
   }
 
   @override
-  Future<void> updateNotes(String uid, String barcode, String? notes) async {
-    await _db
-        .doc(FirestorePaths.savedProduct(uid, barcode))
-        .update(SavedProductModel.notesUpdate(notes));
+  Future<void> setNotes(String uid, String barcode, List<SavedProductNote> notes) async {
+    await _db.doc(FirestorePaths.savedProduct(uid, barcode)).update({
+      'notes': notes
+          .map((note) => {
+                'text': note.text,
+                'createdAt': Timestamp.fromDate(note.createdAt),
+              })
+          .toList(),
+    });
   }
 
   @override
