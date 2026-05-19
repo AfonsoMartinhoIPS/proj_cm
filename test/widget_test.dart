@@ -46,6 +46,13 @@ void main() {
       // Reconstrói o widget após a interação
       await tester.pump();
 
+import 'package:nutri_scan/main.dart';
+
+void main() {
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const App());
+
       // Verifica se a variável mudou para true
       expect(foiPressionado, isTrue);
     });

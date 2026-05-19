@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:projeto/core/core.dart';
-import 'package:projeto/core/router/app_router.dart';
+
+import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +16,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'NutriScan',
+      title: 'nutri_scan',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       routerConfig: appRouter,

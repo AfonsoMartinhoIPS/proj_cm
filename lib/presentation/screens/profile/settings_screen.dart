@@ -4,6 +4,8 @@ import 'package:projeto/core/theme/app_colors.dart';
 import 'package:projeto/core/widgets/nutri_back_button.dart'; 
 import 'package:projeto/core/widgets/nutri_toggle.dart'; 
 
+import 'package:nutri_scan/core/theme/app_colors.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 

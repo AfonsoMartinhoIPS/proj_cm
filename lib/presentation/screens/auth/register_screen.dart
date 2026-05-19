@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:projeto/core/theme/app_colors.dart';
 import 'package:projeto/core/widgets/nutri_back_button.dart';
 
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/presentation/widgets/app_text_field.dart';
+
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
@@ -11,10 +14,20 @@ class RegisterScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(leading: NutriBackButton(onPressed: () => context.pop())),
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            }
+          },
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Column(
+          child: Form( // Wrap with Form for validation capabilities
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
@@ -57,6 +70,18 @@ class RegisterScreen extends StatelessWidget {
                 icon: Icons.lock_reset_outlined,
                 isPassword: true,
               ),
+              Text('Cria Conta', style: Theme.of(context).textTheme.headlineMedium),
+              const SizedBox(height: 10),
+              Text('Regista-te para começar a monitorizar a tua nutrição.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted)),
+              const SizedBox(height: 35),
+              const AppTextField(label: 'Nome Completo', hint: 'Ana Ferreira', icon: Icons.person),
+              const SizedBox(height: 20),
+              const AppTextField(label: 'Email', hint: 'exemplo@email.com', icon: Icons.email_outlined),
+              const SizedBox(height: 20),
+              const AppTextField(label: 'Password', hint: '••••••••', icon: Icons.lock_outline, isPassword: true),
+              const SizedBox(height: 20),
+              const AppTextField(label: 'Confirmar Password', hint: '••••••••', icon: Icons.lock_reset_outlined, isPassword: true),
               const SizedBox(height: 30),
               Row(
                 children: [
@@ -73,17 +98,17 @@ class RegisterScreen extends StatelessWidget {
                       color: AppColors.secondary,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  const Expanded(
+                  const SizedBox(width: 12), // This is a custom checkbox, could be a reusable widget if needed elsewhere.
+                  Expanded(
                     child: Text(
                       'Aceito os Termos de Serviço e a Política de Privacidade.',
                       style: TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 12,
                       ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
                     ),
-                  ),
-                ],
+              )],
               ),
               const SizedBox(height: 40),
               ElevatedButton(
@@ -92,6 +117,7 @@ class RegisterScreen extends StatelessWidget {
                   'Registar',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
+                child: const Text('Registar'),
               ),
               const SizedBox(height: 25),
             ],
@@ -140,6 +166,7 @@ class RegisterScreen extends StatelessWidget {
           ),
         ),
       ],
+        )),
     );
   }
 }

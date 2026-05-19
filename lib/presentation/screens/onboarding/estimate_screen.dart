@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
 class EstimateScreen extends StatelessWidget {
   const EstimateScreen({super.key});
@@ -10,7 +11,13 @@ class EstimateScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+                leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            }
+          },
+        ),
         title: _stepIndicator('3 / 4'),
         centerTitle: true,
       ),

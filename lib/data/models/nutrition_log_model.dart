@@ -1,6 +1,6 @@
-import 'package:projeto/data/models/meal_entry_model.dart';
-import 'package:projeto/domain/entities/app_user.dart';
-import 'package:projeto/domain/entities/nutrition_log.dart';
+import 'package:nutri_scan/data/models/meal_entry_model.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 
 
 class NutritionLogModel {

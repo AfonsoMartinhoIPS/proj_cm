@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:projeto/core/database/firestore_paths.dart';
-import 'package:projeto/data/models/app_user_model.dart';
-import 'package:projeto/domain/entities/app_user.dart';
-import 'package:projeto/domain/repositories/user_repository.dart';
+
+import 'package:nutri_scan/core/database/firestore_paths.dart';
+import 'package:nutri_scan/data/models/app_user_model.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/domain/repositories/user_repository.dart';
 
 class UserRepositoryImpl implements UserRepository {
   final _db = FirebaseFirestore.instance;

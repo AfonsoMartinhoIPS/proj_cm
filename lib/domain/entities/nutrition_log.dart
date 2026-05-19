@@ -1,5 +1,5 @@
-import 'package:projeto/domain/entities/app_user.dart';
-import 'package:projeto/domain/entities/meal_entry.dart';
+import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/domain/entities/meal_entry.dart';
 
 class NutritionLog {
   final String date; // "2025-05-01"

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto/core/theme/app_colors.dart';
+
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/presentation/widgets/app_step_indicator.dart';
 
 class CalculationScreen extends StatefulWidget {
   const CalculationScreen({super.key});
@@ -11,12 +13,20 @@ class CalculationScreen extends StatefulWidget {
 }
 
 class _CalculationScreenState extends State<CalculationScreen> {
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 4), () {
+    _timer = Timer(const Duration(seconds: 4), () {
       if (mounted) context.go('/onboarding/estimate');
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -36,11 +46,12 @@ class _CalculationScreenState extends State<CalculationScreen> {
                   Container(
                     width: 150,
                     height: 150,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                    decoration: BoxDecoration( // TODO: Consider creating a reusable CircularProgressContainer widget
+                    //Para fazer este widget, é preciso fazer "checkpoints" nos calculos, para ir atualizando o progresso. Por exemplo: 1 checkpoint para análise de dados, outro para ajuste de metas, etc. Assim, o progresso pode ser atualizado dinamicamente com base no número de checkpoints concluídos.
+                      shape: BoxShape.circle, // This is a custom circular container, not a standard progress indicator.
                       color: AppColors.primary.withValues(alpha: 0.12),
                       border: Border.all(color: AppColors.primary.withValues(alpha: 0.18), width: 2),
-                    ),
+                    ), // This is a custom circular container, not a standard progress indicator.
                   ),
                   const Text('📊', style: TextStyle(fontSize: 60)),
                   const SizedBox(
@@ -54,19 +65,18 @@ class _CalculationScreenState extends State<CalculationScreen> {
                 ],
               ),
               const SizedBox(height: 50),
-              const Text('A calcular o teu plano...',
+              Text('A calcular o teu plano...',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.onBackground, fontSize: 22, fontWeight: FontWeight.bold)),
+                  style: Theme.of(context).textTheme.titleLarge), // Removed const
               const SizedBox(height: 15),
-              const Text(
+              Text(
                 'Estamos a analisar os teus dados para criar metas de calorias e macros ideais para ti.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textMuted, fontSize: 14, height: 1.5),
-              ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted, height: 1.5)),
               const SizedBox(height: 50),
-              _buildStep('Analisar perfil biométrico', isDone: true),
-              _buildStep('Ajustar metas de peso', isDone: true),
-              _buildStep('Finalizar recomendações', isDone: false),
+              const AppStepIndicator(title: 'Analisar perfil biométrico', isDone: true),
+              const AppStepIndicator(title: 'Ajustar metas de peso', isDone: true),
+              const AppStepIndicator(title: 'Finalizar recomendações', isDone: false),
             ],
           ),
         ),
@@ -74,24 +84,4 @@ class _CalculationScreenState extends State<CalculationScreen> {
     );
   }
 
-  Widget _buildStep(String title, {required bool isDone}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(
-            isDone ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: isDone ? AppColors.secondary : AppColors.border,
-            size: 20,
-          ),
-          const SizedBox(width: 12),
-          Text(title,
-              style: TextStyle(
-                color: isDone ? AppColors.onBackground : AppColors.textMuted,
-                fontSize: 14,
-              )),
-        ],
-      ),
-    );
-  }
 }

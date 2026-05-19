@@ -1,4 +1,4 @@
-import 'package:projeto/domain/entities/product.dart';
+import 'package:nutri_scan/domain/entities/product.dart';
 
 class SavedProduct {
   final Product product;
