@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class ObjectivesScreen extends ConsumerStatefulWidget {
   const ObjectivesScreen({super.key});
@@ -62,10 +63,8 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
               _buildOptionTile('Criar hábitos mais saudáveis', isSelected: false),
               _buildOptionTile('Prevenir doenças relacionadas ao estilo de vida', isSelected: false),
               const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () => submit(),
-                child: const Text('Próximo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
+              //TODO: label style -> fontSize 16, fontWeight bold
+              NutriButton(label: 'Próximo', onPressed: submit),
               const SizedBox(height: 20),
             ],
           ),

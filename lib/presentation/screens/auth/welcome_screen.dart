@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -57,14 +58,15 @@ class WelcomeScreen extends StatelessWidget {
                 ],
               ),
               const Spacer(),
-              ElevatedButton(
+              NutriButton(
+                label: 'Começar agora',
                 onPressed: () => context.push('/onboarding/personal-data'),
-                child: const Text('Começar agora', style: TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 15),
-              OutlinedButton(
+              NutriButton.transparent(
+                label: 'Já tenho conta · ',
                 onPressed: () => context.push('/login'),
-                child: const Text('Já tenho conta · Entrar'),
+                secondaryLabel: 'Entrar',
               ),
               const SizedBox(height: 20),
             ],

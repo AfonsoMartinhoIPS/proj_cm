@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/nutri_toggle.dart';
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

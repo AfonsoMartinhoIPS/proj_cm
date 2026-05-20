@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class ConfirmScreen extends ConsumerWidget {
   const ConfirmScreen({super.key});
@@ -58,10 +59,7 @@ class ConfirmScreen extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
-              ElevatedButton(
-                onPressed: () => context.push('/register'),
-                child: const Text('Criar Conta', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
+              NutriButton(label: "Criar Conta", onPressed: () => context.push('/register')),
               const SizedBox(height: 20),
             ],
           ),

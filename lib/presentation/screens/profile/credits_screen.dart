@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});
@@ -54,10 +55,23 @@ class CreditsScreen extends StatelessWidget {
               style: TextStyle(
                   color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
           const SizedBox(height: 15),
-          _memberTile('Afonso Martinho', '202001865', 'AM'),
-          _memberTile('Daniel Pais',     '202200286', 'DP'),
-          _memberTile('Fernando Ramalho','202002203', 'FR'),
-          _memberTile('Samuel Silva',    '202200315', 'SS'),
+          
+          // Adicionei callbacks fictícios (ligar a um package como url_launcher mais tarde)
+          _memberTile('Afonso Martinho', '202001865', 'AM', onGitTap: () {}),
+          _memberTile('Daniel Pais',     '202200286', 'DP', onGitTap: () {}),
+          _memberTile('Fernando Ramalho','202002203', 'FR', onGitTap: () {}),
+          _memberTile('Samuel Silva',    '202200315', 'SS', onGitTap: () {}),
+          
+          const SizedBox(height: 30),
+          
+          NutriButton.transparent(
+            label: 'Ver Código Fonte no GitHub',
+            icon: const Icon(Icons.code, color: AppColors.secondary, size: 18),
+            onPressed: () {
+              // TODO: Abrir o link do repositório da equipa no GitHub
+            },
+          ),
+          
           const SizedBox(height: 40),
           const Text('Feito com dedicação · IPS 2025/2026',
               textAlign: TextAlign.center,
@@ -68,7 +82,7 @@ class CreditsScreen extends StatelessWidget {
     );
   }
 
-  Widget _memberTile(String name, String id, String initials) {
+  Widget _memberTile(String name, String id, String initials, {required VoidCallback onGitTap}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -84,6 +98,12 @@ class CreditsScreen extends StatelessWidget {
         ),
         title: Text(name, style: const TextStyle(color: AppColors.onBackground, fontSize: 14)),
         subtitle: Text(id, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+        // Oportunidade 1: Botão de texto minimalista à direita em cada linha da equipa
+        trailing: NutriButton.text(
+          label: 'GitHub',
+          fontSize: 11,
+          onPressed: onGitTap,
+        ),
       ),
     );
   }

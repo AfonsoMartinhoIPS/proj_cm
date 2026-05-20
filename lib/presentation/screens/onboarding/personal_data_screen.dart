@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
@@ -130,10 +130,11 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                 ],
               ),
               const SizedBox(height: 40),
-              ElevatedButton(
+              NutriButton(label: 'Próximo', onPressed: submit),
+              /*ElevatedButton(
                 onPressed: submit,
                 child: const Text('Próximo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
+              ),*/
               const SizedBox(height: 20),
             ],
           ),
