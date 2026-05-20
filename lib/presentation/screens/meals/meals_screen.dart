@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/domain/entities/saved_product.dart';
 import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';

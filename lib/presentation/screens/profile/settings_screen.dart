@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/nutri_toggle.dart';
 
 class SettingsScreen extends StatefulWidget {

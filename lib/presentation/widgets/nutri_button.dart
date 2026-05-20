@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nutri_scan/core/theme/app_colors.dart';
-import 'package:nutri_scan/core/constants/app_sizes.dart';
+import 'package:nutri_scan/core/core.dart';
 
 //TODO: Rever.
 class NutriButton extends StatelessWidget {
