@@ -1,9 +1,8 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
 

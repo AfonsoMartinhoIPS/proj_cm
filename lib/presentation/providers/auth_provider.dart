@@ -3,7 +3,6 @@ import 'package:nutri_scan/core/utils/logger.dart';
 import 'package:nutri_scan/data/repositories/auth_repository_impl.dart';
 import 'package:nutri_scan/data/repositories/user_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
-import 'package:nutri_scan/main.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
 

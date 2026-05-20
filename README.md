@@ -4,6 +4,10 @@ Repository:
 
 > https://github.com/AfonsoMartinhoIPS/proj_cm.git
 
+Extra files:
+
+> https://ipsetubal-my.sharepoint.com/:f:/g/personal/202002203_estudantes_ips_pt/IgBfwxjNM_nzRbWJowidQM3yAWKeQ_vvuSac8lh4YS6KJ54?e=SCFOHt
+
 
 ## Objective
 Develop a complete mobile application using Flutter that demonstrates technical competence, good architecture, and solid user experience.

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/theme/app_colors.dart';
-import 'package:nutri_scan/core/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
 
 class ScanScreen extends StatelessWidget {
   const ScanScreen({super.key});

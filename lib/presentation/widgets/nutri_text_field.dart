@@ -2,20 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/constants/app_sizes.dart';
 
 /// Um campo de texto personalizado e animado para a aplicação NutriScan.
-///
-/// Apresenta um layout moderno onde o [label] fixo em maiúsculas fica posicionado
-/// acima do campo de input, contido dentro de uma moldura animada que reage ao foco.
-///
-/// ### Exemplo de utilização:
-/// ```dart
-/// NutriTextField(
-///   label: 'Email',
-///   hint: 'insira o seu email',
-///   icon: Icons.email_outlined,
-///   controller: _emailController,
-///   validator: (value) => value!.isEmpty ? 'Obrigatório' : null,
-/// )
-/// ```
 class NutriTextField extends StatefulWidget {
   /// O texto de identificação fixo que aparece no topo do campo (ex: "EMAIL").
   final String label;
@@ -35,6 +21,24 @@ class NutriTextField extends StatefulWidget {
   /// Função de validação opcional para integrar com um widget [Form].
   final String? Function(String?)? validator;
 
+  /// O tipo de teclado a exibir (ex: numérico, email, etc.).
+  final TextInputType? keyboardType;
+
+  /// Se o campo deve focar automaticamente ao ser renderizado.
+  final bool autofocus;
+
+  /// O número máximo de linhas (útil para campos de texto longos/notas).
+  final int? maxLines;
+
+  /// A ação do teclado (ex: concluir, seguinte, nova linha).
+  final TextInputAction? textInputAction;
+
+  /// Callback chamado sempre que o texto do campo é alterado.
+  final ValueChanged<String>? onChanged;
+
+  /// Callback chamado quando o utilizador submete a ação do teclado (ex: Enter/Search).
+  final ValueChanged<String>? onSubmitted;
+
   /// Cria um [NutriTextField].
   const NutriTextField({
     super.key,
@@ -44,6 +48,12 @@ class NutriTextField extends StatefulWidget {
     this.obscureText = false,
     this.controller,
     this.validator,
+    this.keyboardType,
+    this.autofocus = false,
+    this.maxLines = 1,
+    this.textInputAction,
+    this.onChanged,
+    this.onSubmitted,
   });
 
   @override
@@ -103,6 +113,8 @@ class _NutriTextFieldState extends State<NutriTextField> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
+          crossAxisAlignment: widget.maxLines != null && widget.maxLines! > 1 
+              ? CrossAxisAlignment.start : CrossAxisAlignment.center,
           children: [
             if (widget.icon != null) ...[
               Icon(
@@ -139,6 +151,15 @@ class _NutriTextFieldState extends State<NutriTextField> {
                     focusNode: _focusNode,
                     obscureText: widget.obscureText,
                     validator: widget.validator,
+                    keyboardType: widget.keyboardType,
+                    autofocus: widget.autofocus,
+                    maxLines: widget.maxLines,
+                    textInputAction: widget.textInputAction,
+                    onChanged: widget.onChanged,
+
+                    // No TextFormField nativo do Flutter, o callback chama-se onFieldSubmitted
+                    onFieldSubmitted: widget.onSubmitted,
+                    
                     cursorColor: theme.colorScheme.secondary,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontSize: 15,
