@@ -2,20 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
 
 /// Um campo de texto personalizado e animado para a aplicação NutriScan.
+///
+/// Este componente envolve um [TextFormField] nativo dentro de um [AnimatedContainer]
+/// para fornecer feedback visual dinâmico quando o campo ganha foco ou quando
+/// ocorrem erros de validação, mantendo a consistência com o design system da app.
 class NutriTextField extends StatefulWidget {
+  /// O texto de identificação fixo que aparece no topo do campo (ex: "EMAIL").
   final String label;
+
+  /// O texto de ajuda (placeholder) que aparece quando o campo está vazio.
   final String hint;
+
+  /// Ícone opcional exibido no início do campo.
   final IconData? icon;
+
+  /// Se `true`, oculta o texto digitado (útil para palavras-passe).
   final bool obscureText;
+
+  /// Controlador opcional para manipular o texto do campo.
   final TextEditingController? controller;
+
+  /// Função de validação opcional para integrar com um widget [Form].
   final String? Function(String?)? validator;
+
+  /// O tipo de teclado a exibir (ex: numérico, email, etc.).
   final TextInputType? keyboardType;
+
+  /// Se o campo deve focar automaticamente ao ser renderizado.
   final bool autofocus;
+
+  /// O número máximo de linhas (útil para campos de texto longos/notas).
   final int? maxLines;
+
+  /// A ação do teclado (ex: concluir, seguinte, nova linha).
   final TextInputAction? textInputAction;
+
+  /// Callback chamado sempre que o texto do campo é alterado.
   final ValueChanged<String>? onChanged;
+
+  /// Callback chamado quando o utilizador submete a ação do teclado.
   final ValueChanged<String>? onSubmitted;
 
+  /// Cria um [NutriTextField].
   const NutriTextField({
     super.key,
     required this.label,
@@ -39,7 +67,7 @@ class NutriTextField extends StatefulWidget {
 class _NutriTextFieldState extends State<NutriTextField> {
   final FocusNode _focusNode = FocusNode();
   bool _isFocused = false;
-  String? _errorText; // Guarda o estado do erro localmente
+  String? _errorText;
 
   @override
   void initState() {
@@ -63,12 +91,10 @@ class _NutriTextFieldState extends State<NutriTextField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final Color containerBg = theme.inputDecorationTheme.fillColor ?? theme.cardColor;
     final Color hintColor = theme.inputDecorationTheme.hintStyle?.color ?? theme.hintColor;
         
-    // Gestão dinâmica de cor com base no foco e erros
     final Color activeColor = _errorText != null
         ? theme.colorScheme.error
         : _isFocused 
@@ -111,14 +137,14 @@ class _NutriTextFieldState extends State<NutriTextField> {
                 if (widget.icon != null) ...[
                   Icon(
                     widget.icon,
-                    size: AppSizes.iconMd, // Lido do teu AppSizes (24.0)
+                    size: AppSizes.iconMd,
                     color: _errorText != null
                         ? theme.colorScheme.error
                         : _isFocused 
                             ? theme.colorScheme.secondary 
                             : hintColor,
                   ),
-                  const SizedBox(width: AppSizes.sm), // Usando o teu core spacing (8.0)
+                  const SizedBox(width: AppSizes.sm),
                 ],
                 Expanded(
                   child: Column(
@@ -131,7 +157,7 @@ class _NutriTextFieldState extends State<NutriTextField> {
                         style: theme.textTheme.labelSmall?.copyWith(
                               color: labelColor,
                               letterSpacing: 1.2,
-                              fontSize: AppSizes.fontXs - 2, // Ajustado dinamicamente (10.0)
+                              fontSize: AppSizes.fontXs - 2,
                               fontWeight: FontWeight.w600,
                             ) ??
                             TextStyle(
@@ -141,7 +167,7 @@ class _NutriTextFieldState extends State<NutriTextField> {
                               letterSpacing: 1.2,
                             ),
                       ),
-                      const SizedBox(height: AppSizes.xs), // Usando o teu core spacing (4.0)
+                      const SizedBox(height: AppSizes.xs),
                       TextFormField(
                         controller: widget.controller,
                         focusNode: _focusNode,
@@ -154,7 +180,7 @@ class _NutriTextFieldState extends State<NutriTextField> {
                         onFieldSubmitted: widget.onSubmitted,
                         cursorColor: theme.colorScheme.secondary,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          fontSize: AppSizes.fontMd - 1, // Consistente com a app (15.0)
+                          fontSize: AppSizes.fontMd - 1,
                         ),
                         validator: (value) {
                           if (widget.validator != null) {
@@ -172,13 +198,12 @@ class _NutriTextFieldState extends State<NutriTextField> {
                             color: hintColor,
                             fontSize: AppSizes.fontMd - 1,
                           ),
-                          // Remove decorações extra para dar o controlo total ao Container exterior
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           focusedErrorBorder: InputBorder.none,
-                          errorStyle: const TextStyle(height: 0, fontSize: 0), // Esconde o texto nativo abaixo do input
+                          errorStyle: const TextStyle(height: 0, fontSize: 0),
                           isCollapsed: true,
                         ),
                       ),
@@ -189,7 +214,6 @@ class _NutriTextFieldState extends State<NutriTextField> {
             ),
           ),
         ),
-        // Se existir erro, renderiza-o de forma limpa abaixo do container costumizado
         if (_errorText != null)
           Padding(
             padding: const EdgeInsets.only(left: AppSizes.sm, top: AppSizes.xs),
