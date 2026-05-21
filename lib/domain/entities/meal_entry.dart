@@ -22,4 +22,13 @@ class MealEntry {
     required this.nutriments,
     required this.loggedAt,
   });
+
+  /// Total calories for the consumed serving. Falls back to 0 when the
+  /// product has no caloriesPer100g, so callers never crash on nulls.
+  double get totalCalories => nutriments.calories(grams: servingGrams);
+
+  /// Macros for the consumed serving — mirror totalCalories.
+  double get totalProtein => nutriments.protein(grams: servingGrams);
+  double get totalCarbs   => nutriments.carbs(grams: servingGrams);
+  double get totalFat     => nutriments.fat(grams: servingGrams);
 }

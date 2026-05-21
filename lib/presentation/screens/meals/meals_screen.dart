@@ -6,7 +6,6 @@ import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/domain/entities/saved_product.dart';
 import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/providers/saved_products_provider.dart';
-import 'package:nutri_scan/presentation/screens/meals/utils/meal_utils.dart';
 
 class MealsScreen extends ConsumerStatefulWidget {
   const MealsScreen({super.key});
@@ -44,7 +43,7 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
                 ...nutritionLogs.map((log) => _buildMealCard(
                   title: log.date,
                   totalKcal: '${log.totalCalories} kcal',
-                  items: log.entries.map((e) => {'name': e.productName, 'kcal': '${calculateCaloriesFromMealEntry(e)} kcal'}).toList(),
+                  items: log.entries.map((e) => {'name': e.productName, 'kcal': '${e.totalCalories.toStringAsFixed(0)} kcal'}).toList(),
                 )),
                 const SizedBox(height: 10),
                 OutlinedButton(

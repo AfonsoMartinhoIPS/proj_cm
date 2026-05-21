@@ -222,14 +222,7 @@ class _CalorieCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Calorias hoje'.toUpperCase(),
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 10,
-                      letterSpacing: 1,
-                    ),
-                  ),
+                  const NutriLabel.field('Calorias hoje'),
                   const SizedBox(height: 4),
                   Text(
                     totalCalories.toStringAsFixed(0),

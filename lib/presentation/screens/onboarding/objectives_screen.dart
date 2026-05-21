@@ -34,7 +34,7 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: _stepIndicator('2 / 4'),
+        title: const StepChip('2 / 4'),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -50,13 +50,11 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
               const Text('Usamos estas informações para elaborar recomendações personalizadas.',
                   style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
               const SizedBox(height: 30),
-              const Text('PESO',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              const NutriLabel.field('Peso'),
               const SizedBox(height: 10),
               _buildWeightSelector(),
               const SizedBox(height: 30),
-              const Text('OUTROS',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              const NutriLabel.field('Outros'),
               const SizedBox(height: 15),
               // TODO: make these selectable and save the selections
               _buildOptionTile('Melhorar desempenho desportivo', isSelected: true),
@@ -130,9 +128,4 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
     );
   }
 
-  static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
-    child: Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
-  );
 }

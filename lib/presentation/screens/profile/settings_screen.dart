@@ -76,9 +76,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15, top: 10),
-      child: Text(title,
-          style: const TextStyle(
-              color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+      child: NutriLabel.section(title),
     );
   }
 }

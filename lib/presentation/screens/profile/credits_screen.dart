@@ -51,9 +51,7 @@ class CreditsScreen extends StatelessWidget {
           const Text('Instituição, Instituto Politécnico de Setúbal',
               style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
           const SizedBox(height: 30),
-          const Text('EQUIPA',
-              style: TextStyle(
-                  color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+          const NutriLabel.section('Equipa'),
           const SizedBox(height: 15),
           
           // Adicionei callbacks fictícios (ligar a um package como url_launcher mais tarde)

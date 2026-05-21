@@ -183,22 +183,8 @@ class _NotesSection extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'NOTAS',
-                style: TextStyle(
-                  color: AppColors.textMuted,
-                  fontSize: 11,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                'Guardado em ${_fmt(savedProduct.savedAt)}',
-                style: const TextStyle(
-                  color: AppColors.textMuted,
-                  fontSize: 11,
-                ),
-              ),
+              const NutriLabel.section('Notas'),
+              NutriLabel.caption('Guardado em ${_fmt(savedProduct.savedAt)}'),
             ],
           ),
           const SizedBox(height: 12),
@@ -436,15 +422,7 @@ class _NutritionTable extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'POR 100G / 100ML',
-            style: TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 11,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          const NutriLabel.section('Por 100g / 100ml'),
           const SizedBox(height: 12),
           _row('Calorias', n.caloriesPer100g, 'kcal'),
           _row('Proteína', n.proteinPer100g, 'g'),

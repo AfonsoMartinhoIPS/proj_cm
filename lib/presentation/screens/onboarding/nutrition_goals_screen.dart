@@ -69,7 +69,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: _stepIndicator('3 / 4'),
+        title: const StepChip('3 / 4'),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -119,9 +119,4 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
     );
   }
 
-  static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
-    child: Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
-  );
 }
