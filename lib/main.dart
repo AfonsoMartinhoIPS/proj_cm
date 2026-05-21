@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:nutri_scan/core/core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDatabase();
+
+  // Garante que a app é executada apenas em modo retrato.
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
 
   runApp(const ProviderScope(child: App()));
 }
@@ -19,7 +25,6 @@ class App extends ConsumerWidget {
       title: 'NutriScan',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.dark,
       routerConfig: router,
     );
   }
