@@ -12,7 +12,7 @@ class CreditsScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: const Text('Créditos'),
+        title: const NutriLabel('Créditos'), // TODO: verificar o estado visual
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -30,7 +30,7 @@ class CreditsScreen extends StatelessWidget {
                   child: const Icon(Icons.restaurant_menu, color: AppColors.onBackground, size: 40),
                 ),
                 const SizedBox(height: 15),
-                RichText(
+                RichText( // TODO: substituir por NutriLabel???
                   text: const TextSpan(
                     children: [
                       TextSpan(text: 'Nutri',
@@ -40,20 +40,19 @@ class CreditsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Text('versão 1.0.0 · 2025–2026',
-                    style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                const NutriLabel('versão 1.0.0 · 2025–2026', // TODO: verificar estado visual
+                    color: AppColors.textMuted, variant: NutriLabelVariant.small,),
               ],
             ),
           ),
           const SizedBox(height: 40),
-          const Text('Unidade Curricular, Computação Móvel',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
-          const Text('Instituição, Instituto Politécnico de Setúbal',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          const NutriLabel('Unidade Curricular, Computação Móvel', // TODO: verificar estado visual
+              color: AppColors.textMuted, variant: NutriLabelVariant.small,),
+          const NutriLabel('Instituição, Instituto Politécnico de Setúbal', // TODO: verificar estado visual
+              color: AppColors.textMuted, variant: NutriLabelVariant.small,),
           const SizedBox(height: 30),
-          const Text('EQUIPA',
-              style: TextStyle(
-                  color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+          const NutriLabel('EQUIPA', // TODO: verificar estado visual
+                  color: AppColors.textMuted, variant: NutriLabelVariant.small, fontWeight: FontWeight.bold, letterSpacing: 1.2),
           const SizedBox(height: 15),
           
           // Adicionei callbacks fictícios (ligar a um package como url_launcher mais tarde)
@@ -73,9 +72,9 @@ class CreditsScreen extends StatelessWidget {
           ),
           
           const SizedBox(height: 40),
-          const Text('Feito com dedicação · IPS 2025/2026',
+          const NutriLabel('Feito com dedicação · IPS 2025/2026', // TODO: verificar estado visual
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
+              color: AppColors.textMuted, variant: NutriLabelVariant.small,),
           const SizedBox(height: 20),
         ],
       ),
@@ -93,11 +92,11 @@ class CreditsScreen extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: AppColors.surface,
-          child: Text(initials,
-              style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
+          child: NutriLabel(initials, // TODO: verificar estado visual
+              color: AppColors.secondary, variant: NutriLabelVariant.small, fontWeight: FontWeight.bold),
         ),
-        title: Text(name, style: const TextStyle(color: AppColors.onBackground, fontSize: 14)),
-        subtitle: Text(id, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+        title: NutriLabel(name, color: AppColors.onBackground, variant: NutriLabelVariant.body,),
+        subtitle: NutriLabel(id, color: AppColors.textMuted, variant: NutriLabelVariant.small,),
         // Oportunidade 1: Botão de texto minimalista à direita em cada linha da equipa
         trailing: NutriButton.text(
           label: 'GitHub',

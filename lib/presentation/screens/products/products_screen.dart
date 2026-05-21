@@ -46,7 +46,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                const Text( // TODO: substituir por NutriLabel
                   'Produtos',
                   style: TextStyle(
                     color: AppColors.onBackground,
@@ -85,7 +85,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      Text( // TODO: substituir por NutriLabel
                         'Erro ao carregar produtos: $e',
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: AppColors.textMuted),
@@ -120,7 +120,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          Text( // TODO: substituir por NutriLabel
                             _query.isEmpty
                                 ? 'Ainda não guardaste nenhum produto.'
                                 : 'Nenhum produto encontrado para "$_query".',
@@ -210,7 +210,7 @@ class _ProductRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  Text( // TODO: substituir por NutriLabel
                     savedProduct.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -222,7 +222,7 @@ class _ProductRow extends StatelessWidget {
                   ),
                   if ((savedProduct.brand ?? '').isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(
+                    Text( // TODO: substituir por NutriLabel
                       savedProduct.brand!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -235,7 +235,7 @@ class _ProductRow extends StatelessWidget {
                 ],
               ),
             ),
-            Text(
+            Text( // TODO: substituir por NutriLabel
               savedProduct.caloriesPer100g != null
                   ? '${savedProduct.caloriesPer100g!.toStringAsFixed(0)} kcal'
                   : '— kcal',
@@ -273,7 +273,7 @@ class _ProductRow extends StatelessWidget {
               width: 45,
               height: 45,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Text(
+              errorBuilder: (_, _, _) => Text( // TODO: substituir por NutriLabel???
                 fallbackLetter,
                 style: const TextStyle(
                   color: AppColors.onBackground,
@@ -281,7 +281,7 @@ class _ProductRow extends StatelessWidget {
                 ),
               ),
             )
-          : Text(
+          : Text( // TODO: substituir por NutriLabel???
               fallbackLetter,
               style: const TextStyle(
                 color: AppColors.onBackground,
