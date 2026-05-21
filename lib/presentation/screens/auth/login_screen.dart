@@ -163,7 +163,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       label: 'Google',
                       // height: 20 garante que o logo não deforma o botão de 45px
                       icon: Image.asset(
-                        'assets/images/logos/google-logo-48.png',
+                        'assets/images/logos/google-logo-50.png',
                         height: 18,
                       ),
                       onPressed: () {
