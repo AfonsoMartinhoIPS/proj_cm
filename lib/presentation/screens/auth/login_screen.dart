@@ -29,7 +29,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preenche o email e a password')),
+        const SnackBar(content: NutriLabel('Preenche o email e a password', variant: NutriLabelVariant.small, color: AppColors.error)),
       );
       return;
     }
@@ -48,7 +48,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         },
         error: (e, _) => ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(e.toString()))),
+        ).showSnackBar(SnackBar(content: Text(e.toString()))), //TODO: Trocar para NutriLabel????
       );
     });
 
@@ -83,24 +83,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  RichText(
-                    text: const TextSpan(
+                  const NutriLabel.rich(
+                    variant: NutriLabelVariant.headline,
+                    TextSpan(
                       children: [
                         TextSpan(
                           text: 'Nutri',
-                          style: TextStyle(
-                            color: AppColors.onBackground,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(color: AppColors.onBackground),
                         ),
                         TextSpan(
                           text: 'Scan',
-                          style: TextStyle(
-                            color: AppColors.secondary,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(color: AppColors.secondary),
                         ),
                       ],
                     ),
@@ -108,20 +101,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
               ),
               const SizedBox(height: 48),
-              const Text(
+              const NutriLabel(
                 'Bem-vindo de volta!',
+                variant: NutriLabelVariant.headline,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.onBackground,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              const NutriLabel(
                 'Inicia sessão para continuar.',
+                variant: NutriLabelVariant.body,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.border, fontSize: 14),
+                color: AppColors.border,
               ),
               const SizedBox(height: 40),
               NutriTextField(
@@ -140,12 +130,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               Align(
                 alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'Esqueceste a password?',
-                    style: TextStyle(fontSize: 13),
-                  ),
+                child: NutriButton.text(
+                  onPressed: () {}, //TODO: Inserir lógica de recuperação de password
+                  label: 'Esqueceste a password?',
                 ),
               ),
               const SizedBox(height: 10),
@@ -163,7 +150,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       label: 'Google',
                       // height: 20 garante que o logo não deforma o botão de 45px
                       icon: Image.asset(
-                        'assets/images/logos/google-logo-48.png',
+                        'assets/logos/google-logo-50.png',
                         height: 18,
                       ),
                       onPressed: () {
@@ -176,7 +163,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: NutriButton.transparent(
                       label: 'Apple',
                       icon: Image.asset(
-                        'assets/images/logos/apple-logo-50.png',
+                        'assets/logos/apple-logo-50.png',
                         height: 18,
                         // Garante que o logo da Apple fica com a cor dinâmica do tema/texto
                         color: AppColors.onBackground,
@@ -192,20 +179,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  const NutriLabel(
                     'Não tens conta? ',
-                    style: TextStyle(color: AppColors.secondary, fontSize: 14),
+                    variant: NutriLabelVariant.body,
                   ),
-                  GestureDetector(
-                    onTap: () => context.push('/register'),
-                    child: const Text(
-                      'Registar',
-                      style: TextStyle(
-                        color: AppColors.onBackground,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
+                  NutriButton.text(
+                    label: 'Registar',
+                    onPressed: () => context.push('/register'),
                   ),
                 ],
               ),

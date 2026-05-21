@@ -44,19 +44,29 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const Text('Quais os teus\nobjetivos?',
-                  style: TextStyle(color: AppColors.onBackground, fontSize: 28, fontWeight: FontWeight.bold)),
+              const NutriLabel(
+                'Quais os teus\nobjetivos?',
+                variant: NutriLabelVariant.display,
+              ),
               const SizedBox(height: 10),
-              const Text('Usamos estas informações para elaborar recomendações personalizadas.',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+              const NutriLabel(
+                'Usamos estas informações para elaborar recomendações personalizadas.',
+                variant: NutriLabelVariant.small,
+              ),
               const SizedBox(height: 30),
-              const Text('PESO',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              const NutriLabel(
+                'PESO',
+                variant: NutriLabelVariant.small,
+                fontWeight: FontWeight.bold,
+              ),
               const SizedBox(height: 10),
               _buildWeightSelector(),
               const SizedBox(height: 30),
-              const Text('OUTROS',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              const NutriLabel(
+                'OUTROS',
+                variant: NutriLabelVariant.small,
+                fontWeight: FontWeight.bold,
+              ),
               const SizedBox(height: 15),
               // TODO: make these selectable and save the selections
               _buildOptionTile('Melhorar desempenho desportivo', isSelected: true),
@@ -88,13 +98,13 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
                   color: selected ? AppColors.primary : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(option.label,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: selected ? AppColors.onBackground : AppColors.textMuted,
-                      fontSize: 13,
-                      fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-                    )),
+                child: NutriLabel(
+                  option.label,
+                  variant: NutriLabelVariant.small,
+                  textAlign: TextAlign.center,
+                  fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                  color: selected ? AppColors.onBackground : AppColors.textMuted,
+                ),
               ),
             ),
           );
@@ -115,11 +125,11 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
       child: Row(
         children: [
           Expanded(
-            child: Text(title,
-                style: TextStyle(
-                  color: isSelected ? AppColors.secondary : AppColors.onBackground,
-                  fontSize: 14,
-                )),
+            child: NutriLabel(
+              title,
+              variant: NutriLabelVariant.body,
+              color: isSelected ? AppColors.secondary : AppColors.onBackground,
+            ),
           ),
           Icon(
             isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
@@ -133,6 +143,11 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
   static Widget _stepIndicator(String label) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
     decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
-    child: Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
+    child: NutriLabel(
+      label,
+      variant: NutriLabelVariant.small,
+      color: AppColors.secondary,
+      fontWeight: FontWeight.bold,
+    ),
   );
 }

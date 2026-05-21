@@ -8,6 +8,8 @@ import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/providers/saved_products_provider.dart';
 import 'package:nutri_scan/presentation/screens/meals/utils/meal_utils.dart';
 
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+
 class MealsScreen extends ConsumerStatefulWidget {
   const MealsScreen({super.key});
 
@@ -31,8 +33,10 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
-                Text('Refeições',
-                    style: TextStyle(color: AppColors.onBackground, fontSize: 22, fontWeight: FontWeight.bold)),
+                NutriLabel(
+                  'Refeições', variant: NutriLabelVariant.display,
+                  fontWeight: FontWeight.bold,
+                ),
               ],
             ),
           ),
@@ -49,7 +53,11 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
                 const SizedBox(height: 10),
                 OutlinedButton(
                   onPressed: () {context.push('/meals/add');},
-                  child: const Text('+ Adicionar refeição'),
+                  child: 
+                  const NutriLabel(
+                    '+ Adicionar refeição',
+                    variant: NutriLabelVariant.body,
+                  ),
                 ),
               ]
             ),
@@ -81,9 +89,8 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title,
-                    style: const TextStyle(color: AppColors.onBackground, fontWeight: FontWeight.bold)),
-                Text(totalKcal, style: const TextStyle(color: AppColors.secondary, fontSize: 12)),
+                NutriLabel(title, variant: NutriLabelVariant.bodyLarge),
+                NutriLabel(totalKcal, variant: NutriLabelVariant.body, color: AppColors.secondary),
               ],
             ),
           ),
@@ -92,10 +99,12 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(item['name']!,
-                    style: const TextStyle(color: AppColors.onBackground, fontSize: 13)),
-                Text(item['kcal']!,
-                    style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+                NutriLabel(item['name']!, variant: NutriLabelVariant.small, color: AppColors.onBackground),
+                NutriLabel(
+                  item['kcal']!,
+                  variant: NutriLabelVariant.small,
+                  color: AppColors.textMuted,
+                ),
               ],
             ),
           )),

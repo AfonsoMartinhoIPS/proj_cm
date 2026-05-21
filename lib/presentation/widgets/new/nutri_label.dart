@@ -1,11 +1,91 @@
-//TODO: Implementar o NutriLabel.
-//O NutriLabel é um widget simples que exibe texto ao longo da app.
-//Ele pode ser usado para mostrar:
+// presentation/widgets/new/nutri_label.dart
 
-//- Títulos de seções (ex: "NOTIFICAÇÕES", "PREFERÊNCIAS")
-//- Rótulos de campos (ex: "EMAIL", "SENHA")
-//- Qualquer outro texto informativo que precise de destaque visual.
-//O objetivo é criar um componente reutilizável que mantenha a consistência visual
-//em toda a aplicação, seguindo as diretrizes de design do app e do Material 3.
+import 'package:flutter/material.dart';
 
-//Após a implementação, a NutriLabel deve ser implementada nos devidos ecras, e outros widgets da biblioteca (Informar os devidos desenvolvidores).
+/// Enum para mapear os estilos de texto definidos no teu AppTheme.
+enum NutriLabelVariant {
+  display,    // displaySmall
+  headline,   // headlineMedium
+  title,      // titleLarge
+  bodyLarge,  // bodyLarge
+  body,       // bodyMedium
+  small,      // bodySmall
+  label,      // labelLarge
+}
+
+class NutriLabel extends StatelessWidget {
+  final String? text;
+  final InlineSpan? textSpan; // Suporte para Text.rich
+  final NutriLabelVariant variant;
+  final Color? color;
+  final TextAlign? textAlign;
+  final FontWeight? fontWeight;
+  final double? letterSpacing;
+  final int? maxLines;
+  final TextOverflow? overflow;
+
+  const NutriLabel(
+    this.text, {
+    super.key,
+    this.variant = NutriLabelVariant.body,
+    this.color,
+    this.textAlign,
+    this.fontWeight,
+    this.letterSpacing,
+    this.maxLines,
+    this.overflow,
+  }) : textSpan = null;
+
+  /// Construtor para suportar árvores de TextSpan complexas (ex: marcas bi-color)
+  const NutriLabel.rich(
+    this.textSpan, {
+    super.key,
+    this.variant = NutriLabelVariant.body,
+    this.color,
+    this.textAlign,
+    this.fontWeight,
+    this.letterSpacing,
+    this.maxLines,
+    this.overflow,
+  }) : text = null;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    // Resolve o estilo base do teu TextTheme centralizado
+    final baseStyle = switch (variant) {
+      NutriLabelVariant.display => textTheme.displaySmall,
+      NutriLabelVariant.headline => textTheme.headlineMedium,
+      NutriLabelVariant.title => textTheme.titleLarge,
+      NutriLabelVariant.bodyLarge => textTheme.bodyLarge,
+      NutriLabelVariant.body => textTheme.bodyMedium,
+      NutriLabelVariant.small => textTheme.bodySmall,
+      NutriLabelVariant.label => textTheme.labelLarge,
+    };
+
+    final finalStyle = baseStyle?.copyWith(
+      color: color,
+      fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
+    );
+
+    if (textSpan != null) {
+      return Text.rich(
+        textSpan!,
+        textAlign: textAlign,
+        maxLines: maxLines,
+        overflow: overflow,
+        style: finalStyle,
+      );
+    }
+
+    return Text(
+      text ?? '',
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+      style: finalStyle,
+    );
+  }
+}

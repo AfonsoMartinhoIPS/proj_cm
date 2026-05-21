@@ -41,13 +41,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         confirmPassword.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Preenche todos os campos')));
+      ).showSnackBar(const SnackBar(content: NutriLabel('Preenche todos os campos', variant: NutriLabelVariant.small, color: AppColors.error)));
       return;
     }
 
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('As passwords não coincidem')),
+        const SnackBar(content: NutriLabel('As passwords não coincidem', variant: NutriLabelVariant.small, color: AppColors.error)),
       );
       return;
     }
@@ -70,7 +70,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         },
         error: (e, _) => ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(e.toString()))),
+        ).showSnackBar(SnackBar(content: Text(e.toString()))),   //TODO: Trocar para NutriLabel????
       );
     });
 
@@ -89,18 +89,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const Text(
+              const NutriLabel(
                 'Cria Conta',
-                style: TextStyle(
-                  color: AppColors.onBackground,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                variant: NutriLabelVariant.display,
               ),
               const SizedBox(height: 10),
-              const Text(
+              const NutriLabel(
                 'Regista-te para começar a monitorizar a tua nutrição.',
-                style: TextStyle(color: AppColors.textMuted, fontSize: 14),
+                variant: NutriLabelVariant.small,
               ),
               const SizedBox(height: 35),
               NutriTextField(
@@ -150,12 +146,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
-                    child: Text(
+                    child: NutriLabel(
                       'Aceito os Termos de Serviço e a Política de Privacidade.',
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 12,
-                      ),
+                      variant: NutriLabelVariant.small,
                     ),
                   ),
                 ],

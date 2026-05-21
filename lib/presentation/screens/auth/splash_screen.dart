@@ -5,6 +5,8 @@ import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -68,27 +70,40 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(22),
                 ),
-                child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 40),
+                child: const Icon(
+                  Icons.qr_code_scanner,
+                  color: Colors.white,
+                  size: 40,
+                ),
               ),
               const SizedBox(height: 24),
-              RichText(
-                text: const TextSpan(
+              const NutriLabel.rich(
+                variant: NutriLabelVariant.title,
+                TextSpan(
                   children: [
                     TextSpan(
                       text: 'Nutri',
-                      style: TextStyle(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: AppColors.onBackground,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     TextSpan(
                       text: 'Scan',
-                      style: TextStyle(color: AppColors.secondary, fontSize: 32, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: AppColors.secondary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
+              const NutriLabel(
                 'Come melhor. Vive melhor.',
-                style: TextStyle(color: AppColors.primary, fontSize: 14, letterSpacing: 1.2),
+                variant: NutriLabelVariant.small,
+                color: AppColors.primary,
+                letterSpacing: 1.2,
               ),
             ],
           ),

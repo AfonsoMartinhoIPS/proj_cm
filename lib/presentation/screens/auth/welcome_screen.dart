@@ -26,25 +26,35 @@ class WelcomeScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.border, width: 3),
                   ),
-                  child: const Center(child: Text('🥗', style: TextStyle(fontSize: 50))),
+                  child: const Center(
+                    // Mantido Text nativo apenas para o emoji de interface
+                    child: Text('🥗', style: TextStyle(fontSize: 50)),
+                  ),
                 ),
               ),
               const SizedBox(height: 30),
-              RichText(
+              const NutriLabel.rich(
+                variant: NutriLabelVariant.headline,
                 textAlign: TextAlign.center,
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                TextSpan(
                   children: [
-                    TextSpan(text: 'Bem-vindo ao\n', style: TextStyle(color: AppColors.onBackground)),
-                    TextSpan(text: 'NutriScan', style: TextStyle(color: AppColors.secondary)),
+                    TextSpan(
+                      text: 'Bem-vindo ao\n', 
+                      style: TextStyle(color: AppColors.onBackground),
+                    ),
+                    TextSpan(
+                      text: 'NutriScan', 
+                      style: TextStyle(color: AppColors.secondary),
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: 15),
-              const Text(
+              const NutriLabel(
                 'A tua app de nutrição pessoal.\nMonitoriza, aprende e atinge os teus objetivos.',
+                variant: NutriLabelVariant.body,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textMuted, fontSize: 14, height: 1.5),
+                color: AppColors.textMuted,
               ),
               const SizedBox(height: 30),
               Wrap(
@@ -89,7 +99,11 @@ class WelcomeScreen extends StatelessWidget {
         children: [
           const CircleAvatar(radius: 3, backgroundColor: AppColors.primary),
           const SizedBox(width: 8),
-          Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 11)),
+          NutriLabel(
+            label,
+            variant: NutriLabelVariant.small,
+            color: AppColors.secondary,
+          ),
         ],
       ),
     );

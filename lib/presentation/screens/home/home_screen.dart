@@ -92,13 +92,10 @@ class HomeScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                const NutriLabel(
                   'Esta semana',
-                  style: TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  variant: NutriLabelVariant.body,
+                  color: AppColors.textMuted,
                 ),
                 NutriButton.text(
                   label: 'Ver mais →',
@@ -115,14 +112,12 @@ class HomeScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                const NutriLabel(
                   'Refeições de hoje',
-                  style: TextStyle(
-                    color: AppColors.onBackground,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  variant: NutriLabelVariant.body,
+                  color: AppColors.textMuted,
                 ),
+                
                 NutriButton.text(
                   label: 'Ver todas',
                   onPressed: () => context.go('/meals'),
@@ -152,17 +147,16 @@ class _Greeting extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            NutriLabel(
               'Olá, ${user?.displayName ?? "utilizador"}',
-              style: const TextStyle(
-                color: AppColors.onBackground,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              variant: NutriLabelVariant.headline,
+              color: AppColors.onBackground,
             ),
-            Text(
+            const SizedBox(height: 5),
+            NutriLabel(
               _formatTodayHeader(),
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+              variant: NutriLabelVariant.small,
+              color: AppColors.textMuted,
             ),
           ],
         ),
@@ -222,28 +216,32 @@ class _CalorieCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  NutriLabel(
                     'Calorias hoje'.toUpperCase(),
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 10,
-                      letterSpacing: 1,
-                    ),
+                    variant: NutriLabelVariant.small,
+                    color: AppColors.textMuted,
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    totalCalories.toStringAsFixed(0),
-                    style: const TextStyle(
-                      color: AppColors.secondary,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    'de ${goalCalories.toStringAsFixed(0)} kcal',
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 12,
+                  NutriLabel.rich(
+                    variant: NutriLabelVariant.headline,
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: totalCalories.toStringAsFixed(0),
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '\n de ${goalCalories.toStringAsFixed(0)} kcal',
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -257,12 +255,12 @@ class _CalorieCard extends StatelessWidget {
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
+                child:
+                 NutriLabel(
                   '${(progress * 100).toStringAsFixed(0)}%',
-                  style: const TextStyle(
-                    color: AppColors.onBackground,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  variant: NutriLabelVariant.small,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -319,9 +317,10 @@ class _CalorieCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white54, fontSize: 10),
+        NutriLabel(
+          label.toUpperCase(),
+          variant: NutriLabelVariant.small,
+          color: AppColors.textMuted,
         ),
         const SizedBox(height: 6),
         SizedBox(
@@ -337,13 +336,10 @@ class _CalorieCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          '${currentGrams.toStringAsFixed(0)}/${goalGrams.toStringAsFixed(0)}g',
-          style: const TextStyle(
-            color: AppColors.onBackground,
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-          ),
+        NutriLabel(
+          '${currentGrams.toStringAsFixed(0)}g / ${goalGrams.toStringAsFixed(0)}g',
+          variant: NutriLabelVariant.small,
+          color: AppColors.textMuted,
         ),
       ],
     );
@@ -405,13 +401,12 @@ class _WeeklyChart extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
+
+              NutriLabel(
                 _ptWeekdaysShort[day.weekday - 1],
-                style: TextStyle(
-                  color: isToday ? AppColors.secondary : AppColors.textMuted,
-                  fontSize: 10,
-                ),
-              ),
+                variant: NutriLabelVariant.small,
+                color: isToday ? AppColors.secondary : AppColors.textMuted,
+              )
             ],
           );
         }).toList(),
@@ -441,9 +436,10 @@ class _TodayMeals extends StatelessWidget {
     if (entries.isEmpty) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 20),
-        child: Text(
+        child: NutriLabel(
           'Sem refeições registadas hoje.',
-          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+          variant: NutriLabelVariant.small,
+          color: AppColors.textMuted,
         ),
       );
     }
@@ -491,18 +487,18 @@ class _TodayMeals extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
+            child: 
+            
+              NutriLabel(
+                title,
+                variant: NutriLabelVariant.bodyLarge,
                 color: AppColors.onBackground,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
               ),
-            ),
           ),
-          Text(
+          NutriLabel(
             kcalLabel,
-            style: const TextStyle(color: AppColors.secondary, fontSize: 13),
+            variant: NutriLabelVariant.small,
+            color: AppColors.secondary,
           ),
         ],
       ),

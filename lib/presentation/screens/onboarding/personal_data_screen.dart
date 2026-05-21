@@ -21,7 +21,6 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
   DateTime? dateOfBirth;
   Gender gender = Gender.other;
 
-
   /**
    * Initialize the text controllers with existing onboarding data, if available. 
    * This allows users to go back and forth between steps without losing their input.
@@ -31,8 +30,12 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     super.initState();
     final onboarding = ref.read(onboardingProvider);
     nameController.text = onboarding.name;
-    weightController.text = onboarding.weight > 0 ? onboarding.weight.toString() : '';
-    heightController.text = onboarding.height > 0 ? onboarding.height.toString() : '';
+    weightController.text = onboarding.weight > 0
+        ? onboarding.weight.toString()
+        : '';
+    heightController.text = onboarding.height > 0
+        ? onboarding.height.toString()
+        : '';
     dateOfBirth = onboarding.dateOfBirth;
     gender = onboarding.gender;
   }
@@ -66,20 +69,25 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     final weight = double.tryParse(weightController.text.trim());
     final height = int.tryParse(heightController.text.trim());
 
-    if (name.isEmpty || dateOfBirth == null || weight == null || height == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preenche todos os campos')),
-      );
+    if (name.isEmpty ||
+        dateOfBirth == null ||
+        weight == null ||
+        height == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: NutriLabel('Preenche todos os campos', variant: NutriLabelVariant.small, color: AppColors.error)));
       return;
     }
 
-    ref.read(onboardingProvider.notifier).setPersonalData(
-      name: name,
-      dateOfBirth: dateOfBirth!,
-      gender: gender,
-      weight: weight,
-      height: height,
-    );
+    ref
+        .read(onboardingProvider.notifier)
+        .setPersonalData(
+          name: name,
+          dateOfBirth: dateOfBirth!,
+          gender: gender,
+          weight: weight,
+          height: height,
+        );
 
     ref.read(onboardingProvider.notifier).calculateAndSetGoals();
     context.push('/onboarding/objectives');
@@ -90,7 +98,10 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         title: _stepIndicator('1 / 4'),
         centerTitle: true,
       ),
@@ -101,11 +112,15 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const Text('Olá! Vamos\nconhecer-te',
-                  style: TextStyle(color: AppColors.onBackground, fontSize: 28, fontWeight: FontWeight.bold)),
+              const NutriLabel(
+                'Olá! Vamos\nconhecer-te',
+                variant: NutriLabelVariant.display,
+              ),
               const SizedBox(height: 10),
-              const Text('Precisamos de alguns dados para personalizar a tua experiência.',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+              const NutriLabel(
+                'Precisamos de alguns dados para personalizar a tua experiência.',
+                variant: NutriLabelVariant.small,
+              ),
               const SizedBox(height: 30),
               NutriTextField(
                 controller: nameController,
@@ -124,17 +139,27 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(child: NutriTextField(controller: weightController, label: 'Peso (kg)', hint: '62', keyboardType: TextInputType.number)),
+                  Expanded(
+                    child: NutriTextField(
+                      controller: weightController,
+                      label: 'Peso (kg)',
+                      hint: '62',
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
                   const SizedBox(width: 15),
-                  Expanded(child: NutriTextField(controller: heightController, label: 'Altura (cm)', hint: '168', keyboardType: TextInputType.number)),
+                  Expanded(
+                    child: NutriTextField(
+                      controller: heightController,
+                      label: 'Altura (cm)',
+                      hint: '168',
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 40),
               NutriButton(label: 'Próximo', onPressed: submit),
-              /*ElevatedButton(
-                onPressed: submit,
-                child: const Text('Próximo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),*/
               const SizedBox(height: 20),
             ],
           ),
@@ -156,17 +181,18 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('DATA DE NASCIMENTO',
-                style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold)),
+            const NutriLabel(
+              'DATA DE NASCIMENTO',
+              variant: NutriLabelVariant.small,
+              fontWeight: FontWeight.bold,
+            ),
             const SizedBox(height: 4),
-            Text(
+            NutriLabel(
               dateOfBirth == null
                   ? 'Selecionar'
                   : '${dateOfBirth!.day}/${dateOfBirth!.month}/${dateOfBirth!.year}',
-              style: TextStyle(
-                color: dateOfBirth == null ? AppColors.border : AppColors.onBackground,
-                fontSize: 16,
-              ),
+              variant: NutriLabelVariant.body,
+              color: dateOfBirth == null ? AppColors.border : null,
             ),
           ],
         ),
@@ -185,8 +211,11 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('GENERO',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold)),
+          const NutriLabel(
+            'GÉNERO',
+            variant: NutriLabelVariant.small,
+            fontWeight: FontWeight.bold,
+          ),
           DropdownButton<Gender>(
             value: gender,
             isExpanded: true,
@@ -195,9 +224,15 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
             style: const TextStyle(color: AppColors.onBackground, fontSize: 16),
             onChanged: (g) => setState(() => gender = g ?? Gender.other),
             items: const [
-              DropdownMenuItem(value: Gender.female, child: Text('Feminino')),
-              DropdownMenuItem(value: Gender.male,   child: Text('Masculino')),
-              DropdownMenuItem(value: Gender.other,  child: Text('Outro')),
+              DropdownMenuItem(
+                value: Gender.female,
+                child: NutriLabel('Feminino'),
+              ),
+              DropdownMenuItem(
+                value: Gender.male,
+                child: NutriLabel('Masculino'),
+              ),
+              DropdownMenuItem(value: Gender.other, child: NutriLabel('Outro')),
             ],
           ),
         ],
@@ -207,7 +242,15 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
 
   static Widget _stepIndicator(String label) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
-    child: Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
+    decoration: BoxDecoration(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: NutriLabel(
+      label,
+      variant: NutriLabelVariant.small,
+      color: AppColors.secondary,
+      fontWeight: FontWeight.bold,
+    ),
   );
 }
