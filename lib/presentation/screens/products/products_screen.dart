@@ -46,13 +46,11 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text( // TODO: substituir por NutriLabel
+                const NutriLabel( 
                   'Produtos',
-                  style: TextStyle(
                     color: AppColors.onBackground,
-                    fontSize: 20,
+                    variant: NutriLabelVariant.bodyLarge,
                     fontWeight: FontWeight.bold,
-                  ),
                 ),
                 NutriButton.text(
                   label: 'Novo',
@@ -85,11 +83,10 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text( // TODO: substituir por NutriLabel
+                      NutriLabel(
                         'Erro ao carregar produtos: $e',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.textMuted),
-                      ),
+                        color: AppColors.textMuted),
                       const SizedBox(height: 15),
                       // Utiliza a variante transparente (ou primária) para uma ação de recuperação
                       SizedBox(
@@ -120,16 +117,14 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text( // TODO: substituir por NutriLabel
+                          NutriLabel( 
                             _query.isEmpty
                                 ? 'Ainda não guardaste nenhum produto.'
                                 : 'Nenhum produto encontrado para "$_query".',
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
                               color: AppColors.textMuted,
-                              fontSize: 14,
+                              variant: NutriLabelVariant.body,
                             ),
-                          ),
                           const SizedBox(height: 16),
                           if (_query.isEmpty) ...[
                             // Se não tem produtos, sugere fazer scan imediatamente
@@ -210,41 +205,35 @@ class _ProductRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text( // TODO: substituir por NutriLabel
+                  NutriLabel( 
                     savedProduct.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
                       color: AppColors.onBackground,
-                      fontSize: 14,
+                      variant: NutriLabelVariant.body,
                       fontWeight: FontWeight.w600,
-                    ),
                   ),
                   if ((savedProduct.brand ?? '').isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text( // TODO: substituir por NutriLabel
+                    NutriLabel( 
                       savedProduct.brand!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
                         color: AppColors.textMuted,
-                        fontSize: 12,
+                        variant: NutriLabelVariant.body,
                       ),
-                    ),
                   ],
                 ],
               ),
             ),
-            Text( // TODO: substituir por NutriLabel
+            NutriLabel( 
               savedProduct.caloriesPer100g != null
                   ? '${savedProduct.caloriesPer100g!.toStringAsFixed(0)} kcal'
                   : '— kcal',
-              style: const TextStyle(
                 color: AppColors.secondary,
-                fontSize: 13,
+                variant: NutriLabelVariant.body,
                 fontWeight: FontWeight.bold,
               ),
-            ),
           ],
         ),
       ),
@@ -273,20 +262,16 @@ class _ProductRow extends StatelessWidget {
               width: 45,
               height: 45,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Text( // TODO: substituir por NutriLabel???
+              errorBuilder: (_, _, _) => NutriLabel( 
                 fallbackLetter,
-                style: const TextStyle(
                   color: AppColors.onBackground,
-                  fontSize: 18,
+                  variant: NutriLabelVariant.bodyLarge,
                 ),
-              ),
             )
-          : Text( // TODO: substituir por NutriLabel???
+          : NutriLabel( 
               fallbackLetter,
-              style: const TextStyle(
                 color: AppColors.onBackground,
-                fontSize: 18,
-              ),
+                variant: NutriLabelVariant.bodyLarge,
             ),
     );
   }

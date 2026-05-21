@@ -14,7 +14,7 @@ class AddMealScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(child:  Scaffold(
-      appBar: AppBar(title: const Text('Adicionar Refeição')),
+      appBar: AppBar(title: const NutriLabel('Adicionar Refeição')), 
       body: AddMealForm(initialProduct: initialProduct),
     ));
   }
@@ -95,11 +95,11 @@ class _AddMealFormState extends ConsumerState<AddMealForm> {
           NutriTextField(controller: servingGrams, label: 'Quantidade (g)', hint: '100', keyboardType: TextInputType.number),
           DropdownButton<MealType>(
             value: selectedMealType,
-            items: MealType.values.map((meal) => DropdownMenuItem(value: meal, child: Text(meal.toString().split('.').last))).toList(),
+            items: MealType.values.map((meal) => DropdownMenuItem(value: meal, child: NutriLabel(meal.toString().split('.').last))).toList(),  
             onChanged: (meal) { if (meal != null) setState(() => selectedMealType = meal); },
           ),
           
-          ElevatedButton(onPressed: submit, child: const Text('Salvar Refeição')),
+          ElevatedButton(onPressed: submit, child: const NutriLabel('Salvar Refeição')), 
         ],
       ),
     );

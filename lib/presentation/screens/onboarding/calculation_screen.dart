@@ -48,7 +48,7 @@ class _CalculationScreenState extends State<CalculationScreen> {
                     ),
                   ),
                   // Nativo por causa do Icon
-                  const Text('📊', style: TextStyle(fontSize: 60)),
+                  const NutriLabel('📊', variant: NutriLabelVariant.display,), //(tem de ser maior)
                   const SizedBox(
                     width: 180,
                     height: 180,

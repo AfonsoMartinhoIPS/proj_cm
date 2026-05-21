@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
+//import 'package:nutri_scan/presentation/widgets/new/nutri_label.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -35,7 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: const Text('Definições'),
+        title: const NutriLabel('Definições', variant: NutriLabelVariant.display,),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -76,9 +77,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15, top: 10),
-      child: Text(title,
-          style: const TextStyle(
-              color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+      child: NutriLabel(title,
+              color: AppColors.textMuted, variant: NutriLabelVariant.small, fontWeight: FontWeight.bold, letterSpacing: 1.2),
     );
   }
 }

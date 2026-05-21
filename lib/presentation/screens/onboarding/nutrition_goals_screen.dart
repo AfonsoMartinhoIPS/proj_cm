@@ -146,7 +146,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
               ),
               const Spacer(),
               //TODO: label style -> fontSize 16, fontWeight bold
-              NutriButton(label: 'Próximo', onPressed: submit),
+              NutriButton(label: 'Próximo', onPressed: submit, fontSize: 16,),
               const SizedBox(height: 20),
             ],
           ),

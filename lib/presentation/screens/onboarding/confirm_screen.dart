@@ -126,13 +126,11 @@ class ConfirmScreen extends ConsumerWidget {
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(20),
     ),
-    child: Text(
+    child: NutriLabel( //TODO: ver o estado visual
       label,
-      style: const TextStyle(
         color: AppColors.secondary,
-        fontSize: 12,
+        variant: NutriLabelVariant.small,
         fontWeight: FontWeight.bold,
-      ),
     ),
   );
 }

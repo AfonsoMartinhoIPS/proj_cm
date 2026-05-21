@@ -12,7 +12,7 @@ class CreditsScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: const NutriLabel('Créditos'), // TODO: verificar o estado visual
+        title: const NutriLabel('Créditos'), 
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -30,8 +30,8 @@ class CreditsScreen extends StatelessWidget {
                   child: const Icon(Icons.restaurant_menu, color: AppColors.onBackground, size: 40),
                 ),
                 const SizedBox(height: 15),
-                RichText( // TODO: substituir por NutriLabel???
-                  text: const TextSpan(
+                NutriLabel.rich( 
+                  const TextSpan(
                     children: [
                       TextSpan(text: 'Nutri',
                           style: TextStyle(color: AppColors.onBackground, fontSize: 24, fontWeight: FontWeight.bold)),
@@ -40,18 +40,18 @@ class CreditsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const NutriLabel('versão 1.0.0 · 2025–2026', // TODO: verificar estado visual
+                const NutriLabel('versão 1.0.0 · 2025–2026', 
                     color: AppColors.textMuted, variant: NutriLabelVariant.small,),
               ],
             ),
           ),
           const SizedBox(height: 40),
-          const NutriLabel('Unidade Curricular, Computação Móvel', // TODO: verificar estado visual
+          const NutriLabel('Unidade Curricular, Computação Móvel', 
               color: AppColors.textMuted, variant: NutriLabelVariant.small,),
-          const NutriLabel('Instituição, Instituto Politécnico de Setúbal', // TODO: verificar estado visual
+          const NutriLabel('Instituição, Instituto Politécnico de Setúbal', 
               color: AppColors.textMuted, variant: NutriLabelVariant.small,),
           const SizedBox(height: 30),
-          const NutriLabel('EQUIPA', // TODO: verificar estado visual
+          const NutriLabel('EQUIPA', 
                   color: AppColors.textMuted, variant: NutriLabelVariant.small, fontWeight: FontWeight.bold, letterSpacing: 1.2),
           const SizedBox(height: 15),
           
@@ -72,7 +72,7 @@ class CreditsScreen extends StatelessWidget {
           ),
           
           const SizedBox(height: 40),
-          const NutriLabel('Feito com dedicação · IPS 2025/2026', // TODO: verificar estado visual
+          const NutriLabel('Feito com dedicação · IPS 2025/2026', 
               textAlign: TextAlign.center,
               color: AppColors.textMuted, variant: NutriLabelVariant.small,),
           const SizedBox(height: 20),
@@ -92,7 +92,7 @@ class CreditsScreen extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: AppColors.surface,
-          child: NutriLabel(initials, // TODO: verificar estado visual
+          child: NutriLabel(initials, 
               color: AppColors.secondary, variant: NutriLabelVariant.small, fontWeight: FontWeight.bold),
         ),
         title: NutriLabel(name, color: AppColors.onBackground, variant: NutriLabelVariant.body,),

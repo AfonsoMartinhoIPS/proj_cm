@@ -43,18 +43,17 @@ class ProductDetailsScreen extends ConsumerWidget {
       body: asyncProduct.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text( // TODO: substituir por NutriLabel
+          child: NutriLabel( 
             'Erro: $e',
-            style: const TextStyle(color: AppColors.textMuted),
+            color: AppColors.textMuted
           ),
         ),
         data: (product) {
           if (product == null) {
             return const Center(
-              child: Text( // TODO: substituir por NutriLabel
+              child: NutriLabel( 
                 'Produto não encontrado.',
-                style: TextStyle(color: AppColors.textMuted), 
-              ),
+                color: AppColors.textMuted), 
             );
           }
           return SingleChildScrollView(
@@ -105,12 +104,12 @@ class _ActionButtons extends ConsumerWidget {
               if (isSaved) {
                 notifier.removeProduct(product.barcode);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Produto removido')), // TODO: substituir por NutriLabel???
+                  const SnackBar(content: NutriLabel('Produto removido', color: AppColors.border,),), 
                 );
               } else {
                 notifier.saveProduct(product);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Produto guardado')), // TODO: substituir por NutriLabel
+                  const SnackBar(content: NutriLabel('Produto guardado', color: AppColors.border,)), 
                 );
               }
             },
@@ -151,7 +150,7 @@ class _NotesSection extends ConsumerWidget {
         onSubmit: (text) {
           final updated = [
             ...savedProduct.notes,
-            SavedProductNote(text: text, createdAt: DateTime.now()), // TODO: substituir por NutriLabel
+            SavedProductNote(text: text, createdAt: DateTime.now()), 
           ];
           ref
               .read(savedProductsProvider.notifier)
@@ -183,29 +182,25 @@ class _NotesSection extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text( // TODO: substituir por NutriLabel
+              const NutriLabel( 
                 'NOTAS',
-                style: TextStyle(
                   color: AppColors.textMuted,
-                  fontSize: 11,
+                  variant: NutriLabelVariant.small,
                   letterSpacing: 1.2,
                   fontWeight: FontWeight.bold,
-                ),
               ),
-              Text( // TODO: substituir por NutriLabel
+              NutriLabel( 
                 'Guardado em ${_fmt(savedProduct.savedAt)}',
-                style: const TextStyle(
                   color: AppColors.textMuted,
-                  fontSize: 11,
+                  variant: NutriLabelVariant.small,
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 12),
           if (savedProduct.notes.isEmpty)
-            const Text( // TODO: substituir por NutriLabel
+            const NutriLabel(
               'Ainda não adicionaste notas a este produto.',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+              color: AppColors.textMuted, variant: NutriLabelVariant.body,
             )
           else
             ...List.generate(savedProduct.notes.length, (i) {
@@ -219,21 +214,17 @@ class _NotesSection extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text( // TODO: substituir por NutriLabel
+                          NutriLabel( 
                             note.text,
-                            style: const TextStyle(
                               color: AppColors.onBackground,
-                              fontSize: 13,
-                            ),
+                              variant: NutriLabelVariant.body,
                           ),
                           const SizedBox(height: 2),
-                          Text( // TODO: substituir por NutriLabel
+                            NutriLabel( 
                             _fmt(note.createdAt),
-                            style: const TextStyle(
                               color: AppColors.textMuted,
-                              fontSize: 10,
+                              variant: NutriLabelVariant.small,
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -290,8 +281,7 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
     if (text.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Escreve algo na nota'))); // TODO: substituir por NutriLabel???
-      return;
+      ).showSnackBar(const SnackBar(content: NutriLabel('Escreve algo na nota'))); 
     }
     Navigator.of(context).pop();
     widget.onSubmit(text);
@@ -306,13 +296,11 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text( // TODO: substituir por NutriLabel
+          const NutriLabel( 
             'Nova nota',
-            style: TextStyle(
               color: AppColors.onBackground,
-              fontSize: 16,
+              variant: NutriLabelVariant.bodyLarge,
               fontWeight: FontWeight.bold,
-            ),
           ),
           const SizedBox(height: 12),
           NutriTextField(
@@ -373,41 +361,33 @@ class _ProductHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text( // TODO: substituir por NutriLabel
+              NutriLabel( 
                 product.name,
-                style: const TextStyle(
                   color: AppColors.onBackground,
-                  fontSize: 18,
+                  variant: NutriLabelVariant.bodyLarge,
                   fontWeight: FontWeight.bold,
-                ),
               ),
               if ((product.brand ?? '').isNotEmpty) ...[
                 const SizedBox(height: 4),
-                Text( // TODO: substituir por NutriLabel
+                NutriLabel(
                   product.brand!,
-                  style: const TextStyle(
                     color: AppColors.textMuted,
-                    fontSize: 13,
-                  ),
+                  variant: NutriLabelVariant.body,
                 ),
               ],
               if ((product.displayQuantity ?? '').isNotEmpty) ...[
                 const SizedBox(height: 4),
-                Text( // TODO: substituir por NutriLabel
+                NutriLabel( 
                   product.displayQuantity!,
-                  style: const TextStyle(
+                  variant: NutriLabelVariant.small,
                     color: AppColors.textMuted,
-                    fontSize: 12,
-                  ),
                 ),
               ],
               const SizedBox(height: 6),
-              Text( // TODO: substituir por NutriLabel
+              NutriLabel( 
                 'Cód: ${product.barcode}',
-                style: const TextStyle(
                   color: AppColors.textMuted,
-                  fontSize: 11,
-                ),
+                variant: NutriLabelVariant.small,
               ),
             ],
           ),
@@ -436,14 +416,12 @@ class _NutritionTable extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text( // TODO: substituir por NutriLabel
+          const NutriLabel( 
             'POR 100G / 100ML',
-            style: TextStyle(
               color: AppColors.textMuted,
-              fontSize: 11,
+              variant: NutriLabelVariant.small,
               letterSpacing: 1.2,
               fontWeight: FontWeight.bold,
-            ),
           ),
           const SizedBox(height: 12),
           _row('Calorias', n.caloriesPer100g, 'kcal'),
@@ -465,17 +443,14 @@ class _NutritionTable extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text( // TODO: substituir por NutriLabel
+          NutriLabel( 
             label,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
-          ),
-          Text( // TODO: substituir por NutriLabel
+            color: AppColors.textMuted, variant: NutriLabelVariant.small),
+          NutriLabel( 
             value != null ? '${value.toStringAsFixed(1)} $unit' : '— $unit',
-            style: const TextStyle(
+              variant: NutriLabelVariant.small,
               color: AppColors.onBackground,
-              fontSize: 13,
               fontWeight: FontWeight.w600,
-            ),
           ),
         ],
       ),

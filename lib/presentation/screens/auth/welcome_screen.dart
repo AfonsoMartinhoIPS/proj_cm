@@ -28,7 +28,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   child: const Center(
                     // Mantido Text nativo apenas para o emoji de interface
-                    child: Text('🥗', style: TextStyle(fontSize: 50)),
+                    child: NutriLabel('🥗', variant: NutriLabelVariant.display,), // TODO: se isto se mantiver precisa de um tamanho maior
                   ),
                 ),
               ),
