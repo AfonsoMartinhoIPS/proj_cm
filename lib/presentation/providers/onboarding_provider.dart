@@ -18,8 +18,8 @@ class OnboardingState {
     this.password = '',
     this.dateOfBirth,
     this.gender = Gender.other,
-    this.weight = 70,
-    this.height = 170,
+    this.weight = 0,
+    this.height = 0,
     this.objective = Objective.maintainWeight,
     this.nutritionGoals,
   });

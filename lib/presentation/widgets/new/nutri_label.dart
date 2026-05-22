@@ -1,85 +1,91 @@
+// presentation/widgets/new/nutri_label.dart
+
 import 'package:flutter/material.dart';
-import 'package:nutri_scan/core/core.dart';
 
-/// Visual variants for [NutriLabel].
-///
-/// - [section] — small uppercase header above grouped content
-///   (e.g. "NOTIFICAÇÕES", "OBJETIVOS DIÁRIOS", "NOTAS").
-/// - [field] — even smaller uppercase label above form inputs
-///   (e.g. "EMAIL", "PESO (KG)").
-/// - [caption] — non-uppercased muted body text for inline hints
-///   (e.g. "de 1580 kcal", "Guardado em 12/05/2026").
-enum NutriLabelVariant { section, field, caption }
+/// Enum para mapear os estilos de texto definidos no teu AppTheme.
+enum NutriLabelVariant {
+  display,    // displaySmall
+  headline,   // headlineMedium
+  title,      // titleLarge
+  bodyLarge,  // bodyLarge
+  body,       // bodyMedium
+  small,      // bodySmall
+  label,      // labelLarge
+}
 
-/// Reusable text label that enforces the project's typographic conventions
-/// for section headers, form labels and captions. Always coloured with
-/// [AppColors.textMuted] unless [color] is provided.
 class NutriLabel extends StatelessWidget {
-  final String text;
+  final String? text;
+  final InlineSpan? textSpan; // Suporte para Text.rich
   final NutriLabelVariant variant;
   final Color? color;
   final TextAlign? textAlign;
+  final FontWeight? fontWeight;
+  final double? letterSpacing;
+  final int? maxLines;
+  final TextOverflow? overflow;
 
   const NutriLabel(
     this.text, {
     super.key,
-    this.variant = NutriLabelVariant.section,
+    this.variant = NutriLabelVariant.body,
     this.color,
     this.textAlign,
-  });
+    this.fontWeight,
+    this.letterSpacing,
+    this.maxLines,
+    this.overflow,
+  }) : textSpan = null;
 
-  /// Convenience constructor for section headers ("NOTIFICAÇÕES").
-  const NutriLabel.section(
-    this.text, {
+  /// Construtor para suportar árvores de TextSpan complexas (ex: marcas bi-color)
+  const NutriLabel.rich(
+    this.textSpan, {
     super.key,
+    this.variant = NutriLabelVariant.body,
     this.color,
     this.textAlign,
-  }) : variant = NutriLabelVariant.section;
-
-  /// Convenience constructor for form field labels ("EMAIL").
-  const NutriLabel.field(
-    this.text, {
-    super.key,
-    this.color,
-    this.textAlign,
-  }) : variant = NutriLabelVariant.field;
-
-  /// Convenience constructor for inline caption text.
-  const NutriLabel.caption(
-    this.text, {
-    super.key,
-    this.color,
-    this.textAlign,
-  }) : variant = NutriLabelVariant.caption;
+    this.fontWeight,
+    this.letterSpacing,
+    this.maxLines,
+    this.overflow,
+  }) : text = null;
 
   @override
   Widget build(BuildContext context) {
-    final resolved = color ?? AppColors.textMuted;
-    final style = switch (variant) {
-      NutriLabelVariant.section => TextStyle(
-          color: resolved,
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1.2,
-        ),
-      NutriLabelVariant.field => TextStyle(
-          color: resolved,
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1.0,
-        ),
-      NutriLabelVariant.caption => TextStyle(
-          color: resolved,
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-        ),
+    final textTheme = Theme.of(context).textTheme;
+
+    // Resolve o estilo base do teu TextTheme centralizado
+    final baseStyle = switch (variant) {
+      NutriLabelVariant.display => textTheme.displaySmall,
+      NutriLabelVariant.headline => textTheme.headlineMedium,
+      NutriLabelVariant.title => textTheme.titleLarge,
+      NutriLabelVariant.bodyLarge => textTheme.bodyLarge,
+      NutriLabelVariant.body => textTheme.bodyMedium,
+      NutriLabelVariant.small => textTheme.bodySmall,
+      NutriLabelVariant.label => textTheme.labelLarge,
     };
 
-    // section and field are conventionally uppercased — caption is rendered as-is.
-    final rendered = variant == NutriLabelVariant.caption
-        ? text
-        : text.toUpperCase();
+    final finalStyle = baseStyle?.copyWith(
+      color: color,
+      fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
+    );
 
-    return Text(rendered, style: style, textAlign: textAlign);
+    if (textSpan != null) {
+      return Text.rich(
+        textSpan!,
+        textAlign: textAlign,
+        maxLines: maxLines,
+        overflow: overflow,
+        style: finalStyle,
+      );
+    }
+
+    return Text(
+      text ?? '',
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+      style: finalStyle,
+    );
   }
 }

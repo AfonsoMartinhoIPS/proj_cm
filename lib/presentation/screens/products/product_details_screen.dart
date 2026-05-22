@@ -33,28 +33,21 @@ class ProductDetailsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text('Detalhes'),
-      ),
+      appBar: NutriTopNavBar(showBackButton: true, title: 'Detalhes do Produto'),
       body: asyncProduct.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text(
+          child: NutriLabel( 
             'Erro: $e',
-            style: const TextStyle(color: AppColors.textMuted),
+            color: AppColors.textMuted
           ),
         ),
         data: (product) {
           if (product == null) {
             return const Center(
-              child: Text(
+              child: NutriLabel( 
                 'Produto não encontrado.',
-                style: TextStyle(color: AppColors.textMuted),
-              ),
+                color: AppColors.textMuted), 
             );
           }
           return SingleChildScrollView(
@@ -91,7 +84,6 @@ class _ActionButtons extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       children: [
-        // Guardar / Remover (Variante secundária/contorno)
         Expanded(
           child: NutriButton.transparent(
             label: isSaved ? 'Remover' : 'Guardar',
@@ -105,19 +97,18 @@ class _ActionButtons extends ConsumerWidget {
               if (isSaved) {
                 notifier.removeProduct(product.barcode);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Produto removido')),
+                  const SnackBar(content: NutriLabel('Produto removido', color: AppColors.border,),), 
                 );
               } else {
                 notifier.saveProduct(product);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Produto guardado')),
+                  const SnackBar(content: NutriLabel('Produto guardado', color: AppColors.border,)), 
                 );
               }
             },
           ),
         ),
         const SizedBox(width: 12),
-        // Adicionar à Refeição (Ação Primária com destaque)
         Expanded(
           child: NutriButton(
             label: 'Add refeição',
@@ -151,7 +142,7 @@ class _NotesSection extends ConsumerWidget {
         onSubmit: (text) {
           final updated = [
             ...savedProduct.notes,
-            SavedProductNote(text: text, createdAt: DateTime.now()),
+            SavedProductNote(text: text, createdAt: DateTime.now()), 
           ];
           ref
               .read(savedProductsProvider.notifier)
@@ -173,6 +164,7 @@ class _NotesSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        // TODO: replace with NutriCard widget
         color: AppColors.surfaceDark,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
@@ -183,15 +175,25 @@ class _NotesSection extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const NutriLabel.section('Notas'),
-              NutriLabel.caption('Guardado em ${_fmt(savedProduct.savedAt)}'),
+              const NutriLabel(
+                'NOTAS',
+                color: AppColors.textMuted,
+                variant: NutriLabelVariant.small,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.bold,
+              ),
+              NutriLabel(
+                'Guardado em ${_fmt(savedProduct.savedAt)}',
+                color: AppColors.textMuted,
+                variant: NutriLabelVariant.small,
+              ),
             ],
           ),
           const SizedBox(height: 12),
           if (savedProduct.notes.isEmpty)
-            const Text(
+            const NutriLabel(
               'Ainda não adicionaste notas a este produto.',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+              color: AppColors.textMuted, variant: NutriLabelVariant.body,
             )
           else
             ...List.generate(savedProduct.notes.length, (i) {
@@ -205,21 +207,17 @@ class _NotesSection extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          NutriLabel( 
                             note.text,
-                            style: const TextStyle(
                               color: AppColors.onBackground,
-                              fontSize: 13,
-                            ),
+                              variant: NutriLabelVariant.body,
                           ),
                           const SizedBox(height: 2),
-                          Text(
+                            NutriLabel( 
                             _fmt(note.createdAt),
-                            style: const TextStyle(
                               color: AppColors.textMuted,
-                              fontSize: 10,
+                              variant: NutriLabelVariant.small,
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -237,7 +235,7 @@ class _NotesSection extends ConsumerWidget {
               );
             }),
           const SizedBox(height: 8),
-          NutriButton.text(
+          NutriButton.text( 
             label: 'Adicionar nota',
             fontSize: 13,
             icon: const Icon(Icons.add, color: AppColors.secondary, size: 16),
@@ -276,8 +274,7 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
     if (text.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Escreve algo na nota')));
-      return;
+      ).showSnackBar(const SnackBar(content: NutriLabel('Escreve algo na nota'))); 
     }
     Navigator.of(context).pop();
     widget.onSubmit(text);
@@ -292,13 +289,11 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
+          const NutriLabel( 
             'Nova nota',
-            style: TextStyle(
               color: AppColors.onBackground,
-              fontSize: 16,
+              variant: NutriLabelVariant.bodyLarge,
               fontWeight: FontWeight.bold,
-            ),
           ),
           const SizedBox(height: 12),
           NutriTextField(
@@ -333,6 +328,7 @@ class _ProductHeader extends StatelessWidget {
           width: 90,
           height: 90,
           decoration: BoxDecoration(
+            // TODO: replace with NutriCard widget
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.border),
@@ -359,41 +355,33 @@ class _ProductHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              NutriLabel( 
                 product.name,
-                style: const TextStyle(
                   color: AppColors.onBackground,
-                  fontSize: 18,
+                  variant: NutriLabelVariant.bodyLarge,
                   fontWeight: FontWeight.bold,
-                ),
               ),
               if ((product.brand ?? '').isNotEmpty) ...[
                 const SizedBox(height: 4),
-                Text(
+                NutriLabel(
                   product.brand!,
-                  style: const TextStyle(
                     color: AppColors.textMuted,
-                    fontSize: 13,
-                  ),
+                  variant: NutriLabelVariant.body,
                 ),
               ],
               if ((product.displayQuantity ?? '').isNotEmpty) ...[
                 const SizedBox(height: 4),
-                Text(
+                NutriLabel( 
                   product.displayQuantity!,
-                  style: const TextStyle(
+                  variant: NutriLabelVariant.small,
                     color: AppColors.textMuted,
-                    fontSize: 12,
-                  ),
                 ),
               ],
               const SizedBox(height: 6),
-              Text(
+              NutriLabel( 
                 'Cód: ${product.barcode}',
-                style: const TextStyle(
                   color: AppColors.textMuted,
-                  fontSize: 11,
-                ),
+                variant: NutriLabelVariant.small,
               ),
             ],
           ),
@@ -415,6 +403,7 @@ class _NutritionTable extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        // TODO: replace with NutriCard widget
         color: AppColors.surfaceDark,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
@@ -422,7 +411,13 @@ class _NutritionTable extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const NutriLabel.section('Por 100g / 100ml'),
+          const NutriLabel(
+            'POR 100G / 100ML',
+            color: AppColors.textMuted,
+            variant: NutriLabelVariant.small,
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.bold,
+          ),
           const SizedBox(height: 12),
           _row('Calorias', n.caloriesPer100g, 'kcal'),
           _row('Proteína', n.proteinPer100g, 'g'),
@@ -443,17 +438,14 @@ class _NutritionTable extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
+          NutriLabel( 
             label,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
-          ),
-          Text(
+            color: AppColors.textMuted, variant: NutriLabelVariant.small),
+          NutriLabel( 
             value != null ? '${value.toStringAsFixed(1)} $unit' : '— $unit',
-            style: const TextStyle(
+              variant: NutriLabelVariant.small,
               color: AppColors.onBackground,
-              fontSize: 13,
               fontWeight: FontWeight.w600,
-            ),
           ),
         ],
       ),
