@@ -73,9 +73,15 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
         dateOfBirth == null ||
         weight == null ||
         height == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: NutriLabel('Preenche todos os campos', variant: NutriLabelVariant.small, color: AppColors.error)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: NutriLabel(
+            'Preenche todos os campos',
+            variant: NutriLabelVariant.small,
+            color: AppColors.error,
+          ),
+        ),
+      );
       return;
     }
 

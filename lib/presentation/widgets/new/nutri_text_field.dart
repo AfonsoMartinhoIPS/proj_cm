@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/widgets/new/nutri_label.dart';
 
 /// Um campo de texto personalizado e animado para a aplicação NutriScan.
 ///
@@ -111,118 +112,117 @@ class _NutriTextFieldState extends State<NutriTextField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          constraints: const BoxConstraints(minHeight: 64), 
-          decoration: ShapeDecoration(
-            color: containerBg,
-            shape: RoundedRectangleBorder(
-              side: BorderSide(
-                width: 2.0,
-                color: activeColor,
+        GestureDetector(
+          onTap: () {
+            // Garante que o campo ganha foco ao clicar em qualquer ponto do container
+            if (!_focusNode.hasFocus) {
+              _focusNode.requestFocus();
+            }
+          },
+          behavior: HitTestBehavior.opaque, // Garante o clique mesmo em áreas vazias/transparentes
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            constraints: const BoxConstraints(minHeight: 64), 
+            decoration: ShapeDecoration(
+              color: containerBg,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  width: 2.0,
+                  color: activeColor,
+                ),
+                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
               ),
-              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.md, 
-              vertical: AppSizes.sm,
-            ),
-            child: Row(
-              crossAxisAlignment: widget.maxLines != null && widget.maxLines! > 1 
-                  ? CrossAxisAlignment.start 
-                  : CrossAxisAlignment.center,
-              children: [
-                if (widget.icon != null) ...[
-                  Icon(
-                    widget.icon,
-                    size: AppSizes.iconMd,
-                    color: _errorText != null
-                        ? theme.colorScheme.error
-                        : _isFocused 
-                            ? theme.colorScheme.secondary 
-                            : hintColor,
-                  ),
-                  const SizedBox(width: AppSizes.sm),
-                ],
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        widget.label.toUpperCase(),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                              color: labelColor,
-                              letterSpacing: 1.2,
-                              fontSize: AppSizes.fontXs - 2,
-                              fontWeight: FontWeight.w600,
-                            ) ??
-                            TextStyle(
-                              color: labelColor,
-                              fontSize: AppSizes.fontXs - 2,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.2,
-                            ),
-                      ),
-                      const SizedBox(height: AppSizes.xs),
-                      TextFormField(
-                        controller: widget.controller,
-                        focusNode: _focusNode,
-                        obscureText: widget.obscureText,
-                        keyboardType: widget.keyboardType,
-                        autofocus: widget.autofocus,
-                        maxLines: widget.maxLines,
-                        textInputAction: widget.textInputAction,
-                        onChanged: widget.onChanged,
-                        onFieldSubmitted: widget.onSubmitted,
-                        cursorColor: theme.colorScheme.secondary,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontSize: AppSizes.fontMd - 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.md, 
+                vertical: AppSizes.sm,
+              ),
+              child: Row(
+                crossAxisAlignment: widget.maxLines != null && widget.maxLines! > 1 
+                    ? CrossAxisAlignment.start 
+                    : CrossAxisAlignment.center,
+                children: [
+                  if (widget.icon != null) ...[
+                    Icon(
+                      widget.icon,
+                      size: AppSizes.iconMd,
+                      color: _errorText != null
+                          ? theme.colorScheme.error
+                          : _isFocused 
+                              ? theme.colorScheme.secondary 
+                              : hintColor,
+                    ),
+                    const SizedBox(width: AppSizes.sm),
+                  ],
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        NutriLabel(
+                          widget.label.toUpperCase(),
+                          variant: NutriLabelVariant.label,
+                          color: labelColor,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.w600,
                         ),
-                        validator: (value) {
-                          if (widget.validator != null) {
-                            final error = widget.validator!(value);
-                            setState(() => _errorText = error);
-                            return error;
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
-                          hintText: widget.hint,
-                          hintStyle: TextStyle(
-                            color: hintColor,
+                        const SizedBox(height: AppSizes.xs),
+                        TextFormField(
+                          controller: widget.controller,
+                          focusNode: _focusNode,
+                          obscureText: widget.obscureText,
+                          keyboardType: widget.keyboardType,
+                          autofocus: widget.autofocus,
+                          maxLines: widget.maxLines,
+                          textInputAction: widget.textInputAction,
+                          onChanged: widget.onChanged,
+                          onFieldSubmitted: widget.onSubmitted,
+                          cursorColor: theme.colorScheme.secondary,
+                          style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: AppSizes.fontMd - 1,
                           ),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          focusedErrorBorder: InputBorder.none,
-                          errorStyle: const TextStyle(height: 0, fontSize: 0),
-                          isCollapsed: true,
+                          validator: (value) {
+                            if (widget.validator != null) {
+                              final error = widget.validator!(value);
+                              setState(() => _errorText = error);
+                              return error;
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                            hintText: widget.hint,
+                            hintStyle: TextStyle(
+                              color: hintColor,
+                              fontSize: AppSizes.fontMd - 1,
+                            ),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            focusedErrorBorder: InputBorder.none,
+                            errorStyle: const TextStyle(height: 0, fontSize: 0),
+                            isCollapsed: true,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
         if (_errorText != null)
           Padding(
             padding: const EdgeInsets.only(left: AppSizes.sm, top: AppSizes.xs),
-            child: Text(
+            child: NutriLabel(
               _errorText!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.error,
-                fontSize: AppSizes.fontXs,
-              ),
+              variant: NutriLabelVariant.small,
+              color: theme.colorScheme.error,
             ),
           ),
       ],

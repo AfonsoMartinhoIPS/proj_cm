@@ -14,8 +14,18 @@ class ObjectivesScreen extends ConsumerStatefulWidget {
 }
 
 class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
-  
   Objective _selectedObjective = Objective.loseWeight;
+
+  final List<String> _selectedSecondaryObjectives = [
+    'Melhorar desempenho desportivo',
+  ];
+
+  // Lista com as opções disponíveis para o Toggler
+  final List<String> _otherObjectivesOptions = [
+    'Melhorar desempenho desportivo',
+    'Criar hábitos mais saudáveis',
+    'Prevenir doenças relacionadas ao estilo de vida',
+  ];
 
   void _selectObjective(Objective objective) {
     setState(() {
@@ -23,17 +33,33 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
     });
   }
 
-  void submit(){
+  void _toggleSecondaryObjective(String option) {
+    setState(() {
+      if (_selectedSecondaryObjectives.contains(option)) {
+        _selectedSecondaryObjectives.remove(option);
+      } else {
+        _selectedSecondaryObjectives.add(option);
+      }
+    });
+  }
+
+  void submit() {
     ref.read(onboardingProvider.notifier).setObjective(_selectedObjective);
+    //TODO: Guardar objetivo secondario:
+    //ef.read(onboardingProvider.notifier).setSecondaryObjectives(_selectedSecondaryObjectives);
+
     context.push('/onboarding/nutrition-goals');
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         title: _stepIndicator('2 / 4'),
         centerTitle: true,
       ),
@@ -68,12 +94,17 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
                 fontWeight: FontWeight.bold,
               ),
               const SizedBox(height: 15),
-              // TODO: make these selectable and save the selections
-              _buildOptionTile('Melhorar desempenho desportivo', isSelected: true),
-              _buildOptionTile('Criar hábitos mais saudáveis', isSelected: false),
-              _buildOptionTile('Prevenir doenças relacionadas ao estilo de vida', isSelected: false),
+              ..._otherObjectivesOptions.map((option) {
+                final isSelected = _selectedSecondaryObjectives.contains(
+                  option,
+                );
+                return NutriToggler(
+                  title: option,
+                  isSelected: isSelected,
+                  onTap: () => _toggleSecondaryObjective(option),
+                );
+              }),
               const SizedBox(height: 40),
-              //TODO: label style -> fontSize 16, fontWeight bold
               NutriButton(label: 'Próximo', onPressed: submit),
               const SizedBox(height: 20),
             ],
@@ -85,7 +116,10 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
 
   Widget _buildWeightSelector() {
     return Container(
-      decoration: BoxDecoration(color: AppColors.surfaceDark, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceDark,
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Row(
         children: Objective.values.map((option) {
           final selected = _selectedObjective == option;
@@ -103,7 +137,9 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
                   variant: NutriLabelVariant.small,
                   textAlign: TextAlign.center,
                   fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-                  color: selected ? AppColors.onBackground : AppColors.textMuted,
+                  color: selected
+                      ? AppColors.onBackground
+                      : AppColors.textMuted,
                 ),
               ),
             ),
@@ -120,7 +156,9 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
       decoration: BoxDecoration(
         color: isSelected ? AppColors.surface : AppColors.surfaceDark,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: isSelected ? AppColors.secondary : AppColors.border),
+        border: Border.all(
+          color: isSelected ? AppColors.secondary : AppColors.border,
+        ),
       ),
       child: Row(
         children: [
@@ -142,7 +180,10 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
 
   static Widget _stepIndicator(String label) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
+    decoration: BoxDecoration(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(20),
+    ),
     child: NutriLabel(
       label,
       variant: NutriLabelVariant.small,
