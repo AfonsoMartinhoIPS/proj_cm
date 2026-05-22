@@ -39,15 +39,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Preenche todos os campos')));
+          NutriFeedback.showSnackBar(
+            context,
+            'Preenche todos os campos',
+            NutriFeedbackType.error,
+          );
       return;
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('As passwords não coincidem')),
+      NutriFeedback.showSnackBar(
+        context,
+        'As passwords não coincidem',
+        NutriFeedbackType.error,
       );
       return;
     }
@@ -68,19 +72,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         data: (user) {
           if (user != null) context.go('/');
         },
-        error: (e, _) => ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString()))),
+        error: (e, _) {
+          NutriFeedback.showSnackBar(
+            context,
+            e.toString(),
+            NutriFeedbackType.error,
+          );
+        }
       );
     });
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+      appBar: const NutriTopNavBar(
+        showBackButton: true,
+        title: 'Cria Conta',
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -89,18 +95,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const Text(
+              const NutriLabel(
                 'Cria Conta',
-                style: TextStyle(
-                  color: AppColors.onBackground,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                variant: NutriLabelVariant.display,
               ),
               const SizedBox(height: 10),
-              const Text(
+              const NutriLabel(
                 'Regista-te para começar a monitorizar a tua nutrição.',
-                style: TextStyle(color: AppColors.textMuted, fontSize: 14),
+                variant: NutriLabelVariant.small,
               ),
               const SizedBox(height: 35),
               NutriTextField(
@@ -150,12 +152,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
-                    child: Text(
+                    child: NutriLabel(
                       'Aceito os Termos de Serviço e a Política de Privacidade.',
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 12,
-                      ),
+                      variant: NutriLabelVariant.small,
                     ),
                   ),
                 ],
@@ -163,7 +162,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               const SizedBox(height: 40),
               NutriButton(
                 label: 'Registar',
-                isLoading: authState.isLoading, // O teu widget trata do resto!
+                isLoading: authState.isLoading,
                 onPressed: submit,
               ),
               const SizedBox(height: 25),

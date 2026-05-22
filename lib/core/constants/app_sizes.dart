@@ -1,3 +1,4 @@
+// core/config/constants/app_sizes.dart
 class AppSizes {
   AppSizes._();
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/widgets/new/nutri_wave_background.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -9,67 +10,68 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Spacer(),
-              Center(
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.border, width: 3),
-                  ),
-                  child: const Center(child: Text('🥗', style: TextStyle(fontSize: 50))),
+      body: WaveBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Spacer(),
+                Center(
+                    child: Center(
+                      child: NutriIcon(size: 100, fill: true),
+                    ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              RichText(
-                textAlign: TextAlign.center,
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                const SizedBox(height: 30),
+                const NutriLabel.rich(
+                  variant: NutriLabelVariant.headline,
+                  textAlign: TextAlign.center,
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Bem-vindo ao\n',
+                        style: TextStyle(color: AppColors.onBackground),
+                      ),
+                      TextSpan(
+                        text: 'NutriScan',
+                        style: TextStyle(color: AppColors.secondary),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 15),
+                const NutriLabel(
+                  'A tua app de nutrição pessoal.\nMonitoriza, aprende e atinge os teus objetivos.',
+                  variant: NutriLabelVariant.body,
+                  textAlign: TextAlign.center,
+                  color: AppColors.textMuted,
+                ),
+                const SizedBox(height: 30),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  alignment: WrapAlignment.center,
                   children: [
-                    TextSpan(text: 'Bem-vindo ao\n', style: TextStyle(color: AppColors.onBackground)),
-                    TextSpan(text: 'NutriScan', style: TextStyle(color: AppColors.secondary)),
+                    _buildTag('Scan de produtos'),
+                    _buildTag('Registo de refeições'),
+                    _buildTag('Objetivos personalizados'),
                   ],
                 ),
-              ),
-              const SizedBox(height: 15),
-              const Text(
-                'A tua app de nutrição pessoal.\nMonitoriza, aprende e atinge os teus objetivos.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textMuted, fontSize: 14, height: 1.5),
-              ),
-              const SizedBox(height: 30),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                alignment: WrapAlignment.center,
-                children: [
-                  _buildTag('Scan de produtos'),
-                  _buildTag('Registo de refeições'),
-                  _buildTag('Objetivos personalizados'),
-                ],
-              ),
-              const Spacer(),
-              NutriButton(
-                label: 'Começar agora',
-                onPressed: () => context.push('/onboarding/personal-data'),
-              ),
-              const SizedBox(height: 15),
-              NutriButton.transparent(
-                label: 'Já tenho conta · ',
-                onPressed: () => context.push('/login'),
-                secondaryLabel: 'Entrar',
-              ),
-              const SizedBox(height: 20),
-            ],
+                const Spacer(),
+                NutriButton(
+                  label: 'Começar agora',
+                  onPressed: () => context.push('/onboarding/personal-data'),
+                ),
+                const SizedBox(height: 15),
+                NutriButton.transparent(
+                  label: 'Já tenho conta · ',
+                  onPressed: () => context.push('/login'),
+                  secondaryLabel: 'Entrar',
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -89,7 +91,11 @@ class WelcomeScreen extends StatelessWidget {
         children: [
           const CircleAvatar(radius: 3, backgroundColor: AppColors.primary),
           const SizedBox(width: 8),
-          Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 11)),
+          NutriLabel(
+            label,
+            variant: NutriLabelVariant.small,
+            color: AppColors.secondary,
+          ),
         ],
       ),
     );

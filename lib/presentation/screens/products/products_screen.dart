@@ -1,3 +1,4 @@
+// lib/presentation/screens/products/products_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -38,146 +39,130 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   Widget build(BuildContext context) {
     final asyncSaved = ref.watch(savedProductsProvider);
 
-    return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 8, 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Produtos',
-                  style: TextStyle(
-                    color: AppColors.onBackground,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                NutriButton.text(
-                  label: 'Novo',
-                  onPressed: () => context.push('/scan'),
-                  icon: const Icon(
-                    Icons.add,
-                    color: AppColors.secondary,
-                    size: 18,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-            child: NutriTextField(
-              controller: _searchController,
-              label: 'Pesquisar',
-              hint: 'Pesquisar produtos guardados',
-              icon: Icons.search,
-              onChanged: (value) => setState(() => _query = value),
-            ),
-          ),
-          Expanded(
-            child: asyncSaved.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Erro ao carregar produtos: $e',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.textMuted),
-                      ),
-                      const SizedBox(height: 15),
-                      // Utiliza a variante transparente (ou primária) para uma ação de recuperação
-                      SizedBox(
-                        width:
-                            180, // Largura controlada para não esticar no ecrã inteiro
-                        child: NutriButton.transparent(
-                          label: 'Tentar novamente',
-                          icon: const Icon(
-                            Icons.refresh,
-                            color: AppColors.secondary,
-                            size: 18,
-                          ),
-                          onPressed: () =>
-                              ref.invalidate(savedProductsProvider),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              data: (savedProducts) {
-                final filtered = _filter(savedProducts);
-
-                if (filtered.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            _query.isEmpty
-                                ? 'Ainda não guardaste nenhum produto.'
-                                : 'Nenhum produto encontrado para "$_query".',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: AppColors.textMuted,
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          if (_query.isEmpty) ...[
-                            // Se não tem produtos, sugere fazer scan imediatamente
-                            SizedBox(
-                              width: 200,
-                              child: NutriButton(
-                                label: 'Faz o teu 1º scan',
-                                icon: const Icon(
-                                  Icons.qr_code_scanner,
-                                  color: AppColors.onBackground,
-                                  size: 18,
-                                ),
-                                onPressed: () => context.push('/scan'),
-                              ),
-                            ),
-                          ] else ...[
-                            // Se foi a pesquisa que falhou, mostra botão de texto para limpar
-                            NutriButton.text(
-                              label: 'Limpar pesquisa',
-                              fontSize: 14,
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() => _query = '');
-                              },
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final savedProduct = filtered[index];
-                    return _ProductRow(
-                      savedProduct: savedProduct,
-                      onTap: () =>
-                          context.push('/products/${savedProduct.barcode}'),
-                    );
-                  },
-                );
-              },
-            ),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: NutriTopNavBar(
+        showBackButton: false,
+        title: 'Produtos',
+        actions: [
+          NutriButton.text(
+            label: 'Novo',
+            onPressed: () => context.push('/scan'),
+            icon: const Icon(Icons.add, color: AppColors.secondary, size: 18),
           ),
         ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              child: NutriTextField(
+                controller: _searchController,
+                label: 'Pesquisar',
+                hint: 'Pesquisar produtos guardados',
+                icon: Icons.search,
+                onChanged: (value) => setState(() => _query = value),
+              ),
+            ),
+            Expanded(
+              child: asyncSaved.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        NutriLabel(
+                          'Erro ao carregar produtos: $e',
+                          textAlign: TextAlign.center,
+                          color: AppColors.textMuted,
+                        ),
+                        const SizedBox(height: 15),
+                        SizedBox(
+                          width:
+                              180,
+                          child: NutriButton.transparent(
+                            label: 'Tentar novamente',
+                            icon: const Icon(
+                              Icons.refresh,
+                              color: AppColors.secondary,
+                              size: 18,
+                            ),
+                            onPressed: () =>
+                                ref.invalidate(savedProductsProvider),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                data: (savedProducts) {
+                  final filtered = _filter(savedProducts);
+
+                  if (filtered.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            NutriLabel(
+                              _query.isEmpty
+                                  ? 'Ainda não guardaste nenhum produto.'
+                                  : 'Nenhum produto encontrado para "$_query".',
+                              textAlign: TextAlign.center,
+                              color: AppColors.textMuted,
+                              variant: NutriLabelVariant.body,
+                            ),
+                            const SizedBox(height: 16),
+                            if (_query.isEmpty) ...[
+                              SizedBox(
+                                width: 200,
+                                child: NutriButton(
+                                  label: 'Faz o teu 1º scan',
+                                  icon: const Icon(
+                                    Icons.qr_code_scanner,
+                                    color: AppColors.onBackground,
+                                    size: 18,
+                                  ),
+                                  onPressed: () => context.push('/scan'),
+                                ),
+                              ),
+                            ] else ...[
+                              NutriButton.text(
+                                label: 'Limpar pesquisa',
+                                fontSize: 14,
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() => _query = '');
+                                },
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: filtered.length,
+                    itemBuilder: (context, index) {
+                      final savedProduct = filtered[index];
+                      return _ProductRow(
+                        savedProduct: savedProduct,
+                        onTap: () =>
+                            context.push('/products/${savedProduct.barcode}'),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -210,40 +195,34 @@ class _ProductRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  NutriLabel(
                     savedProduct.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.onBackground,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    color: AppColors.onBackground,
+                    variant: NutriLabelVariant.body,
+                    fontWeight: FontWeight.w600,
                   ),
                   if ((savedProduct.brand ?? '').isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(
+                    NutriLabel(
                       savedProduct.brand!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 12,
-                      ),
+                      color: AppColors.textMuted,
+                      variant: NutriLabelVariant.body,
                     ),
                   ],
                 ],
               ),
             ),
-            Text(
+            NutriLabel(
               savedProduct.caloriesPer100g != null
                   ? '${savedProduct.caloriesPer100g!.toStringAsFixed(0)} kcal'
                   : '— kcal',
-              style: const TextStyle(
-                color: AppColors.secondary,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
+              color: AppColors.secondary,
+              variant: NutriLabelVariant.body,
+              fontWeight: FontWeight.bold,
             ),
           ],
         ),
@@ -273,20 +252,16 @@ class _ProductRow extends StatelessWidget {
               width: 45,
               height: 45,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Text(
+              errorBuilder: (_, _, _) => NutriLabel(
                 fallbackLetter,
-                style: const TextStyle(
-                  color: AppColors.onBackground,
-                  fontSize: 18,
-                ),
+                color: AppColors.onBackground,
+                variant: NutriLabelVariant.bodyLarge,
               ),
             )
-          : Text(
+          : NutriLabel(
               fallbackLetter,
-              style: const TextStyle(
-                color: AppColors.onBackground,
-                fontSize: 18,
-              ),
+              color: AppColors.onBackground,
+              variant: NutriLabelVariant.bodyLarge,
             ),
     );
   }
