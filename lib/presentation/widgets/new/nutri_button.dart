@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/widgets/new/nutri_label.dart';
 
 // TODO: Importar o ficheiro do Daniel quando ele fizer merge
 // import 'package:nutri_scan/presentation/widgets/nutri_label.dart';
@@ -144,16 +145,21 @@ class NutriButton extends StatelessWidget {
                           const SizedBox(width: 10),
                         ],
                         // TODO: Substituir por NutriLabel(text: label, variant: ...) quando o Daniel terminar
-                        Text(
-                          label, 
-                          style: textStyle?.copyWith(fontWeight: isTextVariant ? FontWeight.w600 : FontWeight.w500),
+                        NutriLabel(
+                          label,
+                          variant: NutriLabelVariant.label,
+                          color: baseColor,
+                          fontWeight: isTextVariant ? FontWeight.w600 : FontWeight.w500,
                         ),
+                        
                         if (secondaryLabel.isNotEmpty) ...[
                           const SizedBox(width: 6),
                           // TODO: Substituir por NutriLabel(text: secondaryLabel, variant: ...)
-                          Text(
-                            secondaryLabel, 
-                            style: textStyle?.copyWith(fontWeight: FontWeight.w900),
+                          NutriLabel(
+                            secondaryLabel,
+                            variant: NutriLabelVariant.label,
+                            color: baseColor.withValues(alpha: 0.8),
+                            fontWeight: FontWeight.w900,
                           ),
                         ],
                       ],
