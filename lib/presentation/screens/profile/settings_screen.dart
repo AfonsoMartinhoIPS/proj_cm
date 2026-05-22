@@ -1,7 +1,7 @@
+// lib/presentation/screens/profile/settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
-//import 'package:nutri_scan/presentation/widgets/new/nutri_label.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -34,16 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        title: const NutriLabel(
-          'Definições',
-          variant: NutriLabelVariant.display,
-        ),
-      ),
+      appBar: NutriTopNavBar(showBackButton: true, title: 'Definições'),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [

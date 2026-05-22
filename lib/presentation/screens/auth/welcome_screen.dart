@@ -19,16 +19,9 @@ class WelcomeScreen extends StatelessWidget {
               const Spacer(),
               Center(
                 child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.border, width: 3),
-                  ),
-                  child: const Center(
-                    // Mantido Text nativo apenas para o emoji de interface
-                    child: NutriLabel('🥗', variant: NutriLabelVariant.display,), // TODO: se isto se mantiver precisa de um tamanho maior
+                  child: Center(
+                    //TODO: Emoji subestituido por imagem, e tamanho aumentado. É preciso escolher um icon melhor.
+                    child: NutriIcon(size: 100,fill: true),
                   ),
                 ),
               ),
@@ -39,11 +32,11 @@ class WelcomeScreen extends StatelessWidget {
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Bem-vindo ao\n', 
+                      text: 'Bem-vindo ao\n',
                       style: TextStyle(color: AppColors.onBackground),
                     ),
                     TextSpan(
-                      text: 'NutriScan', 
+                      text: 'NutriScan',
                       style: TextStyle(color: AppColors.secondary),
                     ),
                   ],

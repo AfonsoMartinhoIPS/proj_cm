@@ -1,3 +1,4 @@
+// lib/presentation/screens/onboarding/nutrition_goals_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -70,13 +71,10 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        title: _stepIndicator('3 / 4'),
-        centerTitle: true,
+      appBar: const NutriTopNavBar(
+        showBackButton: true,
+        title:
+            '3 / 4',
       ),
       body: SafeArea(
         child: Padding(

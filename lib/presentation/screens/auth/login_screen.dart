@@ -28,8 +28,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: NutriLabel('Preenche o email e a password', variant: NutriLabelVariant.small, color: AppColors.error)),
+      NutriFeedback.showSnackBar(
+        context,
+        'Preenche o email e a password',
+        NutriFeedbackType.error,
       );
       return;
     }
@@ -46,19 +48,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         data: (user) {
           if (user != null) context.go('/');
         },
-        error: (e, _) => ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString()))), //TODO: Trocar para NutriLabel????
+        error: (e, _) {
+          NutriFeedback.showSnackBar(
+            context,
+            e.toString(),
+            NutriFeedbackType.error,
+          );
+        },
       );
     });
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back),
-        //   onPressed: () => context.pop(),
-        // ),
+      appBar: const NutriTopNavBar(
+        showBackButton:
+            true, // Opcional, esconde a seta caso seja o ecrã inicial do fluxo
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -71,16 +75,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    width:
+                        40, // Definimos uma largura fixa para o quadrado do logo
+                    height:
+                        40, // Definimos uma altura fixa para o quadrado do logo
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
-                      Icons.qr_code_scanner,
-                      color: AppColors.onBackground,
-                      size: 24,
-                    ),
+                    // Removemos o padding para que o NutriIcon(fill: true) consiga encostar às bordas
+                    child: const NutriIcon(fill: true),
                   ),
                   const SizedBox(width: 12),
                   const NutriLabel.rich(
@@ -131,7 +135,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: NutriButton.text(
-                  onPressed: () {}, //TODO: Inserir lógica de recuperação de password
+                  onPressed:
+                      () {}, //TODO: Inserir lógica de recuperação de password
                   label: 'Esqueceste a password?',
                 ),
               ),

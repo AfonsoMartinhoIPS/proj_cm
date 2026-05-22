@@ -1,3 +1,4 @@
+// lib/presentation/screens/home/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -73,14 +74,53 @@ class HomeScreen extends ConsumerWidget {
     final double totalCarbs = todayLog?.totalCarbs ?? 0;
     final double totalFat = todayLog?.totalFat ?? 0;
 
-    return SafeArea(
+
+    return Scaffold(
+      // 🚀 Implementação da NutriTopNavBar com o Greeting integrado
+      appBar: NutriTopNavBar(
+        showBackButton: false,
+        titleWidget: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            NutriLabel(
+              'Olá, ${user?.displayName ?? "utilizador"}',
+              variant: NutriLabelVariant.headline,
+              color: AppColors.onBackground,
+            ),
+            const SizedBox(height: 2),
+            NutriLabel(
+              _formatTodayHeader(),
+              variant: NutriLabelVariant.small,
+              color: AppColors.textMuted,
+            ),
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: GestureDetector(
+              onTap: () => context.push('/profile'),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.primary, width: 2),
+                ),
+                child: const Icon(Icons.person, color: AppColors.onBackground),
+              ),
+            ),
+          ),
+        ],
+      ),
+    body: SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Greeting(user: user),
-            const SizedBox(height: 24),
             _CalorieCard(
               totalCalories: totalCalories,
               totalProtein: totalProtein,
@@ -117,7 +157,7 @@ class HomeScreen extends ConsumerWidget {
                   variant: NutriLabelVariant.body,
                   color: AppColors.textMuted,
                 ),
-                
+
                 NutriButton.text(
                   label: 'Ver todas',
                   onPressed: () => context.go('/meals'),
@@ -129,51 +169,7 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Top row: greeting on the left, profile avatar (tappable) on the right.
-class _Greeting extends StatelessWidget {
-  const _Greeting({required this.user});
-
-  final AppUser? user;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            NutriLabel(
-              'Olá, ${user?.displayName ?? "utilizador"}',
-              variant: NutriLabelVariant.headline,
-              color: AppColors.onBackground,
-            ),
-            const SizedBox(height: 5),
-            NutriLabel(
-              _formatTodayHeader(),
-              variant: NutriLabelVariant.small,
-              color: AppColors.textMuted,
-            ),
-          ],
-        ),
-        GestureDetector(
-          onTap: () => context.push('/profile'),
-          child: Container(
-            width: 45,
-            height: 45,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.primary, width: 2),
-            ),
-            child: const Icon(Icons.person, color: AppColors.onBackground),
-          ),
-        ),
-      ],
+    )
     );
   }
 }
@@ -255,8 +251,7 @@ class _CalorieCard extends StatelessWidget {
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child:
-                 NutriLabel(
+                child: NutriLabel(
                   '${(progress * 100).toStringAsFixed(0)}%',
                   variant: NutriLabelVariant.small,
                   color: Colors.white,
@@ -406,7 +401,7 @@ class _WeeklyChart extends StatelessWidget {
                 _ptWeekdaysShort[day.weekday - 1],
                 variant: NutriLabelVariant.small,
                 color: isToday ? AppColors.secondary : AppColors.textMuted,
-              )
+              ),
             ],
           );
         }).toList(),
@@ -487,13 +482,11 @@ class _TodayMeals extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: 
-            
-              NutriLabel(
-                title,
-                variant: NutriLabelVariant.bodyLarge,
-                color: AppColors.onBackground,
-              ),
+            child: NutriLabel(
+              title,
+              variant: NutriLabelVariant.bodyLarge,
+              color: AppColors.onBackground,
+            ),
           ),
           NutriLabel(
             kcalLabel,

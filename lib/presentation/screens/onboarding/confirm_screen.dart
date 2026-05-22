@@ -15,13 +15,9 @@ class ConfirmScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        title: _stepIndicator('4 / 4'),
-        centerTitle: true,
+      appBar: const NutriTopNavBar(
+        showBackButton: true,
+        title: '4 / 4',
       ),
       body: SafeArea(
         child: Padding(

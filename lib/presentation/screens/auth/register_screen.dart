@@ -39,15 +39,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: NutriLabel('Preenche todos os campos', variant: NutriLabelVariant.small, color: AppColors.error)));
+          NutriFeedback.showSnackBar(
+            context,
+            'Preenche todos os campos',
+            NutriFeedbackType.error,
+          );
       return;
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: NutriLabel('As passwords não coincidem', variant: NutriLabelVariant.small, color: AppColors.error)),
+      NutriFeedback.showSnackBar(
+        context,
+        'As passwords não coincidem',
+        NutriFeedbackType.error,
       );
       return;
     }
@@ -68,19 +72,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         data: (user) {
           if (user != null) context.go('/');
         },
-        error: (e, _) => ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString()))),   //TODO: Trocar para NutriLabel????
+        error: (e, _) {
+          NutriFeedback.showSnackBar(
+            context,
+            e.toString(),
+            NutriFeedbackType.error,
+          );
+        }
       );
     });
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+      appBar: const NutriTopNavBar(
+        showBackButton: true,
+        title: 'Cria Conta',
       ),
       body: SafeArea(
         child: SingleChildScrollView(

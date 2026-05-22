@@ -1,10 +1,11 @@
+// lib/presentation/screens/profile/profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
-import 'package:nutri_scan/presentation/widgets/new/nutri_label.dart';
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -12,26 +13,25 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).value;
-    
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const NutriLabel('Perfil'), 
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-      ),
+      appBar: NutriTopNavBar(showBackButton: true, title: 'Perfil'),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           children: [
-            _UserHeader(user: user, onLogout: () => ref.read(authProvider.notifier).logout()),
+            _UserHeader(
+              user: user,
+              onLogout: () => ref.read(authProvider.notifier).logout(),
+            ),
             const SizedBox(height: 20),
             _GoalsSection(user: user),
             const SizedBox(height: 30),
-            _menuButton('Definições', onPressed: () => context.push('/settings')),
+            _menuButton(
+              'Definições',
+              onPressed: () => context.push('/settings'),
+            ),
             const SizedBox(height: 15),
             _menuButton('Créditos', onPressed: () => context.push('/credits')),
             const SizedBox(height: 20),
@@ -44,7 +44,11 @@ class ProfileScreen extends ConsumerWidget {
   Widget _menuButton(String label, {required VoidCallback onPressed}) {
     return ElevatedButton(
       onPressed: onPressed,
-      child: NutriLabel(label, variant: NutriLabelVariant.body, fontWeight: FontWeight.bold), 
+      child: NutriLabel(
+        label,
+        variant: NutriLabelVariant.body,
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 }
@@ -76,16 +80,26 @@ class _UserHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                NutriLabel(user?.displayName ?? 'Sem nome', 
-                    color: AppColors.onBackground, variant: NutriLabelVariant.bodyLarge, fontWeight: FontWeight.bold),
-                NutriLabel(user?.email ?? '—', color: AppColors.textMuted, variant: NutriLabelVariant.body,), 
+                NutriLabel(
+                  user?.displayName ?? 'Sem nome',
+                  color: AppColors.onBackground,
+                  variant: NutriLabelVariant.bodyLarge,
+                  fontWeight: FontWeight.bold,
+                ),
+                NutriLabel(
+                  user?.email ?? '—',
+                  color: AppColors.textMuted,
+                  variant: NutriLabelVariant.body,
+                ),
                 const SizedBox(height: 8),
-                if (user?.objective != null)
-                  _tag(user!.objective!.label),
+                if (user?.objective != null) _tag(user!.objective!.label),
                 const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: onLogout,
-                  child: const NutriLabel('Logout', variant: NutriLabelVariant.body,), 
+                  child: const NutriLabel(
+                    'Logout',
+                    variant: NutriLabelVariant.body,
+                  ),
                 ),
               ],
             ),
@@ -102,7 +116,11 @@ class _UserHeader extends StatelessWidget {
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: NutriLabel(text, color: AppColors.onBackground, variant: NutriLabelVariant.small,), 
+      child: NutriLabel(
+        text,
+        color: AppColors.onBackground,
+        variant: NutriLabelVariant.small,
+      ),
     );
   }
 }
@@ -125,15 +143,25 @@ class _GoalsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const NutriLabel('OBJETIVOS DIÁRIOS',  
-              color: AppColors.textMuted, variant: NutriLabelVariant.small, letterSpacing: 1.2),
+          const NutriLabel(
+            'OBJETIVOS DIÁRIOS',
+            color: AppColors.textMuted,
+            variant: NutriLabelVariant.small,
+            letterSpacing: 1.2,
+          ),
           const SizedBox(height: 15),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _goalItem(goals?.calories.toStringAsFixed(0) ?? '—', 'kcal'),
-              _goalItem('${goals?.protein.toStringAsFixed(0) ?? '—'}g', 'proteína'),
-              _goalItem('${user?.weight.toStringAsFixed(0) ?? '—'}kg', 'peso atual'),
+              _goalItem(
+                '${goals?.protein.toStringAsFixed(0) ?? '—'}g',
+                'proteína',
+              ),
+              _goalItem(
+                '${user?.weight.toStringAsFixed(0) ?? '—'}kg',
+                'peso atual',
+              ),
             ],
           ),
         ],
@@ -144,9 +172,17 @@ class _GoalsSection extends StatelessWidget {
   Widget _goalItem(String value, String label) {
     return Column(
       children: [
-        NutriLabel(value, 
-            color: AppColors.secondary, variant: NutriLabelVariant.bodyLarge, fontWeight: FontWeight.bold),
-        NutriLabel(label, color: AppColors.textMuted, variant: NutriLabelVariant.small,),
+        NutriLabel(
+          value,
+          color: AppColors.secondary,
+          variant: NutriLabelVariant.bodyLarge,
+          fontWeight: FontWeight.bold,
+        ),
+        NutriLabel(
+          label,
+          color: AppColors.textMuted,
+          variant: NutriLabelVariant.small,
+        ),
       ],
     );
   }

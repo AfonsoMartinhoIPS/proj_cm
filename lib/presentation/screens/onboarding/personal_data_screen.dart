@@ -1,3 +1,4 @@
+// lib/presentation/screens/onboarding/personal_data_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -73,14 +74,10 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
         dateOfBirth == null ||
         weight == null ||
         height == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: NutriLabel(
-            'Preenche todos os campos',
-            variant: NutriLabelVariant.small,
-            color: AppColors.error,
-          ),
-        ),
+      NutriFeedback.showSnackBar(
+        context,
+        'Preenche todos os campos',
+        NutriFeedbackType.error,
       );
       return;
     }
@@ -103,13 +100,10 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        title: _stepIndicator('1 / 4'),
-        centerTitle: true,
+      appBar: const NutriTopNavBar(
+        showBackButton: true,
+        title:
+            '1 / 4',
       ),
       body: SafeArea(
         child: SingleChildScrollView(

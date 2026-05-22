@@ -1,3 +1,4 @@
+// lib/presentation/screens/scanner/scan_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
@@ -20,20 +21,13 @@ class ScanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: const NutriTopNavBar(showBackButton: false, title: 'Scan Barcode'),
+      body: SafeArea(
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Row(
-              children: [
-                Spacer(),
-                NutriLabel('Scan Barcode',
-                  color: AppColors.onBackground, variant: NutriLabelVariant.display, fontWeight: FontWeight.bold),
-                Spacer(),
-              ],
-            ),
-          ),
           Expanded(
             flex: 5,
             child: Container(
@@ -68,7 +62,7 @@ class ScanScreen extends StatelessWidget {
           const Spacer(),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildScannerOverlay() {

@@ -1,7 +1,7 @@
-
-
+// lib/presentation/screens/meals/add_meal_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
@@ -13,16 +13,18 @@ class AddMealScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(child:  Scaffold(
-      appBar: AppBar(title: const NutriLabel('Adicionar Refeição')), 
-      body: AddMealForm(initialProduct: initialProduct),
-    ));
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: const NutriTopNavBar(showBackButton: true, title: 'Adicionar Refeição'),
+      body: SafeArea(
+        child: AddMealForm(initialProduct: initialProduct),
+      ),
+    );
   }
 }
 
-
 class AddMealForm extends ConsumerStatefulWidget {
-  
   AddMealForm({super.key, this.initialProduct});
   final Product? initialProduct;
 
@@ -31,7 +33,6 @@ class AddMealForm extends ConsumerStatefulWidget {
 }
 
 class _AddMealFormState extends ConsumerState<AddMealForm> {
-  
   Product? selectedProduct;
   MealType selectedMealType = MealType.lunch;
 
@@ -47,12 +48,9 @@ class _AddMealFormState extends ConsumerState<AddMealForm> {
 
     nameController.text = selectedProduct?.name ?? '';
     servingGrams.text = '100'; // default to 100g
-        
   }
 
   void submit() {
-    
-
     /*
     {
       id: string                // UUID
@@ -75,31 +73,47 @@ class _AddMealFormState extends ConsumerState<AddMealForm> {
     */
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     /*
       1. Fetch product from DB
 
     */
 
-
-    
-
     return Center(
       child: Column(
         children: [
-          NutriTextField(controller: nameController, label: 'Nome do produto', hint: 'Ex. Iogurte natural'),
+          NutriTextField(
+            controller: nameController,
+            label: 'Nome do produto',
+            hint: 'Ex. Iogurte natural',
+          ),
           const SizedBox(height: 12),
-          NutriTextField(controller: servingGrams, label: 'Quantidade (g)', hint: '100', keyboardType: TextInputType.number),
+          NutriTextField(
+            controller: servingGrams,
+            label: 'Quantidade (g)',
+            hint: '100',
+            keyboardType: TextInputType.number,
+          ),
           DropdownButton<MealType>(
             value: selectedMealType,
-            items: MealType.values.map((meal) => DropdownMenuItem(value: meal, child: NutriLabel(meal.toString().split('.').last))).toList(),  
-            onChanged: (meal) { if (meal != null) setState(() => selectedMealType = meal); },
+            items: MealType.values
+                .map(
+                  (meal) => DropdownMenuItem(
+                    value: meal,
+                    child: NutriLabel(meal.toString().split('.').last),
+                  ),
+                )
+                .toList(),
+            onChanged: (meal) {
+              if (meal != null) setState(() => selectedMealType = meal);
+            },
           ),
-          
-          ElevatedButton(onPressed: submit, child: const NutriLabel('Salvar Refeição')), 
+
+          NutriButton(
+            label: 'Salvar Refeição',
+            onPressed: submit,
+          ),
         ],
       ),
     );

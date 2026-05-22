@@ -33,13 +33,7 @@ class ProductDetailsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        title: const NutriLabel('Detalhes', variant: NutriLabelVariant.display,),
-      ),
+      appBar: NutriTopNavBar(showBackButton: true, title: 'Detalhes do Produto'),
       body: asyncProduct.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
