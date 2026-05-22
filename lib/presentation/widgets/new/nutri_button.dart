@@ -1,9 +1,7 @@
+// lib/presentation/widgets/nutri_button.dart
 import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/new/nutri_label.dart';
-
-// TODO: Importar o ficheiro do Daniel quando ele fizer merge
-// import 'package:nutri_scan/presentation/widgets/nutri_label.dart';
 
 /// Define as variantes visuais disponíveis para o [NutriButton].
 enum NutriButtonVariant { primary, transparent, text }
@@ -137,7 +135,6 @@ class NutriButton extends StatelessWidget {
                           icon!,
                           const SizedBox(width: 10),
                         ],
-                        // TODO: Substituir por NutriLabel(text: label, variant: ...) quando o Daniel terminar
                         NutriLabel(
                           label,
                           variant: NutriLabelVariant.label,
@@ -147,7 +144,6 @@ class NutriButton extends StatelessWidget {
                         
                         if (secondaryLabel.isNotEmpty) ...[
                           const SizedBox(width: 6),
-                          // TODO: Substituir por NutriLabel(text: secondaryLabel, variant: ...)
                           NutriLabel(
                             secondaryLabel,
                             variant: NutriLabelVariant.label,

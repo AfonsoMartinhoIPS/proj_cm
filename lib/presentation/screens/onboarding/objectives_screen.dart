@@ -47,7 +47,7 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
   void submit() {
     ref.read(onboardingProvider.notifier).setObjective(_selectedObjective);
     //TODO: Guardar objetivo secondario:
-    //ef.read(onboardingProvider.notifier).setSecondaryObjectives(_selectedSecondaryObjectives);
+    //ref.read(onboardingProvider.notifier).setSecondaryObjectives(_selectedSecondaryObjectives);
 
     context.push('/onboarding/nutrition-goals');
   }

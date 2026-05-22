@@ -4,10 +4,28 @@ import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
+/// Uma barra de navegação superior (`AppBar`) personalizada e reutilizável para o app NutriScan.
+///
+/// Alinha o conteúdo à esquerda por padrão para um visual moderno e lida de forma
+/// segura com potenciais overflows de texto no título.
 class NutriTopNavBar extends StatelessWidget implements PreferredSizeWidget {
+  /// O texto simples a ser exibido como título.
   final String? title;
-  final Widget? titleWidget; // 🚀 Permite passar estruturas complexas sem dar overflow
+
+  /// Um widget costumizado para o título, ideal para estruturas complexas
+  /// (ex: linhas com ícones ou avatares) evitando problemas de overflow.
+  /// 
+  /// Se fornecido, tem prioridade sobre o [title].
+  final Widget? titleWidget;
+
+  /// Controla a visibilidade do botão de retroceder. O padrão é `true`.
+  /// 
+  /// O botão só será renderizado se esta flag for verdadeira **e** se
+  /// o `go_router` tiver um histórico válido para fazer pop.
   final bool showBackButton;
+
+  /// Uma lista de widgets (ex: botões de ação ou definições) a apresentar 
+  /// no canto superior direito da barra.
   final List<Widget>? actions;
 
   const NutriTopNavBar({
