@@ -141,7 +141,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 NutriButton(
                   label: 'Entrar',
                   isLoading: authState
-                      .isLoading, // O teu botão esconde o texto e mostra o progresso sozinho
+                      .isLoading,
                   onPressed: submit,
                 ),
                 const SizedBox(height: 32),
@@ -150,7 +150,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Expanded(
                       child: NutriButton.transparent(
                         label: 'Google',
-                        // height: 20 garante que o logo não deforma o botão de 45px
                         icon: Image.asset(
                           'assets/logos/google-logo-50.png',
                           height: 18,
@@ -161,20 +160,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: NutriButton.transparent(
-                        label: 'Apple',
-                        icon: Image.asset(
-                          'assets/logos/apple-logo-50.png',
-                          height: 18,
-                          // Garante que o logo da Apple fica com a cor dinâmica do tema/texto
-                          color: AppColors.onBackground,
-                        ),
-                        onPressed: () {
-                          // Samuel: Inserir a lógica de login da Apple aqui
-                        },
-                      ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 40),

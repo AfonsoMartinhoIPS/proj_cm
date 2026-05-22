@@ -35,7 +35,6 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
-            // Parse nutrition logs into meal cards
             ...nutritionLogs.map(
               (log) => _buildMealCard(
                 title: log.date,

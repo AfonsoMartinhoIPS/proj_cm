@@ -84,7 +84,6 @@ class _ActionButtons extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       children: [
-        // Guardar / Remover (Variante secundária/contorno)
         Expanded(
           child: NutriButton.transparent(
             label: isSaved ? 'Remover' : 'Guardar',
@@ -110,7 +109,6 @@ class _ActionButtons extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: 12),
-        // Adicionar à Refeição (Ação Primária com destaque)
         Expanded(
           child: NutriButton(
             label: 'Add refeição',

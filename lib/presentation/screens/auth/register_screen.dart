@@ -162,7 +162,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               const SizedBox(height: 40),
               NutriButton(
                 label: 'Registar',
-                isLoading: authState.isLoading, // O teu widget trata do resto!
+                isLoading: authState.isLoading,
                 onPressed: submit,
               ),
               const SizedBox(height: 25),

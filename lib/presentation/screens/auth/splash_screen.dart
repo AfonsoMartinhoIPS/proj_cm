@@ -38,7 +38,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (_navigated) return;
     _navigated = true;
     
-    // Aumentei ligeiramente para 2 segundos para dar tempo do shader iniciar suavemente
     await Future.delayed(const Duration(seconds: 2)); 
     if (!mounted) return;
     if (user != null) {

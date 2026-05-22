@@ -94,7 +94,6 @@ class CreditsScreen extends StatelessWidget {
         ),
         title: NutriLabel(name, color: AppColors.onBackground, variant: NutriLabelVariant.body,),
         subtitle: NutriLabel(id, color: AppColors.textMuted, variant: NutriLabelVariant.small,),
-        // Oportunidade 1: Botão de texto minimalista à direita em cada linha da equipa
         trailing: NutriButton.text(
           label: 'GitHub',
           fontSize: 11,

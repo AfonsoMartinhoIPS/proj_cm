@@ -76,7 +76,6 @@ class HomeScreen extends ConsumerWidget {
 
 
     return Scaffold(
-      // 🚀 Implementação da NutriTopNavBar com o Greeting integrado
       appBar: NutriTopNavBar(
         showBackButton: false,
         titleWidget: Column(

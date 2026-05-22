@@ -80,10 +80,9 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                           color: AppColors.textMuted,
                         ),
                         const SizedBox(height: 15),
-                        // Utiliza a variante transparente (ou primária) para uma ação de recuperação
                         SizedBox(
                           width:
-                              180, // Largura controlada para não esticar no ecrã inteiro
+                              180,
                           child: NutriButton.transparent(
                             label: 'Tentar novamente',
                             icon: const Icon(
@@ -119,7 +118,6 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                             ),
                             const SizedBox(height: 16),
                             if (_query.isEmpty) ...[
-                              // Se não tem produtos, sugere fazer scan imediatamente
                               SizedBox(
                                 width: 200,
                                 child: NutriButton(
@@ -133,7 +131,6 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                                 ),
                               ),
                             ] else ...[
-                              // Se foi a pesquisa que falhou, mostra botão de texto para limpar
                               NutriButton.text(
                                 label: 'Limpar pesquisa',
                                 fontSize: 14,
