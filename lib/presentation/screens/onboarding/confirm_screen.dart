@@ -115,18 +115,4 @@ class ConfirmScreen extends ConsumerWidget {
       ),
     );
   }
-
-  static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-    decoration: BoxDecoration(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: NutriLabel( //TODO: ver o estado visual
-      label,
-        color: AppColors.secondary,
-        variant: NutriLabelVariant.small,
-        fontWeight: FontWeight.bold,
-    ),
-  );
 }

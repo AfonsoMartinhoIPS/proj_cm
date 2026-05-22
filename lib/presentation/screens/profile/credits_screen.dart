@@ -1,6 +1,5 @@
 // lib/presentation/screens/profile/credits_screen.dart
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 

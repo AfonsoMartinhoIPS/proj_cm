@@ -143,7 +143,6 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                 ),
               ),
               const Spacer(),
-              //TODO: label style -> fontSize 16, fontWeight bold
               NutriButton(label: 'Próximo', onPressed: submit, fontSize: 16,),
               const SizedBox(height: 20),
             ],
@@ -152,18 +151,4 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
       ),
     );
   }
-
-  static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-    decoration: BoxDecoration(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: NutriLabel(
-      label,
-      variant: NutriLabelVariant.small,
-      color: AppColors.secondary,
-      fontWeight: FontWeight.bold,
-    ),
-  );
 }

@@ -98,13 +98,6 @@ class NutriButton extends StatelessWidget {
       baseColor = (isTransparent || isTextVariant) ? AppColors.secondary : AppColors.onBackground;
       backgroundColor = (isTransparent || isTextVariant) ? Colors.transparent : AppColors.primary;
     }
-    
-    final textStyle = Theme.of(context).textTheme.labelLarge?.copyWith(
-          fontFamily: 'DM Sans',
-          letterSpacing: 0.60,
-          fontSize: fontSize ?? 16,
-          color: baseColor,
-        );
 
     return Container(
       width: isTextVariant ? null : double.infinity,

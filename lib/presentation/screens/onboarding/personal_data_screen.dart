@@ -22,10 +22,8 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
   DateTime? dateOfBirth;
   Gender gender = Gender.other;
 
-  /**
-   * Initialize the text controllers with existing onboarding data, if available. 
-   * This allows users to go back and forth between steps without losing their input.
-   */
+  /// Initialize the text controllers with existing onboarding data, if available. 
+  /// This allows users to go back and forth between steps without losing their input.
   @override
   void initState() {
     super.initState();
@@ -41,9 +39,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     gender = onboarding.gender;
   }
 
-  /**
-   * Dispose of the text controllers when the widget is removed from the widget tree to free up resources.
-   */
+  /// Dispose of the text controllers when the widget is removed from the widget tree to free up resources.
   @override
   void dispose() {
     nameController.dispose();
@@ -52,9 +48,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     super.dispose();
   }
 
-  /**
-   * Show a date picker to allow the user to select their date of birth.
-   */
+  /// Show a date picker to allow the user to select their date of birth.
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -240,8 +234,10 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     );
   }
 
-  static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    /*
+    Possivel widget?
+    static Widget _stepIndicator(String label) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
     decoration: BoxDecoration(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(20),
@@ -252,5 +248,5 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
       color: AppColors.secondary,
       fontWeight: FontWeight.bold,
     ),
-  );
+  );*/
 }

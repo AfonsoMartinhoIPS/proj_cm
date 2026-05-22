@@ -146,47 +146,4 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
       ),
     );
   }
-
-  Widget _buildOptionTile(String title, {required bool isSelected}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: isSelected ? AppColors.surface : AppColors.surfaceDark,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: isSelected ? AppColors.secondary : AppColors.border,
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: NutriLabel(
-              title,
-              variant: NutriLabelVariant.body,
-              color: isSelected ? AppColors.secondary : AppColors.onBackground,
-            ),
-          ),
-          Icon(
-            isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: isSelected ? AppColors.primary : AppColors.border,
-          ),
-        ],
-      ),
-    );
-  }
-
-  static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-    decoration: BoxDecoration(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: NutriLabel(
-      label,
-      variant: NutriLabelVariant.small,
-      color: AppColors.secondary,
-      fontWeight: FontWeight.bold,
-    ),
-  );
 }
