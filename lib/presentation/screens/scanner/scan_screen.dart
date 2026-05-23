@@ -4,65 +4,96 @@ import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
+/// Barcode scanner screen with two usage modes:
+///
+/// 1. **Tab mode** (default, `returnBarcode: false`) — opened from the bottom
+///    nav. On scan or manual entry, pushes `/products/$barcode` so the user
+///    lands on the product detail screen.
+///
+/// 2. **Pick mode** (`returnBarcode: true`) — opened from flows that need a
+///    barcode result (e.g. AddMealScreen's product picker). On scan or manual
+///    entry, pops the route with the barcode string as the result, so the
+///    caller can `await context.push<String>(...)` and use the returned value.
+///
+/// The split exists because `/scan` (tab) lives inside the `ShellRoute` —
+/// pushing it from a screen outside the shell would mount a second `MainShell`
+/// and trigger duplicate Hero key reservations. The pick variant is registered
+/// at top level so it can be pushed safely from anywhere.
 class ScanScreen extends StatelessWidget {
-  const ScanScreen({super.key});
+  /// When `true`, scanner ends by popping the route with the barcode string.
+  /// When `false`, scanner ends by pushing the product details route.
+  final bool returnBarcode;
+
+  const ScanScreen({super.key, this.returnBarcode = false});
 
   void _openManualEntry(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // lets the sheet resize for the keyboard
+      isScrollControlled: true,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => const _ManualBarcodeSheet(),
+      builder: (_) => _ManualBarcodeSheet(returnBarcode: returnBarcode),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const NutriTopNavBar(showBackButton: false, title: 'Scan Barcode'),
-      body: SafeArea(
-      child: Column(
-        children: [
-          Expanded(
-            flex: 5,
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D1A10),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Icon(Icons.videocam_off, color: AppColors.border, size: 40),
-                  _buildScannerOverlay(),
-                ],
-              ),
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-            child: NutriLabel(
-              'Aponta a câmara para o código de barras do produto',
-              textAlign: TextAlign.center,
-              color: AppColors.textMuted, variant: NutriLabelVariant.body,),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: OutlinedButton(
-              onPressed: () => _openManualEntry(context),
-              child: const NutriLabel('Inserir código manualmente', variant: NutriLabelVariant.body,),
-            ),
-          ),
-          const Spacer(),
-        ],
+      appBar: NutriTopNavBar(
+        showBackButton: returnBarcode,
+        title: 'Scan Barcode',
       ),
-    ));
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              flex: 5,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0D1A10),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    const Icon(
+                      Icons.videocam_off,
+                      color: AppColors.border,
+                      size: 40,
+                    ),
+                    _buildScannerOverlay(),
+                  ],
+                ),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+              child: NutriLabel(
+                'Aponta a câmara para o código de barras do produto',
+                textAlign: TextAlign.center,
+                color: AppColors.textMuted,
+                variant: NutriLabelVariant.body,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: OutlinedButton(
+                onPressed: () => _openManualEntry(context),
+                child: const NutriLabel(
+                  'Inserir código manualmente',
+                  variant: NutriLabelVariant.body,
+                ),
+              ),
+            ),
+            const Spacer(),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildScannerOverlay() {
@@ -87,18 +118,36 @@ class ScanScreen extends StatelessWidget {
     );
   }
 
-  Widget _corner({double? top, double? bottom, double? left, double? right, required bool isTop, required bool isLeft}) {
+  Widget _corner({
+    double? top,
+    double? bottom,
+    double? left,
+    double? right,
+    required bool isTop,
+    required bool isLeft,
+  }) {
     return Positioned(
-      top: top, bottom: bottom, left: left, right: right,
+      top: top,
+      bottom: bottom,
+      left: left,
+      right: right,
       child: Container(
         width: 25,
         height: 25,
         decoration: BoxDecoration(
           border: Border(
-            top:    isTop    ? const BorderSide(color: AppColors.secondary, width: 3) : BorderSide.none,
-            bottom: !isTop   ? const BorderSide(color: AppColors.secondary, width: 3) : BorderSide.none,
-            left:   isLeft   ? const BorderSide(color: AppColors.secondary, width: 3) : BorderSide.none,
-            right:  !isLeft  ? const BorderSide(color: AppColors.secondary, width: 3) : BorderSide.none,
+            top: isTop
+                ? const BorderSide(color: AppColors.secondary, width: 3)
+                : BorderSide.none,
+            bottom: !isTop
+                ? const BorderSide(color: AppColors.secondary, width: 3)
+                : BorderSide.none,
+            left: isLeft
+                ? const BorderSide(color: AppColors.secondary, width: 3)
+                : BorderSide.none,
+            right: !isLeft
+                ? const BorderSide(color: AppColors.secondary, width: 3)
+                : BorderSide.none,
           ),
         ),
       ),
@@ -108,8 +157,15 @@ class ScanScreen extends StatelessWidget {
 
 /// Bottom sheet for entering a barcode by hand. Owns its controller so it
 /// is created/disposed with the sheet's lifecycle.
+///
+/// Behaviour on submit depends on [returnBarcode]:
+///   - `false` → close sheet, push `/products/$barcode` (tab flow)
+///   - `true`  → close sheet AND pop the parent scanner route with the barcode
+///               so the caller's `await context.push<String>(...)` resolves
 class _ManualBarcodeSheet extends StatefulWidget {
-  const _ManualBarcodeSheet();
+  final bool returnBarcode;
+
+  const _ManualBarcodeSheet({required this.returnBarcode});
 
   @override
   State<_ManualBarcodeSheet> createState() => _ManualBarcodeSheetState();
@@ -128,12 +184,21 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
     final barcode = _barcodeController.text.trim();
     if (barcode.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: NutriLabel('Introduz um código de barras')), 
+        const SnackBar(content: NutriLabel('Introduz um código de barras')),
       );
       return;
     }
-    Navigator.of(context).pop();             // close sheet first
-    context.push('/products/$barcode');      // open details screen
+
+    // Close the sheet first.
+    Navigator.of(context).pop();
+
+    if (widget.returnBarcode) {
+      // Pick mode — pop the scanner route with the barcode as result.
+      context.pop(barcode);
+    } else {
+      // Tab mode — navigate to product details.
+      context.push('/products/$barcode');
+    }
   }
 
   @override
@@ -148,7 +213,10 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
         children: [
           const NutriLabel(
             'Inserir código de barras',
-            color: AppColors.onBackground, variant: NutriLabelVariant.body, fontWeight: FontWeight.bold),
+            color: AppColors.onBackground,
+            variant: NutriLabelVariant.body,
+            fontWeight: FontWeight.bold,
+          ),
           const SizedBox(height: 12),
           NutriTextField(
             controller: _barcodeController,
@@ -163,7 +231,12 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _submit,
-            child: const NutriLabel('Search Product', variant: NutriLabelVariant.body, fontWeight: FontWeight.bold)), 
+            child: const NutriLabel(
+              'Procurar produto',
+              variant: NutriLabelVariant.body,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );

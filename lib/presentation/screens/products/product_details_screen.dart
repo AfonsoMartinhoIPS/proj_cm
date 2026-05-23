@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/widgets/new/product/product_nutriments.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 import 'package:nutri_scan/data/repositories/product_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
@@ -57,7 +58,7 @@ class ProductDetailsScreen extends ConsumerWidget {
               children: [
                 _ProductHeader(product: product),
                 const SizedBox(height: 24),
-                _NutritionTable(product: product),
+                ProductNutritionTable(product: product),
                 const SizedBox(height: 24),
                 _ActionButtons(product: product, isSaved: savedProduct != null),
                 if (savedProduct != null) ...[

@@ -39,7 +39,9 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
     final now = DateTime.now();
     final dates = List.generate(days, (i) => _dateKey(now.subtract(Duration(days: i)))).reversed.toList();
     logger.d('NutritionLogs: fetching last $days days (${dates.first} → ${dates.last})');
-    return repo.getLogs(uid, dates);
+    List<NutritionLog> logs = await repo.getLogs(uid, dates);
+    logger.d('NutritionLogs: fetched ${logs.length} logs');
+    return logs;
   }
 
   Future<void> loadMore({int extraDays = 7}) async {
@@ -79,7 +81,14 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
     final d = date ?? _todayKey();
     logger.d('NutritionLogs: addEntry on $d — ${entry.productName} (${entry.servingGrams}g)');
     try {
-      await repo.addEntry(user.uid, d, entry);
+      // Pass the user's current goals so the repo can freeze them on the
+      // log doc on first creation (per docs/DB.md goals-snapshot design).
+      await repo.addEntry(
+        user.uid,
+        d,
+        entry,
+        goalsSnapshot: user.nutritionGoals,
+      );
       await _refreshDate(user, d);
     } catch (e, st) {
       logger.e('NutritionLogs: addEntry error', error: e, stackTrace: st);
@@ -107,7 +116,12 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
     final d = date ?? _todayKey();
     logger.d('NutritionLogs: setWater ${ml}ml on $d');
     try {
-      await repo.updateWater(user.uid, d, ml);
+      await repo.updateWater(
+        user.uid,
+        d,
+        ml,
+        goalsSnapshot: user.nutritionGoals,
+      );
       await _refreshDate(user, d);
     } catch (e, st) {
       logger.e('NutritionLogs: setWater error', error: e, stackTrace: st);

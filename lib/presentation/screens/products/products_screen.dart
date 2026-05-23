@@ -146,6 +146,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                     );
                   }
 
+                  // TODO: Create a separate ProductListItem widget that also shows kcal/100g and brand.
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     itemCount: filtered.length,

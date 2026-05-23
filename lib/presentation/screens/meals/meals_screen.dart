@@ -31,6 +31,8 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
       backgroundColor: AppColors.background,
       appBar: const NutriTopNavBar(showBackButton: false, title: 'Refeições'),
       body: SafeArea(
+
+        // List of Meals
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
@@ -54,7 +56,7 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
                 context.push('/meals/add');
               },
               child: const NutriLabel(
-                '+ Adicionar refeição',
+                '+ Adicionar',
                 variant: NutriLabelVariant.body,
               ),
             ),
@@ -64,6 +66,8 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
     );
   }
 
+
+  // TODO: Make widget
   Widget _buildMealCard({
     required String title,
     required String totalKcal,

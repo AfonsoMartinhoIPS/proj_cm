@@ -441,13 +441,11 @@ class _TodayMeals extends StatelessWidget {
     }
 
     // Sum calories per meal type — multiple entries (e.g. two snacks) collapse to one row.
+    // Entry stores already-scaled totals so we just sum them.
     final Map<MealType, double> caloriesByMealType = {};
     for (final entry in entries) {
-      final double entryCalories = entry.nutriments.calories(
-        grams: entry.servingGrams,
-      );
       caloriesByMealType[entry.mealType] =
-          (caloriesByMealType[entry.mealType] ?? 0) + entryCalories;
+          (caloriesByMealType[entry.mealType] ?? 0) + entry.calories;
     }
 
     return Column(
