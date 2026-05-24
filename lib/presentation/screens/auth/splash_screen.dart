@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/core/utils/logger.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
-
-
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
-import 'package:nutri_scan/presentation/widgets/new/nutri_wave_background.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -37,8 +34,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Future<void> _navigate(AppUser? user) async {
     if (_navigated) return;
     _navigated = true;
-    
-    await Future.delayed(const Duration(seconds: 2)); 
+    await Future.delayed(const Duration(seconds: 1)); // minimum splash time
     if (!mounted) return;
     if (user != null) {
       logger.d('SplashScreen: user session found, navigating to home');
@@ -60,44 +56,42 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     });
 
     return Scaffold(
-      body: WaveBackground(
-        child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                NutriIcon(size: 80),
-                const SizedBox(height: 24),
-                const NutriLabel.rich(
-                  variant: NutriLabelVariant.title,
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Nutri',
-                        style: TextStyle(
-                          color: AppColors.onBackground,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'Scan',
-                        style: TextStyle(
-                          color: AppColors.secondary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const NutriLabel(
-                  'Come melhor. Vive melhor.',
-                  variant: NutriLabelVariant.small,
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
                   color: AppColors.primary,
-                  letterSpacing: 1.2,
+                  borderRadius: BorderRadius.circular(22),
                 ),
-              ],
-            ),
+                child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 40),
+              ),
+              const SizedBox(height: 24),
+              RichText(
+                text: const TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Nutri',
+                      style: TextStyle(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: 'Scan',
+                      style: TextStyle(color: AppColors.secondary, fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Come melhor. Vive melhor.',
+                style: TextStyle(color: AppColors.primary, fontSize: 14, letterSpacing: 1.2),
+              ),
+            ],
           ),
         ),
       ),

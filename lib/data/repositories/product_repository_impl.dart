@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/database/firestore_paths.dart';
+import 'package:nutri_scan/core/utils/logger.dart';
 import 'package:nutri_scan/data/datasources/open_food_facts_datasource.dart';
 import 'package:nutri_scan/data/models/product_model.dart';
 import 'package:nutri_scan/data/models/saved_product_model.dart';

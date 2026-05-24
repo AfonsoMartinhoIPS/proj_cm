@@ -1,7 +1,5 @@
-// core/theme/app_theme.dart
-
 import 'package:flutter/material.dart';
-import 'package:nutri_scan/core/core.dart';
+import 'app_colors.dart';
 
 /// Gestor de temas centralizado da aplicação.
 /// 
@@ -17,6 +15,9 @@ class AppTheme {
   static ThemeData get dark => _buildTheme(Brightness.dark);
 
   /// Constrói um [ThemeData] unificado com base no [brightness] fornecido.
+  /// 
+  /// Centraliza as propriedades comuns e adapta os componentes dinamicamente
+  /// consoante o modo (Light ou Dark) para evitar duplicação de código.
   static ThemeData _buildTheme(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
 
@@ -48,7 +49,7 @@ class AppTheme {
         iconTheme: IconThemeData(color: isDark ? colorScheme.secondary : Colors.white),
         titleTextStyle: TextStyle(
           color: isDark ? colorScheme.onSurface : Colors.white,
-          fontSize: AppSizes.fontXl,
+          fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -64,7 +65,7 @@ class AppTheme {
         color: colorScheme.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+          borderRadius: BorderRadius.circular(16),
           side: BorderSide(color: isDark ? AppColors.border : Colors.grey[300]!),
         ),
       ),
@@ -74,22 +75,19 @@ class AppTheme {
         fillColor: isDark ? AppColors.surfaceDark : Colors.grey[100],
         hintStyle: TextStyle(color: isDark ? AppColors.textMuted : Colors.grey[600]),
         labelStyle: TextStyle(color: isDark ? AppColors.textMuted : Colors.grey[800]),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSizes.md, 
-          vertical: AppSizes.md,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: isDark ? AppColors.border : Colors.grey[300]!),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
             color: isDark ? colorScheme.secondary : colorScheme.primary, 
             width: 2,
           ),
         ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppSizes.radiusMd)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -98,7 +96,7 @@ class AppTheme {
           foregroundColor: colorScheme.onPrimary,
           minimumSize: const Size(double.infinity, 50),
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSizes.radiusMd)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
 
@@ -107,7 +105,7 @@ class AppTheme {
           side: BorderSide(color: isDark ? AppColors.border : colorScheme.primary),
           foregroundColor: isDark ? colorScheme.secondary : colorScheme.primary,
           minimumSize: const Size(double.infinity, 50),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSizes.radiusMd)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
 
@@ -131,15 +129,18 @@ class AppTheme {
   }
 
   /// Gera a tipografia customizada com base na cor principal do texto.
+  /// 
+  /// Usa os parênteses retos (e.g. [baseColor]) para criar hiperligações automáticas 
+  /// na documentação gerada pelo gerador de docs do Dart.
   static TextTheme _buildTextTheme(Color baseColor, bool isDark) {
     return TextTheme(
-      displaySmall:   TextStyle(color: baseColor, fontSize: AppSizes.fontDisplay, fontWeight: FontWeight.bold),
-      headlineMedium: TextStyle(color: baseColor, fontSize: AppSizes.fontXxl, fontWeight: FontWeight.bold),
-      titleLarge:     TextStyle(color: baseColor, fontSize: AppSizes.fontXl, fontWeight: FontWeight.bold),
-      bodyLarge:      TextStyle(color: baseColor, fontSize: AppSizes.fontMd),
-      bodyMedium:     TextStyle(color: baseColor, fontSize: AppSizes.fontSm),
-      bodySmall:      TextStyle(color: isDark ? AppColors.textMuted : Colors.grey[700], fontSize: AppSizes.fontXs),
-      labelLarge:     const TextStyle(fontSize: AppSizes.fontSm, fontWeight: FontWeight.w600),
+      displaySmall:   TextStyle(color: baseColor, fontSize: 28, fontWeight: FontWeight.bold),
+      headlineMedium: TextStyle(color: baseColor, fontSize: 22, fontWeight: FontWeight.bold),
+      titleLarge:     TextStyle(color: baseColor, fontSize: 20, fontWeight: FontWeight.bold),
+      bodyLarge:      TextStyle(color: baseColor, fontSize: 16),
+      bodyMedium:     TextStyle(color: baseColor, fontSize: 14),
+      bodySmall:      TextStyle(color: isDark ? AppColors.textMuted : Colors.grey[700], fontSize: 12),
+      labelLarge:     const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
     );
   }
 }

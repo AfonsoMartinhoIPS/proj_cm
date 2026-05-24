@@ -1,15 +1,12 @@
-// lib/presentation/screens/meals/meals_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/domain/entities/saved_product.dart';
 import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/providers/saved_products_provider.dart';
 import 'package:nutri_scan/presentation/screens/meals/utils/meal_utils.dart';
-
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class MealsScreen extends ConsumerStatefulWidget {
   const MealsScreen({super.key});
@@ -19,48 +16,45 @@ class MealsScreen extends ConsumerStatefulWidget {
 }
 
 class _MealsScreenState extends ConsumerState<MealsScreen> {
+
   @override
   Widget build(BuildContext context) {
-    final List<NutritionLog> nutritionLogs =
-        ref.watch(nutritionLogsProvider).value ?? [];
-    SavedProduct? savedProduct = ref
-        .watch(savedProductsProvider)
-        .value
-        ?.firstOrNull;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const NutriTopNavBar(showBackButton: false, title: 'Refeições'),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          children: [
-            ...nutritionLogs.map(
-              (log) => _buildMealCard(
-                title: log.date,
-                totalKcal: '${log.totalCalories} kcal',
-                items: log.entries
-                    .map(
-                      (e) => {
-                        'name': e.productName,
-                        'kcal': '${calculateCaloriesFromMealEntry(e)} kcal',
-                      },
-                    )
-                    .toList(),
-              ),
+    final List<NutritionLog> nutritionLogs = ref.watch(nutritionLogsProvider).value ?? [];
+    SavedProduct? savedProduct = ref.watch(savedProductsProvider).value?.firstOrNull;
+    return SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text('Refeições',
+                    style: TextStyle(color: AppColors.onBackground, fontSize: 22, fontWeight: FontWeight.bold)),
+              ],
             ),
-            const SizedBox(height: 10),
-            OutlinedButton(
-              onPressed: () {
-                context.push('/meals/add');
-              },
-              child: const NutriLabel(
-                '+ Adicionar refeição',
-                variant: NutriLabelVariant.body,
-              ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                // Parse nutrition logs into meal cards
+                ...nutritionLogs.map((log) => _buildMealCard(
+                  title: log.date,
+                  totalKcal: '${log.totalCalories} kcal',
+                  items: log.entries.map((e) => {'name': e.productName, 'kcal': '${calculateCaloriesFromMealEntry(e)} kcal'}).toList(),
+                )),
+                const SizedBox(height: 10),
+                OutlinedButton(
+                  onPressed: () {context.push('/meals/add');},
+                  child: const Text('+ Adicionar refeição'),
+                ),
+              ]
             ),
-          ],
-        ),
+            )
+        ],
       ),
     );
   }
@@ -82,44 +76,29 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.surfaceDark.withValues(alpha: 0.5),
-                ),
-              ),
+              border: Border(bottom: BorderSide(color: AppColors.surfaceDark.withValues(alpha: 0.5))),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                NutriLabel(title, variant: NutriLabelVariant.bodyLarge),
-                NutriLabel(
-                  totalKcal,
-                  variant: NutriLabelVariant.body,
-                  color: AppColors.secondary,
-                ),
+                Text(title,
+                    style: const TextStyle(color: AppColors.onBackground, fontWeight: FontWeight.bold)),
+                Text(totalKcal, style: const TextStyle(color: AppColors.secondary, fontSize: 12)),
               ],
             ),
           ),
-          ...items.map(
-            (item) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  NutriLabel(
-                    item['name']!,
-                    variant: NutriLabelVariant.small,
-                    color: AppColors.onBackground,
-                  ),
-                  NutriLabel(
-                    item['kcal']!,
-                    variant: NutriLabelVariant.small,
-                    color: AppColors.textMuted,
-                  ),
-                ],
-              ),
+          ...items.map((item) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(item['name']!,
+                    style: const TextStyle(color: AppColors.onBackground, fontSize: 13)),
+                Text(item['kcal']!,
+                    style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+              ],
             ),
-          ),
+          )),
         ],
       ),
     );

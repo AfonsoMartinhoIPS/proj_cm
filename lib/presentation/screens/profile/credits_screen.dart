@@ -1,7 +1,6 @@
-// lib/presentation/screens/profile/credits_screen.dart
 import 'package:flutter/material.dart';
-import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
 class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});
@@ -10,7 +9,10 @@ class CreditsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: NutriTopNavBar(showBackButton: true, title: 'Créditos'),
+      appBar: AppBar(
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        title: const Text('Créditos'),
+      ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
@@ -27,8 +29,8 @@ class CreditsScreen extends StatelessWidget {
                   child: const Icon(Icons.restaurant_menu, color: AppColors.onBackground, size: 40),
                 ),
                 const SizedBox(height: 15),
-                NutriLabel.rich( 
-                  const TextSpan(
+                RichText(
+                  text: const TextSpan(
                     children: [
                       TextSpan(text: 'Nutri',
                           style: TextStyle(color: AppColors.onBackground, fontSize: 24, fontWeight: FontWeight.bold)),
@@ -37,48 +39,36 @@ class CreditsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const NutriLabel('versão 1.0.0 · 2025–2026', 
-                    color: AppColors.textMuted, variant: NutriLabelVariant.small,),
+                const Text('versão 1.0.0 · 2025–2026',
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
               ],
             ),
           ),
           const SizedBox(height: 40),
-          const NutriLabel('Unidade Curricular, Computação Móvel', 
-              color: AppColors.textMuted, variant: NutriLabelVariant.small,),
-          const NutriLabel('Instituição, Instituto Politécnico de Setúbal', 
-              color: AppColors.textMuted, variant: NutriLabelVariant.small,),
+          const Text('Unidade Curricular, Computação Móvel',
+              style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          const Text('Instituição, Instituto Politécnico de Setúbal',
+              style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
           const SizedBox(height: 30),
-          const NutriLabel('EQUIPA', 
-                  color: AppColors.textMuted, variant: NutriLabelVariant.small, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+          const Text('EQUIPA',
+              style: TextStyle(
+                  color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
           const SizedBox(height: 15),
-          
-          // Adicionei callbacks fictícios (ligar a um package como url_launcher mais tarde)
-          _memberTile('Afonso Martinho', '202001865', 'AM', onGitTap: () {}),
-          _memberTile('Daniel Pais',     '202200286', 'DP', onGitTap: () {}),
-          _memberTile('Fernando Ramalho','202002203', 'FR', onGitTap: () {}),
-          _memberTile('Samuel Silva',    '202200315', 'SS', onGitTap: () {}),
-          
-          const SizedBox(height: 30),
-          
-          NutriButton.transparent(
-            label: 'Ver Código Fonte no GitHub',
-            icon: const Icon(Icons.code, color: AppColors.secondary, size: 18),
-            onPressed: () {
-              // TODO: Abrir o link do repositório da equipa no GitHub
-            },
-          ),
-          
+          _memberTile('Afonso Martinho', '202001865', 'AM'),
+          _memberTile('Daniel Pais',     '202200286', 'DP'),
+          _memberTile('Fernando Ramalho','202002203', 'FR'),
+          _memberTile('Samuel Silva',    '202200315', 'SS'),
           const SizedBox(height: 40),
-          const NutriLabel('Feito com dedicação · IPS 2025/2026', 
+          const Text('Feito com dedicação · IPS 2025/2026',
               textAlign: TextAlign.center,
-              color: AppColors.textMuted, variant: NutriLabelVariant.small,),
+              style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
           const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  Widget _memberTile(String name, String id, String initials, {required VoidCallback onGitTap}) {
+  Widget _memberTile(String name, String id, String initials) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -89,16 +79,11 @@ class CreditsScreen extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: AppColors.surface,
-          child: NutriLabel(initials, 
-              color: AppColors.secondary, variant: NutriLabelVariant.small, fontWeight: FontWeight.bold),
+          child: Text(initials,
+              style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
         ),
-        title: NutriLabel(name, color: AppColors.onBackground, variant: NutriLabelVariant.body,),
-        subtitle: NutriLabel(id, color: AppColors.textMuted, variant: NutriLabelVariant.small,),
-        trailing: NutriButton.text(
-          label: 'GitHub',
-          fontSize: 11,
-          onPressed: onGitTap,
-        ),
+        title: Text(name, style: const TextStyle(color: AppColors.onBackground, fontSize: 14)),
+        subtitle: Text(id, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
       ),
     );
   }

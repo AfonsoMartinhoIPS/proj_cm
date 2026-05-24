@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/database/firestore_paths.dart';
+import 'package:nutri_scan/core/utils/logger.dart';
 import 'package:nutri_scan/data/models/app_user_model.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/domain/repositories/user_repository.dart';

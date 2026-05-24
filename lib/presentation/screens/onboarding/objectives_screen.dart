@@ -1,11 +1,9 @@
-// lib/presentation/screens/on_boarding/objectives_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 class ObjectivesScreen extends ConsumerStatefulWidget {
   const ObjectivesScreen({super.key});
@@ -15,18 +13,8 @@ class ObjectivesScreen extends ConsumerStatefulWidget {
 }
 
 class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
+  
   Objective _selectedObjective = Objective.loseWeight;
-
-  final List<String> _selectedSecondaryObjectives = [
-    'Melhorar desempenho desportivo',
-  ];
-
-  // Lista com as opções disponíveis para o Toggler
-  final List<String> _otherObjectivesOptions = [
-    'Melhorar desempenho desportivo',
-    'Criar hábitos mais saudáveis',
-    'Prevenir doenças relacionadas ao estilo de vida',
-  ];
 
   void _selectObjective(Objective objective) {
     setState(() {
@@ -34,32 +22,19 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
     });
   }
 
-  void _toggleSecondaryObjective(String option) {
-    setState(() {
-      if (_selectedSecondaryObjectives.contains(option)) {
-        _selectedSecondaryObjectives.remove(option);
-      } else {
-        _selectedSecondaryObjectives.add(option);
-      }
-    });
-  }
-
-  void submit() {
+  void submit(){
     ref.read(onboardingProvider.notifier).setObjective(_selectedObjective);
-    //TODO: Guardar objetivo secondario:
-    //ref.read(onboardingProvider.notifier).setSecondaryObjectives(_selectedSecondaryObjectives);
-
     context.push('/onboarding/nutrition-goals');
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const NutriTopNavBar(
-        showBackButton: true,
-        title:
-            '2 / 4',
+      appBar: AppBar(
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        title: _stepIndicator('2 / 4'),
+        centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -68,42 +43,29 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const NutriLabel(
-                'Quais os teus\nobjetivos?',
-                variant: NutriLabelVariant.display,
-              ),
+              const Text('Quais os teus\nobjetivos?',
+                  style: TextStyle(color: AppColors.onBackground, fontSize: 28, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
-              const NutriLabel(
-                'Usamos estas informações para elaborar recomendações personalizadas.',
-                variant: NutriLabelVariant.small,
-              ),
+              const Text('Usamos estas informações para elaborar recomendações personalizadas.',
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
               const SizedBox(height: 30),
-              const NutriLabel(
-                'PESO',
-                variant: NutriLabelVariant.small,
-                fontWeight: FontWeight.bold,
-              ),
+              const Text('PESO',
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 10),
               _buildWeightSelector(),
               const SizedBox(height: 30),
-              const NutriLabel(
-                'OUTROS',
-                variant: NutriLabelVariant.small,
-                fontWeight: FontWeight.bold,
-              ),
+              const Text('OUTROS',
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 15),
-              ..._otherObjectivesOptions.map((option) {
-                final isSelected = _selectedSecondaryObjectives.contains(
-                  option,
-                );
-                return NutriToggler(
-                  title: option,
-                  isSelected: isSelected,
-                  onTap: () => _toggleSecondaryObjective(option),
-                );
-              }),
+              // TODO: make these selectable and save the selections
+              _buildOptionTile('Melhorar desempenho desportivo', isSelected: true),
+              _buildOptionTile('Criar hábitos mais saudáveis', isSelected: false),
+              _buildOptionTile('Prevenir doenças relacionadas ao estilo de vida', isSelected: false),
               const SizedBox(height: 40),
-              NutriButton(label: 'Próximo', onPressed: submit),
+              ElevatedButton(
+                onPressed: () => submit(),
+                child: const Text('Próximo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
               const SizedBox(height: 20),
             ],
           ),
@@ -114,10 +76,7 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
 
   Widget _buildWeightSelector() {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceDark,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: AppColors.surfaceDark, borderRadius: BorderRadius.circular(12)),
       child: Row(
         children: Objective.values.map((option) {
           final selected = _selectedObjective == option;
@@ -130,15 +89,13 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
                   color: selected ? AppColors.primary : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: NutriLabel(
-                  option.label,
-                  variant: NutriLabelVariant.small,
-                  textAlign: TextAlign.center,
-                  fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-                  color: selected
-                      ? AppColors.onBackground
-                      : AppColors.textMuted,
-                ),
+                child: Text(option.label,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: selected ? AppColors.onBackground : AppColors.textMuted,
+                      fontSize: 13,
+                      fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                    )),
               ),
             ),
           );
@@ -146,4 +103,37 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
       ),
     );
   }
+
+  Widget _buildOptionTile(String title, {required bool isSelected}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: isSelected ? AppColors.surface : AppColors.surfaceDark,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: isSelected ? AppColors.secondary : AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(title,
+                style: TextStyle(
+                  color: isSelected ? AppColors.secondary : AppColors.onBackground,
+                  fontSize: 14,
+                )),
+          ),
+          Icon(
+            isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+            color: isSelected ? AppColors.primary : AppColors.border,
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _stepIndicator(String label) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
+    child: Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
+  );
 }

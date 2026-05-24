@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
-
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
 class CalculationScreen extends StatefulWidget {
   const CalculationScreen({super.key});
@@ -41,36 +39,29 @@ class _CalculationScreenState extends State<CalculationScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.primary.withValues(alpha: 0.12),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.18),
-                        width: 2,
-                      ),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.18), width: 2),
                     ),
                   ),
-                  const NutriLabel('📊', variant: NutriLabelVariant.display,),
+                  const Text('📊', style: TextStyle(fontSize: 60)),
                   const SizedBox(
                     width: 180,
                     height: 180,
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.secondary,
-                      ),
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondary),
                       strokeWidth: 2,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 50),
-              const NutriLabel(
-                'A calcular o teu plano...',
-                variant: NutriLabelVariant.headline,
-                textAlign: TextAlign.center,
-              ),
+              const Text('A calcular o teu plano...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppColors.onBackground, fontSize: 22, fontWeight: FontWeight.bold)),
               const SizedBox(height: 15),
-              const NutriLabel(
+              const Text(
                 'Estamos a analisar os teus dados para criar metas de calorias e macros ideais para ti.',
-                variant: NutriLabelVariant.body,
                 textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.textMuted, fontSize: 14, height: 1.5),
               ),
               const SizedBox(height: 50),
               _buildStep('Analisar perfil biométrico', isDone: true),
@@ -94,11 +85,11 @@ class _CalculationScreenState extends State<CalculationScreen> {
             size: 20,
           ),
           const SizedBox(width: 12),
-          NutriLabel(
-            title,
-            variant: NutriLabelVariant.body,
-            color: isDone ? AppColors.onBackground : AppColors.textMuted,
-          ),
+          Text(title,
+              style: TextStyle(
+                color: isDone ? AppColors.onBackground : AppColors.textMuted,
+                fontSize: 14,
+              )),
         ],
       ),
     );

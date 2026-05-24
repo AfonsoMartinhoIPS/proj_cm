@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/utils/logger.dart';
 import 'package:nutri_scan/data/models/saved_product_model.dart';
 import 'package:nutri_scan/data/repositories/product_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/product.dart';

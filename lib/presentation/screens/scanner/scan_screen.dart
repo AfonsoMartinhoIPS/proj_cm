@@ -1,8 +1,7 @@
-// lib/presentation/screens/scanner/scan_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
+import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
 
 class ScanScreen extends StatelessWidget {
   const ScanScreen({super.key});
@@ -21,13 +20,20 @@ class ScanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const NutriTopNavBar(showBackButton: false, title: 'Scan Barcode'),
-      body: SafeArea(
+    return SafeArea(
       child: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Row(
+              children: [
+                Spacer(),
+                Text('Scan Barcode',
+                    style: TextStyle(color: AppColors.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
+                Spacer(),
+              ],
+            ),
+          ),
           Expanded(
             flex: 5,
             child: Container(
@@ -47,22 +53,23 @@ class ScanScreen extends StatelessWidget {
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-            child: NutriLabel(
+            child: Text(
               'Aponta a câmara para o código de barras do produto',
               textAlign: TextAlign.center,
-              color: AppColors.textMuted, variant: NutriLabelVariant.body,),
+              style: TextStyle(color: AppColors.textMuted, fontSize: 14, height: 1.4),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(24),
             child: OutlinedButton(
               onPressed: () => _openManualEntry(context),
-              child: const NutriLabel('Inserir código manualmente', variant: NutriLabelVariant.body,),
+              child: const Text('Inserir código manualmente', style: TextStyle(fontSize: 14)),
             ),
           ),
           const Spacer(),
         ],
       ),
-    ));
+    );
   }
 
   Widget _buildScannerOverlay() {
@@ -128,7 +135,7 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
     final barcode = _barcodeController.text.trim();
     if (barcode.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: NutriLabel('Introduz um código de barras')), 
+        const SnackBar(content: Text('Introduz um código de barras')),
       );
       return;
     }
@@ -146,9 +153,10 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const NutriLabel(
+          const Text(
             'Inserir código de barras',
-            color: AppColors.onBackground, variant: NutriLabelVariant.body, fontWeight: FontWeight.bold),
+            style: TextStyle(color: AppColors.onBackground, fontSize: 16, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 12),
           NutriTextField(
             controller: _barcodeController,
@@ -163,7 +171,8 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _submit,
-            child: const NutriLabel('Search Product', variant: NutriLabelVariant.body, fontWeight: FontWeight.bold)), 
+            child: const Text('Buscar produto', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          ),
         ],
       ),
     );

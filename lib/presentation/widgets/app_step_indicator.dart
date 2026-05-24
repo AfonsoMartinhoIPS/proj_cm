@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/theme/app_colors.dart';
 
-//TODO: Rever, possivel integrar no NutriTopBar
+//TODO: Rever.
 class AppStepIndicator extends StatelessWidget {
   final String title;
   final bool isDone;
