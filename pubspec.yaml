@@ -2,7 +2,7 @@ name: nutri_scan
 description: "NutriScan é uma aplicação móvel inteligente que ajuda os utilizadores a compreender melhor os alimentos que consomem através da leitura de códigos de barras. Ao fazer scan de um produto, a app analisa informações nutricionais como calorias, açúcar, gordura, proteínas e ingredientes, apresentando os dados de forma clara, rápida e intuitiva.\nA aplicação foi desenvolvida com foco em saúde, praticidade e educação alimentar, permitindo aos utilizadores tomar decisões mais conscientes no dia a dia. O sistema inclui autenticação de utilizadores, armazenamento remoto de dados, integração com APIs externas para obtenção de informação nutricional e notificações relevantes relacionadas com hábitos alimentares e objetivos pessoais.\nCom uma interface moderna e fácil de utilizar, a NutriScan pretende tornar a análise nutricional acessível a qualquer pessoa, incentivando um estilo de vida mais saudável através da tecnologia."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -41,6 +41,7 @@ dependencies:
   dio: ^5.8.0
   logger: ^2.5.0
   flutter_riverpod: ^3.3.1
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:
@@ -55,22 +56,22 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   flutter_native_splash: ^2.4.7
+  mocktail: ^0.3.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/icon/
+    - assets/logos/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -97,3 +98,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  shaders:
+    - shaders/wave.frag

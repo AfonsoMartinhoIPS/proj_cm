@@ -27,7 +27,7 @@ import 'package:nutri_scan/presentation/screens/profile/profile_screen.dart';
 import 'package:nutri_scan/presentation/screens/profile/settings_screen.dart';
 import 'package:nutri_scan/presentation/screens/profile/credits_screen.dart';
 
-import 'package:nutri_scan/presentation/widgets/main_shell.dart';
+import 'package:nutri_scan/presentation/widgets/old_widgets.dart';
 
 class AppRoute {
   final String path;

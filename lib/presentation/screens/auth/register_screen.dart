@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/theme/app_colors.dart';
-import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
@@ -17,7 +17,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -34,21 +35,30 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final password = passwordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
 
-    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preenche todos os campos')),
-      );
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+          NutriFeedback.showSnackBar(
+            context,
+            'Preenche todos os campos',
+            NutriFeedbackType.error,
+          );
       return;
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('As passwords não coincidem')),
+      NutriFeedback.showSnackBar(
+        context,
+        'As passwords não coincidem',
+        NutriFeedbackType.error,
       );
       return;
     }
 
-    ref.read(onboardingProvider.notifier).setCredentials(email: email, password: password);
+    ref
+        .read(onboardingProvider.notifier)
+        .setCredentials(email: email, password: password);
     final onboarding = ref.read(onboardingProvider).copyWith(name: name);
     ref.read(authProvider.notifier).register(onboarding);
   }
@@ -62,19 +72,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         data: (user) {
           if (user != null) context.go('/');
         },
-        error: (e, _) => ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        ),
+        error: (e, _) {
+          NutriFeedback.showSnackBar(
+            context,
+            e.toString(),
+            NutriFeedbackType.error,
+          );
+        }
       );
     });
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+      appBar: const NutriTopNavBar(
+        showBackButton: true,
+        title: 'Cria Conta',
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -83,11 +95,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const Text('Cria Conta',
-                  style: TextStyle(color: AppColors.onBackground, fontSize: 28, fontWeight: FontWeight.bold)),
+              const NutriLabel(
+                'Cria Conta',
+                variant: NutriLabelVariant.display,
+              ),
               const SizedBox(height: 10),
-              const Text('Regista-te para começar a monitorizar a tua nutrição.',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+              const NutriLabel(
+                'Regista-te para começar a monitorizar a tua nutrição.',
+                variant: NutriLabelVariant.small,
+              ),
               const SizedBox(height: 35),
               NutriTextField(
                 controller: nameController,
@@ -128,23 +144,26 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: AppColors.border),
                     ),
-                    child: const Icon(Icons.check, size: 14, color: AppColors.secondary),
+                    child: const Icon(
+                      Icons.check,
+                      size: 14,
+                      color: AppColors.secondary,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
-                    child: Text(
+                    child: NutriLabel(
                       'Aceito os Termos de Serviço e a Política de Privacidade.',
-                      style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                      variant: NutriLabelVariant.small,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: authState.isLoading ? null : submit,
-                child: authState.isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Registar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              NutriButton(
+                label: 'Registar',
+                isLoading: authState.isLoading,
+                onPressed: submit,
               ),
               const SizedBox(height: 25),
             ],
@@ -153,5 +172,4 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       ),
     );
   }
-
 }
