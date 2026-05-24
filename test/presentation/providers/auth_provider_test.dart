@@ -1,4 +1,6 @@
 // test/presentation/providers/auth_provider_test.dart
+// ignore_for_file: unused_local_variable, unused_import
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';

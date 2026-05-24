@@ -1,4 +1,6 @@
 // test/data/repositories/auth_repository_impl_test.dart
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:nutri_scan/data/repositories/auth_repository_impl.dart';

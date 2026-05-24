@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/router/app_router.dart';
-import 'package:nutri_scan/presentation/widgets/old/bottom_navbar.dart';
+import 'package:nutri_scan/presentation/widgets/new/nutri_bottom_bar.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -17,7 +17,7 @@ class MainShell extends StatelessWidget {
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: BottomNavbar(
+      bottomNavigationBar: NutriBottomBar(
         currentIndex: currentIndex.clamp(0, bottomNavRoutes.length - 1),
         onTap: (index) => context.go(bottomNavRoutes[index].path),
       ),

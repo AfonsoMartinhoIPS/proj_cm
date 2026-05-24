@@ -1,4 +1,6 @@
 // test/presentation/providers/nutrition_log_provider_test.dart
+// ignore_for_file: unused_import
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
