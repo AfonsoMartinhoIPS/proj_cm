@@ -104,6 +104,26 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
   }
 
   @override
+  Future<void> updateEntry(String uid, String date, MealEntry entry) async {
+    logger.d('NutritionLogRepository: updateEntry ${entry.id} for $uid on $date');
+    final docRef = _db.doc(FirestorePaths.nutritionLog(uid, date));
+    final doc = await docRef.get();
+    if (!doc.exists) return;
+    final entries =
+        List<Map<String, dynamic>>.from(doc.data()!['entries'] ?? []);
+    final idx = entries.indexWhere((e) => e['id'] == entry.id);
+    if (idx == -1) return;
+    entries[idx] = MealEntryModel.toMap(entry);
+    await docRef.update({'entries': entries});
+  }
+
+  @override
+  Future<void> deleteLog(String uid, String date) async {
+    logger.d('NutritionLogRepository: deleteLog for $uid on $date');
+    await _db.doc(FirestorePaths.nutritionLog(uid, date)).delete();
+  }
+
+  @override
   Future<List<NutritionLog>> getLogs(String uid, List<String> dates) async {
     final futures = dates.map((date) => getLog(uid, date));
     final results = await Future.wait(futures);

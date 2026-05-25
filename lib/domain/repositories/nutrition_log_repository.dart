@@ -20,6 +20,13 @@ abstract class NutritionLogRepository {
 
   Future<void> removeEntry(String uid, String date, String entryId);
 
+  /// Replace an existing entry (matched by [MealEntry.id]) with [entry].
+  /// No-op when the doc or the id is missing.
+  Future<void> updateEntry(String uid, String date, MealEntry entry);
+
+  /// Delete the whole `nutrition_logs/{date}` doc for [uid].
+  Future<void> deleteLog(String uid, String date);
+
   /// Set the daily water total. Creates the doc with [goalsSnapshot] frozen in
   /// when missing, same as [addEntry].
   Future<void> updateWater(

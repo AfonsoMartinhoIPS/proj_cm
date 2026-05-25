@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/data/repositories/product_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
 import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
@@ -10,49 +11,77 @@ import 'package:nutri_scan/presentation/screens/meals/add_meal/add_meal_product_
 import 'package:nutri_scan/presentation/screens/products/widgets/product_picker.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
-
-/// TODO: This should be done at the provider level
-/// Builds the YYYY-MM-DD doc id used by `nutrition_logs/{date}` in Firestore.
-String _dateKey(DateTime d) =>
-    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-
-/// Screen for adding a [MealEntry] to a given day's nutrition log.
+/// Add/edit screen for a [MealEntry].
 ///
-/// Composed of three sections:
-///   1. [AddMealGeneralInfo] — meal type + date (always visible).
-///   2. [ProductPicker] — shown when no product is selected.
-///   3. [AddMealProductSelected] — shown once a product is picked; renders the
-///      product card, serving input and nutrition table.
+/// Two modes, switched via [editingEntry]:
 ///
-/// The "Save" button is enabled only when a product is selected
-/// and the servings field parses to a positive number.
+///   * **Add** (default): meal type + date + product picker + serving form.
+///     Hands a freshly-built entry to `nutritionLogsProvider.addEntry`.
+///   * **Edit**: [editingEntry] + [editingDate] required. Product is locked
+///     (refetched once via [ProductRepositoryImpl] for its per-100g
+///     [Nutriments]); user can only change meal type and serving grams.
+///     Date is locked too — moving an entry across days is out of scope and
+///     would require a delete-on-old + add-on-new transaction.
+///     Save calls `nutritionLogsProvider.updateEntry`.
 ///
-/// Can be opened with a pre-selected [Product] (e.g. from product details
-/// pushing `'/meals/add'` with `extra: product`).
+/// Can also be opened in add-mode with a pre-selected [initialProduct]
+/// (e.g. from product details pushing `/meals/add` with `extra: product`).
 class AddMealScreen extends ConsumerStatefulWidget {
-  /// Product to pre-fill the form with (skips the picker step).
   final Product? initialProduct;
 
-  const AddMealScreen({super.key, this.initialProduct});
+  /// Entry being edited. When set, the screen runs in edit mode.
+  final MealEntry? editingEntry;
+
+  /// YYYY-MM-DD doc id of the log the edited entry lives in. Required when
+  /// [editingEntry] is set so the provider knows which day to mutate.
+  final String? editingDate;
+
+  const AddMealScreen({
+    super.key,
+    this.initialProduct,
+    this.editingEntry,
+    this.editingDate,
+  }) : assert(
+          editingEntry == null || editingDate != null,
+          'editingDate is required when editingEntry is set',
+        );
 
   @override
   ConsumerState<AddMealScreen> createState() => _AddMealScreenState();
 }
 
 class _AddMealScreenState extends ConsumerState<AddMealScreen> {
-  // Shared form state — local to the screen, no provider needed.
   Product? _selectedProduct;
   MealType _mealType = MealType.lunch;
   DateTime _date = DateTime.now();
   final _servingsController = TextEditingController(text: '100');
 
+  bool get _isEditing => widget.editingEntry != null;
+  bool _loadingProduct = false;
+
   @override
   void initState() {
     super.initState();
-    _selectedProduct = widget.initialProduct;
-    // Rebuild on every keystroke so `_canSubmit` re-evaluates and the
-    // save button enables/disables in real time.
+    if (_isEditing) {
+      final entry = widget.editingEntry!;
+      _mealType = entry.mealType;
+      _date = entry.loggedAt;
+      _servingsController.text = entry.servingGrams.toStringAsFixed(0);
+      _fetchEditingProduct(entry.productBarcode);
+    } else {
+      _selectedProduct = widget.initialProduct;
+    }
     _servingsController.addListener(() => setState(() {}));
+  }
+
+  Future<void> _fetchEditingProduct(String barcode) async {
+    setState(() => _loadingProduct = true);
+    final product = await ProductRepositoryImpl().getByBarcode(barcode);
+    if (!mounted) return;
+    setState(() {
+      _selectedProduct = product;
+      _loadingProduct = false;
+    });
   }
 
   @override
@@ -61,42 +90,53 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
     super.dispose();
   }
 
-  /// Submit is allowed only when a product is picked and servings is positive.
   bool get _canSubmit {
     if (_selectedProduct == null) return false;
     final grams = double.tryParse(_servingsController.text.trim());
     return grams != null && grams > 0;
   }
 
-  /// Builds the [MealEntry] from the current form state, hands it to
-  /// [nutritionLogsProvider] for persistence + cache splice. Pops on success.
   Future<void> _submit() async {
     final product = _selectedProduct;
     if (product == null) return;
     final grams = double.tryParse(_servingsController.text.trim()) ?? 0;
     if (grams <= 0) return;
 
-    // Scale per-100g nutriments to the actual consumed serving, then store
-    // the resulting totals on the entry. We do the math here once so the
-    // Firestore doc holds final values that any reader can display as-is.
     final n = product.nutriments;
-    final entry = MealEntry(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      productBarcode: product.barcode,
-      productName: product.name,
-      productImageUrl: product.imageThumbnailUrl ?? product.imageUrl,
-      mealType: _mealType,
-      servingGrams: grams,
-      calories: n.calories(grams: grams),
-      protein: n.protein(grams: grams),
-      carbs: n.carbs(grams: grams),
-      fat: n.fat(grams: grams),
-      loggedAt: DateTime.now(),
-    );
+    final notifier = ref.read(nutritionLogsProvider.notifier);
 
-    await ref
-        .read(nutritionLogsProvider.notifier)
-        .addEntry(entry, date: _dateKey(_date));
+    if (_isEditing) {
+      final original = widget.editingEntry!;
+      final updated = MealEntry(
+        id: original.id,
+        productBarcode: original.productBarcode,
+        productName: original.productName,
+        productImageUrl: original.productImageUrl,
+        mealType: _mealType,
+        servingGrams: grams,
+        calories: n.calories(grams: grams),
+        protein: n.protein(grams: grams),
+        carbs: n.carbs(grams: grams),
+        fat: n.fat(grams: grams),
+        loggedAt: original.loggedAt,
+      );
+      await notifier.updateEntry(updated, date: widget.editingDate);
+    } else {
+      final entry = MealEntry(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        productBarcode: product.barcode,
+        productName: product.name,
+        productImageUrl: product.imageThumbnailUrl ?? product.imageUrl,
+        mealType: _mealType,
+        servingGrams: grams,
+        calories: n.calories(grams: grams),
+        protein: n.protein(grams: grams),
+        carbs: n.carbs(grams: grams),
+        fat: n.fat(grams: grams),
+        loggedAt: DateTime.now(),
+      );
+      await notifier.addEntry(entry, date: dateKey(_date));
+    }
 
     if (!mounted) return;
     context.pop();
@@ -106,25 +146,28 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const NutriTopNavBar(
+      appBar: NutriTopNavBar(
         showBackButton: true,
-        title: 'Adicionar refeição',
+        title: _isEditing ? 'Editar refeição' : 'Adicionar refeição',
       ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // Always visible: meal type + date.
             AddMealGeneralInfo(
               mealType: _mealType,
               date: _date,
               onMealTypeChanged: (t) => setState(() => _mealType = t),
-              onDateChanged: (d) => setState(() => _date = d),
+              onDateChanged: _isEditing ? (_) {} : (d) => setState(() => _date = d),
             ),
             const SizedBox(height: 24),
 
-            // Product picker vs selected based on `_selectedProduct`.
-            if (_selectedProduct == null)
+            if (_loadingProduct)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 32),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_selectedProduct == null)
               ProductPicker(
                 onPick: (product) =>
                     setState(() => _selectedProduct = product),
@@ -133,12 +176,17 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               AddMealProductSelected(
                 product: _selectedProduct!,
                 servingsController: _servingsController,
-                onChange: () => setState(() => _selectedProduct = null),
+                // Lock product in edit mode — empty callback hides the "Mudar"
+                // button effect (button still appears; this is a UX compromise
+                // to avoid forking AddMealProductSelected for one flag).
+                onChange: _isEditing
+                    ? () {}
+                    : () => setState(() => _selectedProduct = null),
               ),
 
             const SizedBox(height: 32),
             NutriButton(
-              label: 'Guardar refeição',
+              label: _isEditing ? 'Atualizar' : 'Guardar refeição',
               onPressed: _canSubmit ? _submit : null,
             ),
           ],

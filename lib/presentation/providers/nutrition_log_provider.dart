@@ -6,11 +6,6 @@ import 'package:nutri_scan/domain/entities/meal_entry.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 
-String _dateKey(DateTime d) =>
-    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-
-String _todayKey() => _dateKey(DateTime.now());
-
 NutritionLog _emptyLog(String date, AppUser user) => NutritionLog(
   date: date,
   entries: const [],
@@ -37,7 +32,7 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
 
   Future<List<NutritionLog>> _fetch(String uid, int days) async {
     final now = DateTime.now();
-    final dates = List.generate(days, (i) => _dateKey(now.subtract(Duration(days: i)))).reversed.toList();
+    final dates = List.generate(days, (i) => dateKey(now.subtract(Duration(days: i)))).reversed.toList();
     logger.d('NutritionLogs: fetching last $days days (${dates.first} → ${dates.last})');
     List<NutritionLog> logs = await repo.getLogs(uid, dates);
     logger.d('NutritionLogs: fetched ${logs.length} logs');
@@ -78,7 +73,7 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
   Future<void> addEntry(MealEntry entry, {String? date}) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
-    final d = date ?? _todayKey();
+    final d = date ?? todayKey();
     logger.d('NutritionLogs: addEntry on $d — ${entry.productName} (${entry.servingGrams}g)');
     try {
       // Pass the user's current goals so the repo can freeze them on the
@@ -99,7 +94,7 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
   Future<void> removeEntry(String entryId, {String? date}) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
-    final d = date ?? _todayKey();
+    final d = date ?? todayKey();
     logger.d('NutritionLogs: removeEntry $entryId on $d');
     try {
       await repo.removeEntry(user.uid, d, entryId);
@@ -110,10 +105,40 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
     }
   }
 
+  Future<void> updateEntry(MealEntry entry, {String? date}) async {
+    final user = ref.read(authProvider).value;
+    if (user == null) return;
+    final d = date ?? todayKey();
+    logger.d('NutritionLogs: updateEntry ${entry.id} on $d');
+    try {
+      await repo.updateEntry(user.uid, d, entry);
+      await _refreshDate(user, d);
+    } catch (e, st) {
+      logger.e('NutritionLogs: updateEntry error', error: e, stackTrace: st);
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> deleteDay(String date) async {
+    final user = ref.read(authProvider).value;
+    if (user == null) return;
+    logger.d('NutritionLogs: deleteDay $date');
+    try {
+      await repo.deleteLog(user.uid, date);
+      final current = state.value ?? [];
+      state = AsyncValue.data(
+        [for (final l in current) if (l.date != date) l],
+      );
+    } catch (e, st) {
+      logger.e('NutritionLogs: deleteDay error', error: e, stackTrace: st);
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> setWater(double ml, {String? date}) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
-    final d = date ?? _todayKey();
+    final d = date ?? todayKey();
     logger.d('NutritionLogs: setWater ${ml}ml on $d');
     try {
       await repo.updateWater(
@@ -130,7 +155,7 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
   }
 
   Future<void> addWater(double ml, {String? date}) async {
-    final d = date ?? _todayKey();
+    final d = date ?? todayKey();
     final logs = state.value ?? [];
     final current = logs.firstWhere(
       (l) => l.date == d,
