@@ -5,7 +5,7 @@ import 'package:nutri_scan/presentation/widgets/new/nutri_label.dart';
 /// Themed confirm dialog. Returns `true` when confirmed, `false` otherwise
 /// (including dismissed via tap-outside / back button).
 ///
-/// [destructive] tints the confirm action in [AppColors.error] — set to false
+/// [destructive] tints the confirm action in [AppColors.error] - set to false
 /// for non-destructive confirmations (e.g. "Save changes?").
 Future<bool> showNutriConfirmDialog(
   BuildContext context, {

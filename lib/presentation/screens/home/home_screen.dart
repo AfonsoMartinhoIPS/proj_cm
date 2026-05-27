@@ -11,7 +11,7 @@ import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/screens/meals/widgets/meal_entry_tile.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
-/// Home dashboard — shows today's intake, weekly bar chart, and today's meals.
+/// Home dashboard - shows today's intake, weekly bar chart, and today's meals.
 /// All data comes from [nutritionLogsProvider] (list of recent logs) and [authProvider]
 /// (current AppUser, for fallback goals).
 class HomeScreen extends ConsumerWidget {
@@ -375,7 +375,7 @@ class _WeeklyChart extends StatelessWidget {
 /// Today's entries grouped by [MealType]. Each section shows its subtotal
 /// kcal; entries render via [MealEntryTile]. Tapping a tile opens the day
 /// detail screen so the user can edit/delete from there (no inline mutation
-/// on the home screen — keeps this widget read-only).
+/// on the home screen - keeps this widget read-only).
 class _TodayMeals extends ConsumerWidget {
   const _TodayMeals({required this.nutritionLog});
 

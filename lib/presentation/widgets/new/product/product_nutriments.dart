@@ -62,7 +62,7 @@ class ProductNutritionTable extends StatelessWidget {
             label,
             color: AppColors.textMuted, variant: NutriLabelVariant.small),
           NutriLabel( 
-            value != null ? '${value.toStringAsFixed(1)} $unit' : '— $unit',
+            value != null ? '${value.toStringAsFixed(1)} $unit' : '- $unit',
               variant: NutriLabelVariant.small,
               color: AppColors.onBackground,
               fontWeight: FontWeight.w600,

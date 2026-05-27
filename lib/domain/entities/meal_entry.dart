@@ -10,13 +10,13 @@ enum MealType {
 
 /// A single logged meal item inside a daily [NutritionLog].
 ///
-/// Nutrient totals are stored **already scaled to the consumed serving** —
+/// Nutrient totals are stored **already scaled to the consumed serving** -
 /// i.e. `calories` is the total kcal for `servingGrams` grams of this product,
 /// not the per-100g rate. This means reading the doc never requires the
 /// caller to do any math: just display the value.
 ///
 /// The scaling is performed once at log time (in `AddMealScreen._submit`)
-/// from the product's per-100g [Nutriments]. Stored values are frozen — they
+/// from the product's per-100g [Nutriments]. Stored values are frozen - they
 /// won't change if the global product is updated later.
 class MealEntry {
   final String id;
@@ -52,7 +52,7 @@ class MealEntry {
   });
 
   // Convenience aliases so existing call sites (`entry.totalCalories`) keep
-  // working. They just return the stored value — no math.
+  // working. They just return the stored value - no math.
   double get totalCalories => calories;
   double get totalProtein => protein;
   double get totalCarbs => carbs;

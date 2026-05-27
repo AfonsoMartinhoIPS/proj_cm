@@ -17,7 +17,7 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<Product?> getByBarcode(String barcode) async {
-    logger.d('getByBarcode: $barcode — checking Firestore');
+    logger.d('getByBarcode: $barcode - checking Firestore');
     final doc = await _db.doc(FirestorePaths.product(barcode)).get();
     final cached = ProductModel.fromDoc(doc);
 
@@ -26,10 +26,10 @@ class ProductRepositoryImpl implements ProductRepository {
       return cached;
     }
 
-    logger.d('cache miss — fetching from OpenFoodFacts');
+    logger.d('cache miss - fetching from OpenFoodFacts');
     final product = await OpenFoodFactsDatasource.getByBarcode(barcode);
     if (product != null) {
-      logger.d('fetched: ${product.name} — saving to Firestore');
+      logger.d('fetched: ${product.name} - saving to Firestore');
       await save(product);
     }
 

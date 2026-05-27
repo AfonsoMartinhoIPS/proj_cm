@@ -46,12 +46,12 @@ class ConfirmScreen extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    _dataRow('Nome', s.name.isEmpty ? '—' : s.name),
+                    _dataRow('Nome', s.name.isEmpty ? '-' : s.name),
                     _dataRow('Idade', '${s.age} anos'),
                     _dataRow('Sexo', _genderLabel(s.gender)),
                     _dataRow('Altura', '${s.height} cm'),
                     _dataRow('Peso', '${s.weight.toStringAsFixed(0)} kg'),
-                    _dataRow('Objectivo', s.objective?.label ?? '—'),
+                    _dataRow('Objectivo', s.objective?.label ?? '-'),
                     if (s.nutritionGoals != null) ...[
                       _dataRow(
                         'Calorias',

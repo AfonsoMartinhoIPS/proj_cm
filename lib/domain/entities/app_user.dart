@@ -52,4 +52,27 @@ class AppUser {
     required this.nutritionGoals,
     required this.objective,
   });
+
+  AppUser copyWith({
+    String? displayName,
+    DateTime? dateOfBirth,
+    Gender? gender,
+    int? height,
+    double? weight,
+    NutritionGoals? nutritionGoals,
+    Objective? objective,
+  }) {
+    return AppUser(
+      uid: uid,
+      email: email,
+      createdAt: createdAt,
+      displayName: displayName ?? this.displayName,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      gender: gender ?? this.gender,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+      nutritionGoals: nutritionGoals ?? this.nutritionGoals,
+      objective: objective ?? this.objective,
+    );
+  }
 }

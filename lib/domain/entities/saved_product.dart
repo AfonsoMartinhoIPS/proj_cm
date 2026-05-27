@@ -9,7 +9,7 @@ class SavedProductNote {
 }
 
 /// Snapshot of a product the user has saved.
-/// Full product data lives in `products/{barcode}` — this only holds enough
+/// Full product data lives in `products/{barcode}` - this only holds enough
 /// to render the saved list without a second read per item.
 class SavedProduct {
   final String barcode;

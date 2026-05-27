@@ -27,6 +27,7 @@ import 'package:nutri_scan/presentation/screens/scanner/scan_screen.dart';
 
 import 'package:nutri_scan/presentation/screens/profile/profile_screen.dart';
 import 'package:nutri_scan/presentation/screens/profile/settings_screen.dart';
+import 'package:nutri_scan/presentation/screens/profile/goals_editor_screen.dart';
 import 'package:nutri_scan/presentation/screens/profile/credits_screen.dart';
 
 import 'package:nutri_scan/presentation/widgets/old_widgets.dart';
@@ -123,6 +124,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // protected
       GoRoute(path: '/profile',  builder: (_, _) => const ProfileScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+      GoRoute(path: '/profile/goals', builder: (_, _) => const GoalsEditorScreen()),
       GoRoute(path: '/credits',  builder: (_, _) => const CreditsScreen()),
       
       // meals
@@ -150,7 +152,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      // Active scanner that returns a barcode via Navigator.pop — used by
+      // Active scanner that returns a barcode via Navigator.pop - used by
       // ProductPicker. Lives outside ShellRoute so it can be
       // pushed from any screen without remounting MainShell.
       GoRoute(

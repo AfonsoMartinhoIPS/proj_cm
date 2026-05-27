@@ -10,7 +10,7 @@ import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 /// shortcut to swap the selection, an editable serving-grams field, and the
 /// full [ProductNutritionTable] below.
 ///
-/// All meal-form state lives on the parent screen — this widget is purely
+/// All meal-form state lives on the parent screen - this widget is purely
 /// presentational and reports user input via [servingsController] / [onChange].
 class AddMealProductSelected extends StatelessWidget {
   /// Product the user picked. Guaranteed non-null at this point in the flow.

@@ -118,7 +118,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
               NutriTextField(
                 controller: nameController,
                 label: 'Nome completo',
-                hint: 'Ana Ferreira',
+                hint: 'ex. Ana Ferreira',
                 icon: Icons.person_outline,
               ),
               const SizedBox(height: 20),
@@ -136,7 +136,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                     child: NutriTextField(
                       controller: weightController,
                       label: 'Peso (kg)',
-                      hint: '62',
+                      hint: 'ex. 62',
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -145,7 +145,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                     child: NutriTextField(
                       controller: heightController,
                       label: 'Altura (cm)',
-                      hint: '168',
+                      hint: 'ex. 168',
                       keyboardType: TextInputType.number,
                     ),
                   ),

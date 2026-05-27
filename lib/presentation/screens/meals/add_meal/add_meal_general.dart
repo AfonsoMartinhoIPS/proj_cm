@@ -7,7 +7,7 @@ import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 /// don't depend on a specific product: which meal of the day the entry is
 /// for, and on which date it was eaten.
 ///
-/// Stateless — all values live on the parent screen and are pushed in via
+/// Stateless - all values live on the parent screen and are pushed in via
 /// [mealType] and [date]. User input bubbles back through [onMealTypeChanged]
 /// and [onDateChanged].
 class AddMealGeneralInfo extends StatelessWidget {

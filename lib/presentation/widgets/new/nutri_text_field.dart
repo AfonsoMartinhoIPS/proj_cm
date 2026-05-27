@@ -176,7 +176,14 @@ class _NutriTextFieldState extends State<NutriTextField> {
                         const SizedBox(height: AppSizes.xs),
                         TextFormField(
                           controller: widget.controller,
-                          initialValue: widget.value,
+                          // Flutter forbids passing both controller AND
+                          // initialValue. Only use initialValue when no
+                          // external controller was supplied - otherwise the
+                          // field resets to the initialValue every rebuild
+                          // (e.g. when focus toggles trigger setState).
+                          initialValue: widget.controller == null
+                              ? widget.value
+                              : null,
                           focusNode: _focusNode,
                           obscureText: widget.obscureText,
                           keyboardType: widget.keyboardType,
@@ -190,12 +197,18 @@ class _NutriTextFieldState extends State<NutriTextField> {
                             fontSize: AppSizes.fontMd - 1,
                           ),
                           validator: (value) {
-                            if (widget.validator != null) {
-                              final error = widget.validator!(value);
-                              setState(() => _errorText = error);
-                              return error;
-                            }
-                            return null;
+                            if (widget.validator == null) return null;
+                            final error = widget.validator!(value);
+                            // Defer the rebuild - validator runs during the
+                            // build phase, so calling setState synchronously
+                            // throws "setState during build" in debug.
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              if (!mounted) return;
+                              if (_errorText != error) {
+                                setState(() => _errorText = error);
+                              }
+                            });
+                            return error;
                           },
                           decoration: InputDecoration(
                             isDense: true,

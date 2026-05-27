@@ -1,7 +1,7 @@
 // lib/presentation/widgets/nutri_icon.dart
 import 'package:flutter/material.dart';
 
-/// Um widget de ícone adaptável que renderiza o logótipo da aplicação (`icon_fill.png`).
+/// Um widget de ícone adaptável que renderiza o logótipo da aplicação (`app_icon.png`).
 ///
 /// O [NutriIcon] calcula automaticamente o seu tamanho com base nas restrições
 /// ([BoxConstraints]) do widget pai, a menos que um [size] explícito seja fornecido.
@@ -81,7 +81,7 @@ class NutriIcon extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(_inheritRadius(context)),
       child: Image.asset(
-        'assets/icon/icon_fill.png',
+        'assets/icon/app_icon.png',
         width: targetSize,
         height: targetSize,
         fit: fitStrategy,

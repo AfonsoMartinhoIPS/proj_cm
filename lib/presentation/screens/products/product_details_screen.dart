@@ -97,14 +97,10 @@ class _ActionButtons extends ConsumerWidget {
               final notifier = ref.read(savedProductsProvider.notifier);
               if (isSaved) {
                 notifier.removeProduct(product.barcode);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: NutriLabel('Produto removido', color: AppColors.border,),), 
-                );
+                NutriFeedback.showInfo(context, 'Produto removido');
               } else {
                 notifier.saveProduct(product);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: NutriLabel('Produto guardado', color: AppColors.border,)), 
-                );
+                NutriFeedback.showSuccess(context, 'Produto guardado');
               }
             },
           ),
@@ -273,9 +269,8 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
   void _submit() {
     final text = _controller.text.trim();
     if (text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: NutriLabel('Escreve algo na nota'))); 
+      NutriFeedback.showError(context, 'Escreve algo na nota');
+      return;
     }
     Navigator.of(context).pop();
     widget.onSubmit(text);
@@ -443,7 +438,7 @@ class _NutritionTable extends StatelessWidget {
             label,
             color: AppColors.textMuted, variant: NutriLabelVariant.small),
           NutriLabel( 
-            value != null ? '${value.toStringAsFixed(1)} $unit' : '— $unit',
+            value != null ? '${value.toStringAsFixed(1)} $unit' : '- $unit',
               variant: NutriLabelVariant.small,
               color: AppColors.onBackground,
               fontWeight: FontWeight.w600,

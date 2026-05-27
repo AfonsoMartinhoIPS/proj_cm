@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
 
-/// Standard surface card used across the app — rounded corners, bordered,
+/// Standard surface card used across the app - rounded corners, bordered,
 /// fills with [AppColors.surface] by default. Pick a `variant` to switch
 /// to the darker surface used inside other cards.
 enum NutriCardVariant { surface, surfaceDark }
