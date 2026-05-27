@@ -1,4 +1,6 @@
 // test/data/repositories/product_repository_impl_test.dart
+// ignore_for_file: prefer_function_declarations_over_variables, depend_on_referenced_packages, unused_local_variable, unused_import
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:nutri_scan/data/models/product_model.dart';
