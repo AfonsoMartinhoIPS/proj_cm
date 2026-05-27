@@ -7,56 +7,76 @@ import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/screens/meals/widgets/day_summary_card.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
-/// Top-level meals screen: list of recent days. Tapping a day opens
-/// [DayDetailScreen]; the trailing icon on each card deletes the whole day
-/// (with confirm).
+/// Top-level meals screen.
 ///
-/// Days with no entries are filtered out so the list stays clean.
-class MealsScreen extends ConsumerWidget {
+/// Shows recent days as cards (newest first). Features:
+///   * **Search** — filter days by entry product name (case-insensitive
+///     substring match on any entry).
+///   * **Pagination** — when the user scrolls within 200px of the bottom and
+///     no fetch is in flight, the screen calls
+///     [NutritionLogsNotifier.loadMore] to extend the window by 7 days.
+///   * **Per-card delete** — trailing icon on each card opens a confirm dialog
+///     then removes the whole day via `deleteDay`.
+///
+/// Empty days are filtered out of the list (the auto-cleanup in the provider
+/// already deletes truly empty docs, but `state.value` may still contain
+/// stale entries until the next refresh).
+class MealsScreen extends ConsumerStatefulWidget {
   const MealsScreen({super.key});
 
-  Future<bool> _confirmDelete(BuildContext context, NutritionLog log) async {
-    final res = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: const NutriLabel(
-          'Apagar dia?',
-          variant: NutriLabelVariant.title,
-          color: AppColors.onBackground,
-        ),
-        content: NutriLabel(
-          'Vai remover ${log.entries.length} '
-          '${log.entries.length == 1 ? 'refeição' : 'refeições'} '
-          'registadas em ${log.date}.',
-          variant: NutriLabelVariant.body,
-          color: AppColors.textMuted,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const NutriLabel(
-              'Cancelar',
-              variant: NutriLabelVariant.label,
-              color: AppColors.textMuted,
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const NutriLabel(
-              'Apagar',
-              variant: NutriLabelVariant.label,
-              color: AppColors.error,
-            ),
-          ),
-        ],
-      ),
-    );
-    return res ?? false;
+  @override
+  ConsumerState<MealsScreen> createState() => _MealsScreenState();
+}
+
+class _MealsScreenState extends ConsumerState<MealsScreen> {
+  final _searchController = TextEditingController();
+  final _scrollController = ScrollController();
+  String _query = '';
+  bool _loadingMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  /// Triggers `loadMore` when the user scrolls within 200px of the list
+  /// bottom. Guarded by [_loadingMore] so back-to-back scroll events don't
+  /// stack multiple fetches.
+  void _onScroll() {
+    if (_loadingMore) return;
+    if (!_scrollController.hasClients) return;
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 200) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _loadMore() async {
+    setState(() => _loadingMore = true);
+    try {
+      await ref.read(nutritionLogsProvider.notifier).loadMore();
+    } finally {
+      if (mounted) setState(() => _loadingMore = false);
+    }
+  }
+
+  bool _matchesQuery(NutritionLog log) {
+    if (_query.isEmpty) return true;
+    final q = _query.toLowerCase();
+    return log.entries.any((e) => e.productName.toLowerCase().contains(q));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final async = ref.watch(nutritionLogsProvider);
 
     return Scaffold(
@@ -79,29 +99,70 @@ class MealsScreen extends ConsumerWidget {
             ),
           ),
           data: (logs) {
-            final withEntries = [
-              for (final l in logs) if (l.entries.isNotEmpty) l,
+            final filtered = [
+              for (final l in logs)
+                if (l.entries.isNotEmpty && _matchesQuery(l)) l,
             ]..sort((a, b) => b.date.compareTo(a.date));
 
-            if (withEntries.isEmpty) return const _EmptyState();
-
-            return ListView.builder(
-              padding: const EdgeInsets.all(AppSizes.md),
-              itemCount: withEntries.length,
-              itemBuilder: (context, i) {
-                final log = withEntries[i];
-                return DaySummaryCard(
-                  log: log,
-                  onTap: () => context.push('/meals/day/${log.date}'),
-                  onDelete: () async {
-                    final ok = await _confirmDelete(context, log);
-                    if (!ok) return;
-                    await ref
-                        .read(nutritionLogsProvider.notifier)
-                        .deleteDay(log.date);
-                  },
-                );
-              },
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.md, AppSizes.md, AppSizes.md, AppSizes.sm,
+                  ),
+                  child: NutriTextField(
+                    label: 'Pesquisar',
+                    hint: 'Nome do produto…',
+                    icon: Icons.search,
+                    controller: _searchController,
+                    onChanged: (v) => setState(() => _query = v.trim()),
+                  ),
+                ),
+                Expanded(
+                  child: filtered.isEmpty
+                      ? _EmptyState(hasQuery: _query.isNotEmpty)
+                      : ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSizes.md, AppSizes.sm,
+                            AppSizes.md, AppSizes.xl,
+                          ),
+                          itemCount: filtered.length + 1,
+                          itemBuilder: (context, i) {
+                            if (i == filtered.length) {
+                              return _loadingMore
+                                  ? const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: AppSizes.md,
+                                      ),
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink();
+                            }
+                            final log = filtered[i];
+                            return DaySummaryCard(
+                              log: log,
+                              onTap: () => context.push('/meals/day/${log.date}'),
+                              onDelete: () async {
+                                final ok = await showNutriConfirmDialog(
+                                  context,
+                                  title: 'Apagar dia?',
+                                  body: 'Vai remover ${log.entries.length} '
+                                      '${log.entries.length == 1 ? 'refeição' : 'refeições'} '
+                                      'registadas em ${formatRelativeDate(log.date)}.',
+                                );
+                                if (!ok) return;
+                                await ref
+                                    .read(nutritionLogsProvider.notifier)
+                                    .deleteDay(log.date);
+                              },
+                            );
+                          },
+                        ),
+                ),
+              ],
             );
           },
         ),
@@ -111,7 +172,9 @@ class MealsScreen extends ConsumerWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  final bool hasQuery;
+
+  const _EmptyState({required this.hasQuery});
 
   @override
   Widget build(BuildContext context) {
@@ -121,20 +184,24 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.restaurant_outlined,
+            Icon(
+              hasQuery ? Icons.search_off : Icons.restaurant_outlined,
               size: 48,
               color: AppColors.textMuted,
             ),
             const SizedBox(height: AppSizes.md),
-            const NutriLabel(
-              'Nenhuma refeição registada',
+            NutriLabel(
+              hasQuery
+                  ? 'Sem resultados'
+                  : 'Nenhuma refeição registada',
               variant: NutriLabelVariant.bodyLarge,
               color: AppColors.onBackground,
             ),
             const SizedBox(height: AppSizes.sm),
-            const NutriLabel(
-              'Toca em + para começar.',
+            NutriLabel(
+              hasQuery
+                  ? 'Tenta outra pesquisa.'
+                  : 'Toca em + para começar.',
               variant: NutriLabelVariant.body,
               color: AppColors.textMuted,
             ),

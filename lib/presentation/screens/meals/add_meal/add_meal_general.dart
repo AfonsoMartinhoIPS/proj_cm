@@ -123,8 +123,7 @@ class _DateField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatted = '${date.day.toString().padLeft(2, '0')}/'
-        '${date.month.toString().padLeft(2, '0')}/${date.year}';
+    final formatted = formatDmy(date);
 
     return InkWell(
       onTap: onTap,

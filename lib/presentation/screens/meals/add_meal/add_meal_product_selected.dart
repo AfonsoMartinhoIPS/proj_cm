@@ -21,13 +21,19 @@ class AddMealProductSelected extends StatelessWidget {
 
   /// Fired when the user taps "Mudar" to swap to a different product.
   /// Parent should clear its `selectedProduct` so the picker renders again.
+  /// Ignored when [showChange] is false.
   final VoidCallback onChange;
+
+  /// Whether the "Mudar" shortcut is rendered. Off in edit mode where the
+  /// product is locked to the entry being edited.
+  final bool showChange;
 
   const AddMealProductSelected({
     super.key,
     required this.product,
     required this.servingsController,
     required this.onChange,
+    this.showChange = true,
   });
 
   @override
@@ -45,7 +51,8 @@ class AddMealProductSelected extends StatelessWidget {
               letterSpacing: 1.2,
               color: AppColors.textMuted,
             ),
-            NutriButton.text(label: 'Mudar', onPressed: onChange),
+            if (showChange)
+              NutriButton.text(label: 'Mudar', onPressed: onChange),
           ],
         ),
         const SizedBox(height: 8),

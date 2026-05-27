@@ -22,54 +22,6 @@ class DayDetailScreen extends ConsumerWidget {
 
   const DayDetailScreen({super.key, required this.date});
 
-  String _formatDate(String iso) {
-    final parts = iso.split('-');
-    if (parts.length != 3) return iso;
-    return '${parts[2]}/${parts[1]}/${parts[0]}';
-  }
-
-  Future<bool> _confirm(
-    BuildContext context, {
-    required String title,
-    required String body,
-  }) async {
-    final res = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: NutriLabel(
-          title,
-          variant: NutriLabelVariant.title,
-          color: AppColors.onBackground,
-        ),
-        content: NutriLabel(
-          body,
-          variant: NutriLabelVariant.body,
-          color: AppColors.textMuted,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const NutriLabel(
-              'Cancelar',
-              variant: NutriLabelVariant.label,
-              color: AppColors.textMuted,
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const NutriLabel(
-              'Apagar',
-              variant: NutriLabelVariant.label,
-              color: AppColors.error,
-            ),
-          ),
-        ],
-      ),
-    );
-    return res ?? false;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final logs = ref.watch(nutritionLogsProvider).value ?? [];
@@ -79,18 +31,18 @@ class DayDetailScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       appBar: NutriTopNavBar(
         showBackButton: true,
-        title: _formatDate(date),
+        title: formatDmyFromIso(date),
         actions: [
           if (log != null && log.entries.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_outline),
               tooltip: 'Apagar dia',
               onPressed: () async {
-                final ok = await _confirm(
+                final ok = await showNutriConfirmDialog(
                   context,
                   title: 'Apagar dia?',
                   body: 'Vai remover todas as ${log.entries.length} '
-                      'refeições registadas em ${_formatDate(date)}.',
+                      'refeições registadas em ${formatDmyFromIso(date)}.',
                 );
                 if (!ok || !context.mounted) return;
                 await ref
@@ -105,7 +57,7 @@ class DayDetailScreen extends ConsumerWidget {
       body: SafeArea(
         child: (log == null || log.entries.isEmpty)
             ? _EmptyState(date: date)
-            : _Body(log: log, onConfirm: _confirm),
+            : _Body(log: log),
       ),
     );
   }
@@ -113,13 +65,8 @@ class DayDetailScreen extends ConsumerWidget {
 
 class _Body extends ConsumerWidget {
   final NutritionLog log;
-  final Future<bool> Function(
-    BuildContext context, {
-    required String title,
-    required String body,
-  }) onConfirm;
 
-  const _Body({required this.log, required this.onConfirm});
+  const _Body({required this.log});
 
   Map<MealType, List<MealEntry>> _grouped() {
     final m = <MealType, List<MealEntry>>{
@@ -151,7 +98,7 @@ class _Body extends ConsumerWidget {
                 extra: {'entry': e, 'date': log.date},
               ),
               onDelete: (e) async {
-                final ok = await onConfirm(
+                final ok = await showNutriConfirmDialog(
                   context,
                   title: 'Apagar refeição?',
                   body: 'Remover "${e.productName}" deste dia.',

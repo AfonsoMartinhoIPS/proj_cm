@@ -20,20 +20,6 @@ class DaySummaryCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  String _formatDate(String iso) {
-    final parts = iso.split('-');
-    if (parts.length != 3) return iso;
-    final d = DateTime.tryParse(iso);
-    if (d == null) return iso;
-    final today = DateTime.now();
-    final t = DateTime(today.year, today.month, today.day);
-    final logDay = DateTime(d.year, d.month, d.day);
-    final diff = t.difference(logDay).inDays;
-    if (diff == 0) return 'Hoje';
-    if (diff == 1) return 'Ontem';
-    return '${parts[2]}/${parts[1]}/${parts[0]}';
-  }
-
   @override
   Widget build(BuildContext context) {
     final entries = log.entries.length;
@@ -61,7 +47,7 @@ class DaySummaryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       NutriLabel(
-                        _formatDate(log.date),
+                        formatRelativeDate(log.date),
                         variant: NutriLabelVariant.bodyLarge,
                         fontWeight: FontWeight.bold,
                         color: AppColors.onBackground,

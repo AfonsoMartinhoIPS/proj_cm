@@ -65,7 +65,10 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
     if (_isEditing) {
       final entry = widget.editingEntry!;
       _mealType = entry.mealType;
-      _date = entry.loggedAt;
+      // Use the day the entry was logged on (parsed from `editingDate`) so the
+      // displayed date matches the doc bucket, not the loggedAt timestamp
+      // which may be off-by-one across midnight edits.
+      _date = DateTime.tryParse(widget.editingDate!) ?? entry.loggedAt;
       _servingsController.text = entry.servingGrams.toStringAsFixed(0);
       _fetchEditingProduct(entry.productBarcode);
     } else {
@@ -107,6 +110,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
 
     if (_isEditing) {
       final original = widget.editingEntry!;
+      final newDate = dateKey(_date);
       final updated = MealEntry(
         id: original.id,
         productBarcode: original.productBarcode,
@@ -120,7 +124,11 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         fat: n.fat(grams: grams),
         loggedAt: original.loggedAt,
       );
-      await notifier.updateEntry(updated, date: widget.editingDate);
+      await notifier.moveEntry(
+        updated,
+        oldDate: widget.editingDate!,
+        newDate: newDate,
+      );
     } else {
       final entry = MealEntry(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -158,7 +166,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               mealType: _mealType,
               date: _date,
               onMealTypeChanged: (t) => setState(() => _mealType = t),
-              onDateChanged: _isEditing ? (_) {} : (d) => setState(() => _date = d),
+              onDateChanged: (d) => setState(() => _date = d),
             ),
             const SizedBox(height: 24),
 
@@ -176,12 +184,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               AddMealProductSelected(
                 product: _selectedProduct!,
                 servingsController: _servingsController,
-                // Lock product in edit mode — empty callback hides the "Mudar"
-                // button effect (button still appears; this is a UX compromise
-                // to avoid forking AddMealProductSelected for one flag).
-                onChange: _isEditing
-                    ? () {}
-                    : () => setState(() => _selectedProduct = null),
+                showChange: !_isEditing,
+                onChange: () => setState(() => _selectedProduct = null),
               ),
 
             const SizedBox(height: 32),

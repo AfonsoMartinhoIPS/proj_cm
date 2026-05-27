@@ -39,13 +39,21 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
     return logs;
   }
 
+  /// Extend the loaded window by [extraDays] more days. Keeps the current
+  /// list in [state] while the additional days are fetched so the UI doesn't
+  /// flash an empty/loading state during infinite-scroll pagination.
   Future<void> loadMore({int extraDays = 7}) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
     _daysLoaded += extraDays;
     logger.d('NutritionLogs: loadMore → $_daysLoaded days total');
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _fetch(user.uid, _daysLoaded));
+    try {
+      final logs = await _fetch(user.uid, _daysLoaded);
+      state = AsyncValue.data(logs);
+    } catch (e, st) {
+      logger.e('NutritionLogs: loadMore error', error: e, stackTrace: st);
+      state = AsyncValue.error(e, st);
+    }
   }
 
   Future<void> setRange(int days) async {
@@ -61,12 +69,25 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
   // --- mutations: refresh just the affected date and splice into list ---
 
   Future<void> _refreshDate(AppUser user, String date) async {
-    final updated = await repo.getLog(user.uid, date) ?? _emptyLog(date, user);
+    NutritionLog? updated = await repo.getLog(user.uid, date);
+
+    // Auto-cleanup: if the doc still exists but is fully empty (no entries
+    // AND no water logged), delete it so the day disappears from the list
+    // instead of leaving an empty placeholder behind. Goals snapshot alone
+    // isn't worth keeping.
+    if (updated != null &&
+        updated.entries.isEmpty &&
+        updated.waterMl == 0) {
+      logger.d('NutritionLogs: auto-deleting empty log on $date');
+      await repo.deleteLog(user.uid, date);
+      updated = null;
+    }
+
     final current = state.value ?? [];
-    final newList = [
-      for (final l in current) if (l.date != date) l,
-      updated,
-    ]..sort((a, b) => a.date.compareTo(b.date));
+    final filtered = [for (final l in current) if (l.date != date) l];
+    final newList = updated == null
+        ? filtered
+        : ([...filtered, updated]..sort((a, b) => a.date.compareTo(b.date)));
     state = AsyncValue.data(newList);
   }
 
@@ -115,6 +136,41 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
       await _refreshDate(user, d);
     } catch (e, st) {
       logger.e('NutritionLogs: updateEntry error', error: e, stackTrace: st);
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Move [entry] from [oldDate] to [newDate]. When the dates match this is
+  /// equivalent to [updateEntry]; otherwise it removes the entry from the old
+  /// day and re-adds it on the new one (carrying the user's current goals as
+  /// the new-day goals snapshot when that doc has to be created).
+  ///
+  /// Not atomic — a Firestore transaction would be the right tool but the
+  /// student-project scope keeps it as two sequential writes.
+  Future<void> moveEntry(
+    MealEntry entry, {
+    required String oldDate,
+    required String newDate,
+  }) async {
+    final user = ref.read(authProvider).value;
+    if (user == null) return;
+    if (oldDate == newDate) {
+      await updateEntry(entry, date: newDate);
+      return;
+    }
+    logger.d('NutritionLogs: moveEntry ${entry.id} $oldDate → $newDate');
+    try {
+      await repo.removeEntry(user.uid, oldDate, entry.id);
+      await repo.addEntry(
+        user.uid,
+        newDate,
+        entry,
+        goalsSnapshot: user.nutritionGoals,
+      );
+      await _refreshDate(user, oldDate);
+      await _refreshDate(user, newDate);
+    } catch (e, st) {
+      logger.e('NutritionLogs: moveEntry error', error: e, stackTrace: st);
       state = AsyncValue.error(e, st);
     }
   }
