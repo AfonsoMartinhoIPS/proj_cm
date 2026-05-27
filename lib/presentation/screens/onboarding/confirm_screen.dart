@@ -39,6 +39,7 @@ class ConfirmScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
+                  // TODO: replace with NutriCard widget
                   color: AppColors.surfaceDark,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: AppColors.border),

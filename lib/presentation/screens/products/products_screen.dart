@@ -146,6 +146,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                     );
                   }
 
+                  // TODO: Create a separate ProductListItem widget that also shows kcal/100g and brand.
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     itemCount: filtered.length,
@@ -240,6 +241,7 @@ class _ProductRow extends StatelessWidget {
       width: 45,
       height: 45,
       decoration: BoxDecoration(
+        // TODO: replace with NutriCard widget
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.border),

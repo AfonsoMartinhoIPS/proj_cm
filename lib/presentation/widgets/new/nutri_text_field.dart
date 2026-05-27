@@ -15,6 +15,9 @@ class NutriTextField extends StatefulWidget {
   /// O texto de ajuda (placeholder) que aparece quando o campo está vazio.
   final String hint;
 
+  /// O texto inicial
+  final String? value;
+
   /// Ícone opcional exibido no início do campo.
   final IconData? icon;
 
@@ -60,6 +63,7 @@ class NutriTextField extends StatefulWidget {
     this.textInputAction,
     this.onChanged,
     this.onSubmitted,
+    this.value,
   });
 
   @override
@@ -172,6 +176,7 @@ class _NutriTextFieldState extends State<NutriTextField> {
                         const SizedBox(height: AppSizes.xs),
                         TextFormField(
                           controller: widget.controller,
+                          initialValue: widget.value,
                           focusNode: _focusNode,
                           obscureText: widget.obscureText,
                           keyboardType: widget.keyboardType,

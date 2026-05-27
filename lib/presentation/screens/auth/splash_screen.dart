@@ -42,7 +42,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (!mounted) return;
     if (user != null) {
       logger.d('SplashScreen: user session found, navigating to home');
-      //context.go('/');
+      context.go('/');
     } else {
       logger.d('SplashScreen: no user session, navigating to welcome');
       context.go('/welcome');

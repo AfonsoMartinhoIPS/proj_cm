@@ -9,7 +9,9 @@ import 'package:nutri_scan/presentation/screens/auth/splash_screen.dart';
 import 'package:nutri_scan/presentation/screens/auth/welcome_screen.dart';
 import 'package:nutri_scan/presentation/screens/auth/login_screen.dart';
 import 'package:nutri_scan/presentation/screens/auth/register_screen.dart';
-import 'package:nutri_scan/presentation/screens/meals/add_meal_screen.dart';
+import 'package:nutri_scan/domain/entities/meal_entry.dart';
+import 'package:nutri_scan/presentation/screens/meals/add_meal/add_meal_screen.dart';
+import 'package:nutri_scan/presentation/screens/meals/day_detail_screen.dart';
 
 import 'package:nutri_scan/presentation/screens/onboarding/personal_data_screen.dart';
 import 'package:nutri_scan/presentation/screens/onboarding/objectives_screen.dart';
@@ -126,10 +128,34 @@ final routerProvider = Provider<GoRouter>((ref) {
       // meals
       GoRoute(path: '/meals/add', builder: (context, state) => AddMealScreen(initialProduct: state.extra as Product?,)),
       GoRoute(
+        path: '/meals/edit',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return AddMealScreen(
+            editingEntry: extra['entry'] as MealEntry,
+            editingDate: extra['date'] as String,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/meals/day/:date',
+        builder: (context, state) => DayDetailScreen(
+          date: state.pathParameters['date']!,
+        ),
+      ),
+      GoRoute(
         path: '/products/:barcode',
         builder: (context, state) => ProductDetailsScreen(
           barcode: state.pathParameters['barcode']!,
         ),
+      ),
+
+      // Active scanner that returns a barcode via Navigator.pop — used by
+      // ProductPicker. Lives outside ShellRoute so it can be
+      // pushed from any screen without remounting MainShell.
+      GoRoute(
+        path: '/scanner/pick',
+        builder: (_, _) => const ScanScreen(returnBarcode: true),
       ),
 
       ShellRoute(

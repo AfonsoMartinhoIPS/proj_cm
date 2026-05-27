@@ -96,8 +96,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
       backgroundColor: AppColors.background,
       appBar: const NutriTopNavBar(
         showBackButton: true,
-        title:
-            '1 / 4',
+        title: '1 / 4',
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -168,6 +167,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
         decoration: BoxDecoration(
+          // TODO: replace with NutriCard widget
           color: AppColors.surfaceDark,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.border),
@@ -198,6 +198,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
       decoration: BoxDecoration(
+        // TODO: replace with NutriCard widget
         color: AppColors.surfaceDark,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
@@ -233,20 +234,4 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
       ),
     );
   }
-
-    /*
-    Possivel widget?
-    static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-    decoration: BoxDecoration(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: NutriLabel(
-      label,
-      variant: NutriLabelVariant.small,
-      color: AppColors.secondary,
-      fontWeight: FontWeight.bold,
-    ),
-  );*/
 }

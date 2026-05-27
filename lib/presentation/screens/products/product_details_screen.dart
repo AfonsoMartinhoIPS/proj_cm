@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/widgets/new/product/product_nutriments.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 import 'package:nutri_scan/data/repositories/product_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
@@ -57,7 +58,7 @@ class ProductDetailsScreen extends ConsumerWidget {
               children: [
                 _ProductHeader(product: product),
                 const SizedBox(height: 24),
-                _NutritionTable(product: product),
+                ProductNutritionTable(product: product),
                 const SizedBox(height: 24),
                 _ActionButtons(product: product, isSaved: savedProduct != null),
                 if (savedProduct != null) ...[
@@ -164,6 +165,7 @@ class _NotesSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        // TODO: replace with NutriCard widget
         color: AppColors.surfaceDark,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
@@ -174,18 +176,18 @@ class _NotesSection extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const NutriLabel( 
+              const NutriLabel(
                 'NOTAS',
-                  color: AppColors.textMuted,
-                  variant: NutriLabelVariant.small,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.bold,
+                color: AppColors.textMuted,
+                variant: NutriLabelVariant.small,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.bold,
               ),
-              NutriLabel( 
+              NutriLabel(
                 'Guardado em ${_fmt(savedProduct.savedAt)}',
-                  color: AppColors.textMuted,
-                  variant: NutriLabelVariant.small,
-                ),
+                color: AppColors.textMuted,
+                variant: NutriLabelVariant.small,
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -327,6 +329,7 @@ class _ProductHeader extends StatelessWidget {
           width: 90,
           height: 90,
           decoration: BoxDecoration(
+            // TODO: replace with NutriCard widget
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.border),
@@ -401,6 +404,7 @@ class _NutritionTable extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        // TODO: replace with NutriCard widget
         color: AppColors.surfaceDark,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
@@ -408,12 +412,12 @@ class _NutritionTable extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const NutriLabel( 
+          const NutriLabel(
             'POR 100G / 100ML',
-              color: AppColors.textMuted,
-              variant: NutriLabelVariant.small,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.bold,
+            color: AppColors.textMuted,
+            variant: NutriLabelVariant.small,
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.bold,
           ),
           const SizedBox(height: 12),
           _row('Calorias', n.caloriesPer100g, 'kcal'),

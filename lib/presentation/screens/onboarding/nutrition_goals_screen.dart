@@ -73,8 +73,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
       backgroundColor: AppColors.background,
       appBar: const NutriTopNavBar(
         showBackButton: true,
-        title:
-            '3 / 4',
+        title: '3 / 4',
       ),
       body: SafeArea(
         child: Padding(
@@ -99,6 +98,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                   horizontal: 12,
                 ),
                 decoration: BoxDecoration(
+                  // TODO: replace with NutriCard widget
                   color: AppColors.surfaceDark,
                   borderRadius: BorderRadius.circular(25),
                   border: Border.all(color: AppColors.border),

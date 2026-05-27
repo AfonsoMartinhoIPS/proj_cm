@@ -58,8 +58,7 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
       backgroundColor: AppColors.background,
       appBar: const NutriTopNavBar(
         showBackButton: true,
-        title:
-            '2 / 4',
+        title: '2 / 4',
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -115,6 +114,7 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
   Widget _buildWeightSelector() {
     return Container(
       decoration: BoxDecoration(
+        // TODO: replace with NutriCard widget
         color: AppColors.surfaceDark,
         borderRadius: BorderRadius.circular(12),
       ),

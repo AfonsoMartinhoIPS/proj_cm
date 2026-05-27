@@ -48,8 +48,8 @@ class CreditsScreen extends StatelessWidget {
           const NutriLabel('Instituição, Instituto Politécnico de Setúbal', 
               color: AppColors.textMuted, variant: NutriLabelVariant.small,),
           const SizedBox(height: 30),
-          const NutriLabel('EQUIPA', 
-                  color: AppColors.textMuted, variant: NutriLabelVariant.small, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+          const NutriLabel('EQUIPA',
+              color: AppColors.textMuted, variant: NutriLabelVariant.small, fontWeight: FontWeight.bold, letterSpacing: 1.2),
           const SizedBox(height: 15),
           
           // Adicionei callbacks fictícios (ligar a um package como url_launcher mais tarde)
@@ -82,6 +82,7 @@ class CreditsScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
+        // TODO: replace with NutriCard widget
         color: AppColors.surfaceDark,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),

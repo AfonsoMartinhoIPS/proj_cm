@@ -8,46 +8,8 @@ import 'package:nutri_scan/domain/entities/meal_entry.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
+import 'package:nutri_scan/presentation/screens/meals/widgets/meal_entry_tile.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
-
-// Localization tables. Dart's DateTime returns weekday/month as int;
-// we map manually to avoid pulling in `intl` package for one screen.
-const _ptWeekdays = [
-  'Segunda-feira',
-  'Terça-feira',
-  'Quarta-feira',
-  'Quinta-feira',
-  'Sexta-feira',
-  'Sábado',
-  'Domingo',
-];
-const _ptWeekdaysShort = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-const _ptMonths = [
-  'Jan',
-  'Fev',
-  'Mar',
-  'Abr',
-  'Mai',
-  'Jun',
-  'Jul',
-  'Ago',
-  'Set',
-  'Out',
-  'Nov',
-  'Dez',
-];
-
-/// Format current date as "YYYY-MM-DD". Matches the Firestore doc id for NutritionLog.
-String _todayKey() {
-  final now = DateTime.now();
-  return '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-}
-
-/// Pretty header date in PT, e.g. "Segunda-feira, 7 Mai".
-String _formatTodayHeader() {
-  final now = DateTime.now();
-  return '${_ptWeekdays[now.weekday - 1]}, ${now.day} ${_ptMonths[now.month - 1]}';
-}
 
 /// Home dashboard — shows today's intake, weekly bar chart, and today's meals.
 /// All data comes from [nutritionLogsProvider] (list of recent logs) and [authProvider]
@@ -61,11 +23,11 @@ class HomeScreen extends ConsumerWidget {
     final List<NutritionLog> nutritionLogs =
         ref.watch(nutritionLogsProvider).value ?? [];
 
-    final todayKey = _todayKey();
+    final today = todayKey();
     // Pick today's log out of the list. May be null if user hasn't logged anything yet.
     final NutritionLog? todayLog = nutritionLogs
         .cast<NutritionLog?>()
-        .firstWhere((log) => log!.date == todayKey, orElse: () => null);
+        .firstWhere((log) => log!.date == today, orElse: () => null);
 
     // Goals priority: log's snapshot (frozen on the day) → user's current goals → null.
     final NutritionGoals? goals = todayLog?.goals ?? user?.nutritionGoals;
@@ -89,7 +51,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 2),
             NutriLabel(
-              _formatTodayHeader(),
+              formatPtHeader(DateTime.now()),
               variant: NutriLabelVariant.small,
               color: AppColors.textMuted,
             ),
@@ -104,6 +66,7 @@ class HomeScreen extends ConsumerWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
+                  // TODO: replace with NutriCard widget
                   color: AppColors.surface,
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.primary, width: 2),
@@ -199,6 +162,7 @@ class _CalorieCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
+        // TODO: replace with NutriCard widget
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white10),
@@ -357,15 +321,14 @@ class _WeeklyChart extends StatelessWidget {
       7,
       (i) => now.subtract(Duration(days: 6 - i)),
     );
-    final String todayKey = _todayKey();
+    final String today = todayKey();
 
     return SizedBox(
       height: 100,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: days.map((day) {
-          final String dayKey =
-              '${day.year.toString().padLeft(4, '0')}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}';
+          final String dayKey = dateKey(day);
 
           // Find the log for this day; null if user didn't log anything.
           final NutritionLog? dayLog = nutritionLogs
@@ -378,7 +341,7 @@ class _WeeklyChart extends StatelessWidget {
             0.05,
             1.0,
           );
-          final bool isToday = dayKey == todayKey;
+          final bool isToday = dayKey == today;
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -397,7 +360,7 @@ class _WeeklyChart extends StatelessWidget {
               const SizedBox(height: 8),
 
               NutriLabel(
-                _ptWeekdaysShort[day.weekday - 1],
+                ptWeekdaysShort[day.weekday - 1],
                 variant: NutriLabelVariant.small,
                 color: isToday ? AppColors.secondary : AppColors.textMuted,
               ),
@@ -409,14 +372,16 @@ class _WeeklyChart extends StatelessWidget {
   }
 }
 
-/// List of today's meals grouped by MealType (breakfast/lunch/dinner/snack).
-/// Each row shows the meal name and total kcal for that meal.
-class _TodayMeals extends StatelessWidget {
+/// Today's entries grouped by [MealType]. Each section shows its subtotal
+/// kcal; entries render via [MealEntryTile]. Tapping a tile opens the day
+/// detail screen so the user can edit/delete from there (no inline mutation
+/// on the home screen — keeps this widget read-only).
+class _TodayMeals extends ConsumerWidget {
   const _TodayMeals({required this.nutritionLog});
 
   final NutritionLog? nutritionLog;
 
-  static const Map<MealType, String> _mealLabels = {
+  static const _mealLabels = {
     MealType.breakfast: 'Pequeno-almoço',
     MealType.lunch: 'Almoço',
     MealType.dinner: 'Jantar',
@@ -424,7 +389,7 @@ class _TodayMeals extends StatelessWidget {
   };
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final List<MealEntry> entries =
         nutritionLog?.entries ?? const <MealEntry>[];
     if (entries.isEmpty) {
@@ -438,60 +403,79 @@ class _TodayMeals extends StatelessWidget {
       );
     }
 
-    // Sum calories per meal type — multiple entries (e.g. two snacks) collapse to one row.
-    final Map<MealType, double> caloriesByMealType = {};
-    for (final entry in entries) {
-      final double entryCalories = entry.nutriments.calories(
-        grams: entry.servingGrams,
-      );
-      caloriesByMealType[entry.mealType] =
-          (caloriesByMealType[entry.mealType] ?? 0) + entryCalories;
+    final grouped = <MealType, List<MealEntry>>{
+      for (final t in MealType.values) t: [],
+    };
+    for (final e in entries) {
+      grouped[e.mealType]!.add(e);
     }
+    final date = nutritionLog!.date;
 
     return Column(
-      // Iterate MealType.values to keep canonical order (breakfast → snack).
-      children: MealType.values
-          .where((mealType) => caloriesByMealType.containsKey(mealType))
-          .map(
-            (mealType) => _mealRow(
-              _mealLabels[mealType]!,
-              '${caloriesByMealType[mealType]!.toStringAsFixed(0)} kcal',
+      children: [
+        for (final type in MealType.values)
+          if (grouped[type]!.isNotEmpty)
+            _MealTypeBlock(
+              label: _mealLabels[type]!,
+              entries: grouped[type]!,
+              onTap: () => context.push('/meals/day/$date'),
             ),
-          )
-          .toList(),
+      ],
     );
   }
+}
 
-  Widget _mealRow(String title, String kcalLabel) {
-    return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.surfaceDark)),
-      ),
-      child: Row(
+class _MealTypeBlock extends StatelessWidget {
+  final String label;
+  final List<MealEntry> entries;
+  final VoidCallback onTap;
+
+  const _MealTypeBlock({
+    required this.label,
+    required this.entries,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final subtotal = entries.fold<double>(0, (s, e) => s + e.calories);
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.sm, vertical: AppSizes.xs,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                NutriLabel(
+                  label.toUpperCase(),
+                  variant: NutriLabelVariant.small,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                  color: AppColors.textMuted,
+                ),
+                NutriLabel(
+                  '${subtotal.toStringAsFixed(0)} kcal',
+                  variant: NutriLabelVariant.small,
+                  color: AppColors.secondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: NutriLabel(
-              title,
-              variant: NutriLabelVariant.bodyLarge,
-              color: AppColors.onBackground,
+          // Read-only on home: tap → day detail. We pass the same `onTap` for
+          // both edit + delete so the user is routed to detail instead of
+          // mutating from here.
+          for (final e in entries)
+            MealEntryTile(
+              entry: e,
+              onEdit: onTap,
+              onDelete: onTap,
             ),
-          ),
-          NutriLabel(
-            kcalLabel,
-            variant: NutriLabelVariant.small,
-            color: AppColors.secondary,
-          ),
         ],
       ),
     );

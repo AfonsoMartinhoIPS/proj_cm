@@ -17,7 +17,7 @@ class _CalculationScreenState extends State<CalculationScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 4), () {
-      if (mounted) context.go('/onboarding/estimate');
+      if (mounted) context.go('/onboarding/nutrition-goals');
     });
   }
 

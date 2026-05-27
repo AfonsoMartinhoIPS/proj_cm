@@ -2,20 +2,43 @@ import 'package:nutri_scan/data/models/meal_entry_model.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 
-
+/// Firestore (de)serialization for `nutrition_logs/{date}` docs.
 class NutritionLogModel {
+  /// Defaults used when a legacy doc has no `goals` snapshot. Same fallback
+  /// values as NutritionLogsNotifier._emptyLog.
+  static const _fallbackGoals = NutritionGoals(
+    calories: 2000,
+    protein: 150,
+    carbs: 250,
+    fat: 65,
+    water: 2000,
+  );
+
+  /// Parses a Firestore doc map into a [NutritionLog]. Tolerant of missing or
+  /// malformed fields — older docs created before the goals-snapshot refactor
+  /// have no `goals` field and would otherwise crash. We default what's safe
+  /// and skip what isn't (entries with non-map shape are filtered).
   static NutritionLog fromMap(Map<String, dynamic> map) {
     return NutritionLog(
-      date: map['date'] as String,
-      entries: (map['entries'] as List<dynamic>).map((e) => MealEntryModel.fromMap(e as Map<String, dynamic>)).toList(),
-      waterMl: (map['waterMl'] as num).toDouble(),
-      goals: NutritionGoals(
-        calories: (map['goals']['calories'] as num).toDouble(),
-        protein: (map['goals']['protein'] as num).toDouble(),
-        carbs: (map['goals']['carbs'] as num).toDouble(),
-        fat: (map['goals']['fat'] as num).toDouble(),
-        water: (map['goals']['water'] as num).toDouble(),
-      ),
+      date: map['date'] as String? ?? '',
+      entries: ((map['entries'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((e) => MealEntryModel.fromMap(Map<String, dynamic>.from(e)))
+          .toList(),
+      waterMl: (map['waterMl'] as num?)?.toDouble() ?? 0,
+      goals: _parseGoals(map['goals']),
+    );
+  }
+
+  static NutritionGoals _parseGoals(dynamic raw) {
+    if (raw is! Map) return _fallbackGoals;
+    final goals = Map<String, dynamic>.from(raw);
+    return NutritionGoals(
+      calories: (goals['calories'] as num?)?.toDouble() ?? _fallbackGoals.calories,
+      protein: (goals['protein'] as num?)?.toDouble() ?? _fallbackGoals.protein,
+      carbs: (goals['carbs'] as num?)?.toDouble() ?? _fallbackGoals.carbs,
+      fat: (goals['fat'] as num?)?.toDouble() ?? _fallbackGoals.fat,
+      water: (goals['water'] as num?)?.toDouble() ?? _fallbackGoals.water,
     );
   }
 

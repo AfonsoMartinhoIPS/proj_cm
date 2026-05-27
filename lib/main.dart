@@ -26,6 +26,7 @@ class App extends ConsumerWidget {
       title: 'NutriScan',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }
