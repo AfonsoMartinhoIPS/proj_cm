@@ -66,6 +66,7 @@ version
 Thumbs.db
 .aiignore
 CLAUDE*
+.claude/
 
 # ==========================================
 # 5. Custom
