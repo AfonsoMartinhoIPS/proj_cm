@@ -80,6 +80,22 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     }
   }
 
+  Future<void> updateGoals(NutritionGoals goals) async {
+    final user = state.value;
+    if (user == null) {
+      logger.w('AuthNotifier: updateGoals called with no user');
+      return;
+    }
+    logger.d('AuthNotifier: updating goals for ${user.uid}');
+    try {
+      await userRepository.updateGoals(user.uid, goals);
+      state = AsyncValue.data(user.copyWith(nutritionGoals: goals));
+    } catch (e, st) {
+      logger.e('AuthNotifier: updateGoals error', error: e, stackTrace: st);
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> logout() async {
     logger.d('AuthNotifier: logging out');
     await authRepository.logout();

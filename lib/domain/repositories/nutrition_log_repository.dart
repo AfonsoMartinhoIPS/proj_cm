@@ -9,7 +9,7 @@ abstract class NutritionLogRepository {
   ///
   /// If the log doc does not exist yet for that date it is created on the
   /// fly via `set(..., merge: true)`. [goalsSnapshot] should be the user's
-  /// goals as of "today" — it gets frozen onto the doc so future goal edits
+  /// goals as of "today" - it gets frozen onto the doc so future goal edits
   /// do not retroactively change historical days.
   Future<void> addEntry(
     String uid,

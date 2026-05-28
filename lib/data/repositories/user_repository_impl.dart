@@ -32,7 +32,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> updateGoals(String uid, NutritionGoals goals) async {
     logger.d('Updating goals for user: $uid');
     await _db.doc(FirestorePaths.user(uid)).update({
-      'goals': {
+      'nutritionGoals': {
         'calories': goals.calories,
         'protein': goals.protein,
         'carbs': goals.carbs,

@@ -171,7 +171,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     NutriButton.text(
                       label: 'Registar',
-                      onPressed: () => context.push('/register'),
+                      onPressed: () => context.push('/onboarding/personal-data'),
                     ),
                   ],
                 ),

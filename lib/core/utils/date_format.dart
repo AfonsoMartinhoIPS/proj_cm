@@ -43,7 +43,7 @@ String formatRelativeDate(String iso) {
   return formatDmyFromIso(iso);
 }
 
-/// "Segunda-feira, 7 Mai" — PT long-form header date.
+/// "Segunda-feira, 7 Mai" - PT long-form header date.
 String formatPtHeader(DateTime d) {
   return '${ptWeekdays[d.weekday - 1]}, ${d.day} ${ptMonths[d.month - 1]}';
 }

@@ -15,7 +15,7 @@ class NutritionLogModel {
   );
 
   /// Parses a Firestore doc map into a [NutritionLog]. Tolerant of missing or
-  /// malformed fields — older docs created before the goals-snapshot refactor
+  /// malformed fields - older docs created before the goals-snapshot refactor
   /// have no `goals` field and would otherwise crash. We default what's safe
   /// and skip what isn't (entries with non-map shape are filtered).
   static NutritionLog fromMap(Map<String, dynamic> map) {

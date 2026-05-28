@@ -20,7 +20,7 @@ import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 ///   * **Edit**: [editingEntry] + [editingDate] required. Product is locked
 ///     (refetched once via [ProductRepositoryImpl] for its per-100g
 ///     [Nutriments]); user can only change meal type and serving grams.
-///     Date is locked too — moving an entry across days is out of scope and
+///     Date is locked too - moving an entry across days is out of scope and
 ///     would require a delete-on-old + add-on-new transaction.
 ///     Save calls `nutritionLogsProvider.updateEntry`.
 ///
@@ -129,6 +129,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         oldDate: widget.editingDate!,
         newDate: newDate,
       );
+      if (!mounted) return;
+      NutriFeedback.showSuccess(context, 'Refeição atualizada');
     } else {
       final entry = MealEntry(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -144,6 +146,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         loggedAt: DateTime.now(),
       );
       await notifier.addEntry(entry, date: dateKey(_date));
+      if (!mounted) return;
+      NutriFeedback.showSuccess(context, 'Refeição adicionada');
     }
 
     if (!mounted) return;

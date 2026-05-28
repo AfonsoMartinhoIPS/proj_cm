@@ -4,7 +4,7 @@ import 'package:nutri_scan/domain/entities/meal_entry.dart';
 ///
 /// The on-disk shape stores scaled-for-serving totals (kcal/g for the actual
 /// consumed amount) rather than per-100g rates. This means any client reading
-/// the doc just displays the numbers — no /100 math at read time. The scaling
+/// the doc just displays the numbers - no /100 math at read time. The scaling
 /// is computed once in `AddMealScreen._submit` when the entry is created.
 class MealEntryModel {
   static MealEntry fromMap(Map<String, dynamic> map) {
@@ -35,7 +35,7 @@ class MealEntryModel {
       'productImageUrl': e.productImageUrl,
       'mealType': e.mealType.name,
       'servingGrams': e.servingGrams,
-      // Already scaled for the consumed serving — readers display as-is.
+      // Already scaled for the consumed serving - readers display as-is.
       'nutriments': {
         'calories': e.calories,
         'protein': e.protein,

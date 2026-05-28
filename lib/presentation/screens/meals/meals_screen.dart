@@ -10,12 +10,12 @@ import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 /// Top-level meals screen.
 ///
 /// Shows recent days as cards (newest first). Features:
-///   * **Search** — filter days by entry product name (case-insensitive
+///   * **Search** - filter days by entry product name (case-insensitive
 ///     substring match on any entry).
-///   * **Pagination** — when the user scrolls within 200px of the bottom and
+///   * **Pagination** - when the user scrolls within 200px of the bottom and
 ///     no fetch is in flight, the screen calls
 ///     [NutritionLogsNotifier.loadMore] to extend the window by 7 days.
-///   * **Per-card delete** — trailing icon on each card opens a confirm dialog
+///   * **Per-card delete** - trailing icon on each card opens a confirm dialog
 ///     then removes the whole day via `deleteDay`.
 ///
 /// Empty days are filtered out of the list (the auto-cleanup in the provider
@@ -157,6 +157,8 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
                                 await ref
                                     .read(nutritionLogsProvider.notifier)
                                     .deleteDay(log.date);
+                                if (!context.mounted) return;
+                                NutriFeedback.showInfo(context, 'Dia removido');
                               },
                             );
                           },

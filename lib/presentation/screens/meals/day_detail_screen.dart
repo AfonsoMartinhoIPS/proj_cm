@@ -49,6 +49,7 @@ class DayDetailScreen extends ConsumerWidget {
                     .read(nutritionLogsProvider.notifier)
                     .deleteDay(date);
                 if (!context.mounted) return;
+                NutriFeedback.showInfo(context, 'Dia removido');
                 context.pop();
               },
             ),
@@ -105,6 +106,8 @@ class _Body extends ConsumerWidget {
                 );
                 if (!ok) return;
                 await notifier.removeEntry(e.id, date: log.date);
+                if (!context.mounted) return;
+                NutriFeedback.showInfo(context, 'Refeição removida');
               },
             ),
         const SizedBox(height: AppSizes.md),

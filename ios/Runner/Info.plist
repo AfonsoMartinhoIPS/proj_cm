@@ -66,5 +66,10 @@
 		<false/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+
+
+		<!-- Permissions -->
+		<key>NSCameraUsageDescription</key>
+		<string>Grant access to your camera to start scanning</string>
 	</dict>
 </plist>

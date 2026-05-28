@@ -1,30 +1,44 @@
-// lib/presentation/screens/scanner/scan_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/screens/scanner/widgets/barcode_camera.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
 /// Barcode scanner screen with two usage modes:
 ///
-/// 1. **Tab mode** (default, `returnBarcode: false`) — opened from the bottom
+/// 1. **Tab mode** (default, `returnBarcode: false`) - opened from the bottom
 ///    nav. On scan or manual entry, pushes `/products/$barcode` so the user
 ///    lands on the product detail screen.
 ///
-/// 2. **Pick mode** (`returnBarcode: true`) — opened from flows that need a
+/// 2. **Pick mode** (`returnBarcode: true`) - opened from flows that need a
 ///    barcode result (e.g. AddMealScreen's product picker). On scan or manual
 ///    entry, pops the route with the barcode string as the result, so the
 ///    caller can `await context.push<String>(...)` and use the returned value.
 ///
-/// The split exists because `/scan` (tab) lives inside the `ShellRoute` —
+/// The split exists because `/scan` (tab) lives inside the `ShellRoute` -
 /// pushing it from a screen outside the shell would mount a second `MainShell`
 /// and trigger duplicate Hero key reservations. The pick variant is registered
 /// at top level so it can be pushed safely from anywhere.
+///
+/// This screen is intentionally stateless. Both input sources ([BarcodeCamera]
+/// and [_ManualBarcodeSheet]) own their own state and report up via a
+/// `ValueChanged<String>` callback. The screen's only job is deciding what to
+/// do with the resulting barcode (pop vs push).
 class ScanScreen extends StatelessWidget {
   /// When `true`, scanner ends by popping the route with the barcode string.
   /// When `false`, scanner ends by pushing the product details route.
   final bool returnBarcode;
 
   const ScanScreen({super.key, this.returnBarcode = false});
+
+  void _handleBarcode(BuildContext context, String barcode) {
+    logger.d('ScanScreen: handle barcode=$barcode (returnBarcode=$returnBarcode)');
+    if (returnBarcode) {
+      context.pop(barcode);
+    } else {
+      context.push('/products/$barcode');
+    }
+  }
 
   void _openManualEntry(BuildContext context) {
     showModalBottomSheet(
@@ -34,7 +48,11 @@ class ScanScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => _ManualBarcodeSheet(returnBarcode: returnBarcode),
+      builder: (_) => _ManualBarcodeSheet(
+        // Sheet pops itself, then we resolve via the same handler the camera
+        // path uses. Single source of truth for "what happens with a barcode".
+        onBarcode: (code) => _handleBarcode(context, code),
+      ),
     );
   }
 
@@ -51,23 +69,8 @@ class ScanScreen extends StatelessWidget {
           children: [
             Expanded(
               flex: 5,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0D1A10),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    const Icon(
-                      Icons.videocam_off,
-                      color: AppColors.border,
-                      size: 40,
-                    ),
-                    _buildScannerOverlay(),
-                  ],
-                ),
+              child: BarcodeCamera(
+                onBarcode: (code) => _handleBarcode(context, code),
               ),
             ),
             const Padding(
@@ -95,77 +98,15 @@ class ScanScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildScannerOverlay() {
-    return SizedBox(
-      width: 200,
-      height: 200,
-      child: Stack(
-        children: [
-          _corner(top: 0, left: 0, isTop: true, isLeft: true),
-          _corner(top: 0, right: 0, isTop: true, isLeft: false),
-          _corner(bottom: 0, left: 0, isTop: false, isLeft: true),
-          _corner(bottom: 0, right: 0, isTop: false, isLeft: false),
-          Center(
-            child: Container(
-              width: 180,
-              height: 2,
-              color: AppColors.secondary.withValues(alpha: 0.5),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _corner({
-    double? top,
-    double? bottom,
-    double? left,
-    double? right,
-    required bool isTop,
-    required bool isLeft,
-  }) {
-    return Positioned(
-      top: top,
-      bottom: bottom,
-      left: left,
-      right: right,
-      child: Container(
-        width: 25,
-        height: 25,
-        decoration: BoxDecoration(
-          border: Border(
-            top: isTop
-                ? const BorderSide(color: AppColors.secondary, width: 3)
-                : BorderSide.none,
-            bottom: !isTop
-                ? const BorderSide(color: AppColors.secondary, width: 3)
-                : BorderSide.none,
-            left: isLeft
-                ? const BorderSide(color: AppColors.secondary, width: 3)
-                : BorderSide.none,
-            right: !isLeft
-                ? const BorderSide(color: AppColors.secondary, width: 3)
-                : BorderSide.none,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-/// Bottom sheet for entering a barcode by hand. Owns its controller so it
-/// is created/disposed with the sheet's lifecycle.
-///
-/// Behaviour on submit depends on [returnBarcode]:
-///   - `false` → close sheet, push `/products/$barcode` (tab flow)
-///   - `true`  → close sheet AND pop the parent scanner route with the barcode
-///               so the caller's `await context.push<String>(...)` resolves
+/// Bottom sheet for entering a barcode by hand. Owns its [TextEditingController]
+/// for the field lifecycle and nothing else - routing decisions live on the
+/// parent screen via [onBarcode].
 class _ManualBarcodeSheet extends StatefulWidget {
-  final bool returnBarcode;
+  final ValueChanged<String> onBarcode;
 
-  const _ManualBarcodeSheet({required this.returnBarcode});
+  const _ManualBarcodeSheet({required this.onBarcode});
 
   @override
   State<_ManualBarcodeSheet> createState() => _ManualBarcodeSheetState();
@@ -183,22 +124,11 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
   void _submit() {
     final barcode = _barcodeController.text.trim();
     if (barcode.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: NutriLabel('Introduz um código de barras')),
-      );
+      NutriFeedback.showError(context, 'Introduz um código de barras');
       return;
     }
-
-    // Close the sheet first.
     Navigator.of(context).pop();
-
-    if (widget.returnBarcode) {
-      // Pick mode — pop the scanner route with the barcode as result.
-      context.pop(barcode);
-    } else {
-      // Tab mode — navigate to product details.
-      context.push('/products/$barcode');
-    }
+    widget.onBarcode(barcode);
   }
 
   @override

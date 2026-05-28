@@ -95,7 +95,7 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
     final user = ref.read(authProvider).value;
     if (user == null) return;
     final d = date ?? todayKey();
-    logger.d('NutritionLogs: addEntry on $d — ${entry.productName} (${entry.servingGrams}g)');
+    logger.d('NutritionLogs: addEntry on $d - ${entry.productName} (${entry.servingGrams}g)');
     try {
       // Pass the user's current goals so the repo can freeze them on the
       // log doc on first creation (per docs/DB.md goals-snapshot design).
@@ -145,7 +145,7 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
   /// day and re-adds it on the new one (carrying the user's current goals as
   /// the new-day goals snapshot when that doc has to be created).
   ///
-  /// Not atomic — a Firestore transaction would be the right tool but the
+  /// Not atomic - a Firestore transaction would be the right tool but the
   /// student-project scope keeps it as two sequential writes.
   Future<void> moveEntry(
     MealEntry entry, {

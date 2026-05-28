@@ -44,7 +44,7 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
   ///
   /// The `goals` field is included on every call so the doc has a consistent
   /// shape from creation onwards. The provider passes the user's current
-  /// goals — to keep history truly immutable across goal edits we'd need a
+  /// goals - to keep history truly immutable across goal edits we'd need a
   /// transaction that only writes goals on first creation, but for the
   /// student-project scope this is fine.
   @override
@@ -82,7 +82,7 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
         .update({'entries': entries});
   }
 
-  /// Same lazy-create pattern as [addEntry] — handles the case where the
+  /// Same lazy-create pattern as [addEntry] - handles the case where the
   /// first interaction of the day is logging water (no meal yet).
   @override
   Future<void> updateWater(

@@ -27,7 +27,7 @@ class DaySummaryCard extends StatelessWidget {
     final goal = log.goals.calories;
     final pct = goal > 0
         ? ((log.totalCalories / goal) * 100).clamp(0, 999).toStringAsFixed(0)
-        : '—';
+        : '-';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSizes.md),

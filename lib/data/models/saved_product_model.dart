@@ -33,7 +33,7 @@ class SavedProductModel {
     };
   }
 
-  /// Defensive parse — handles three shapes:
+  /// Defensive parse - handles three shapes:
   ///   - null / missing → []
   ///   - legacy: a single String           → one Note with that text
   ///   - current: List<Map> of {text, createdAt}

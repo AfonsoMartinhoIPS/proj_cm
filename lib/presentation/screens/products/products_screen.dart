@@ -41,16 +41,16 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: NutriTopNavBar(
+      appBar: const NutriTopNavBar(
         showBackButton: false,
         title: 'Produtos',
-        actions: [
-          NutriButton.text(
-            label: 'Novo',
-            onPressed: () => context.push('/scan'),
-            icon: const Icon(Icons.add, color: AppColors.secondary, size: 18),
-          ),
-        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.onPrimary,
+        onPressed: () => context.push('/scan'),
+        tooltip: 'Adicionar produto',
+        child: const Icon(Icons.add),
       ),
       body: SafeArea(
         child: Column(
@@ -220,7 +220,7 @@ class _ProductRow extends StatelessWidget {
             NutriLabel(
               savedProduct.caloriesPer100g != null
                   ? '${savedProduct.caloriesPer100g!.toStringAsFixed(0)} kcal'
-                  : '— kcal',
+                  : '- kcal',
               color: AppColors.secondary,
               variant: NutriLabelVariant.body,
               fontWeight: FontWeight.bold,

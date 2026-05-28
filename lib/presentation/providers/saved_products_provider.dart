@@ -29,11 +29,11 @@ class SavedProductsNotifier extends AsyncNotifier<List<SavedProduct>> {
   }
 
   /// Save a product (from scan, search, etc) to the user's saved list.
-  /// Builds a snapshot from the Product — full data stays in `products/{barcode}`.
+  /// Builds a snapshot from the Product - full data stays in `products/{barcode}`.
   Future<void> saveProduct(Product product) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
-    logger.d('SavedProducts: saving ${product.barcode} — ${product.name}');
+    logger.d('SavedProducts: saving ${product.barcode} - ${product.name}');
     try {
       await repo.saveForUser(user.uid, SavedProductModel.fromProduct(product));
       state = AsyncValue.data(await _fetch(user.uid, _count));

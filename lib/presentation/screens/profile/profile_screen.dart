@@ -88,7 +88,7 @@ class _UserHeader extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
                 NutriLabel(
-                  user?.email ?? '—',
+                  user?.email ?? '-',
                   color: AppColors.textMuted,
                   variant: NutriLabelVariant.body,
                 ),
@@ -155,13 +155,13 @@ class _GoalsSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _goalItem(goals?.calories.toStringAsFixed(0) ?? '—', 'kcal'),
+              _goalItem(goals?.calories.toStringAsFixed(0) ?? '-', 'kcal'),
               _goalItem(
-                '${goals?.protein.toStringAsFixed(0) ?? '—'}g',
+                '${goals?.protein.toStringAsFixed(0) ?? '-'}g',
                 'proteína',
               ),
               _goalItem(
-                '${user?.weight.toStringAsFixed(0) ?? '—'}kg',
+                '${user?.weight.toStringAsFixed(0) ?? '-'}kg',
                 'peso atual',
               ),
             ],
