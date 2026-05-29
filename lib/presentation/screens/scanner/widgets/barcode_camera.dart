@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Live-camera barcode scanner with a corner-bracket viewfinder overlay.
 ///
@@ -12,7 +13,18 @@ import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 /// **Debounce** - `MobileScanner.onDetect` fires multiple times per second
 /// while the same code stays in frame. We forward exactly one callback per
 /// scanner session and then stop the controller; the parent typically
-/// navigates away, but if it doesn't, [resume] can be called to re-arm.
+/// navigates away, but if it doesn't, `_setActive(true)` re-arms it.
+///
+/// **Off-screen / background** - subscribes to [routeObserver] and
+/// [WidgetsBindingObserver] so the camera is fully stopped when another
+/// route is pushed above or the app is paused, and restarted when it returns
+/// to the foreground. Saves battery and frees the sensor for other apps.
+///
+/// **Error fallback** - when `MobileScanner.errorBuilder` fires (camera
+/// missing, permission denied, unsupported, etc.) the widget swaps the
+/// preview for [_CameraFallback], which offers either "Tentar novamente" or
+/// "Abrir Definições" depending on whether the permission was permanently
+/// denied.
 class BarcodeCamera extends StatefulWidget {
   final ValueChanged<String> onBarcode;
 
@@ -22,11 +34,15 @@ class BarcodeCamera extends StatefulWidget {
   State<BarcodeCamera> createState() => _BarcodeCameraState();
 }
 
+enum _CameraStatus { initializing, ready, error }
+
 class _BarcodeCameraState extends State<BarcodeCamera>
     with RouteAware, WidgetsBindingObserver {
   late final MobileScannerController _controller;
   bool _handled = false;
-  String? _error;
+  _CameraStatus _status = _CameraStatus.initializing;
+  MobileScannerException? _lastError;
+  bool _permanentlyDenied = false;
 
   @override
   void initState() {
@@ -63,23 +79,59 @@ class _BarcodeCameraState extends State<BarcodeCamera>
   }
 
   /// Turns the camera on/off and re-arms the handled flag so the next scan
-  /// after `_setActive(true)` fires `onBarcode` again. Swallows start()
-  /// errors — `errorBuilder` renders whatever MobileScanner reports.
+  /// after `_setActive(true)` fires `onBarcode` again. Errors thrown by
+  /// `start()` surface via [errorBuilder] which calls [_reportError].
   Future<void> _setActive(bool active) async {
     if (!mounted) return;
     if (active) {
       setState(() {
         _handled = false;
-        _error = null;
+        _status = _CameraStatus.initializing;
+        _lastError = null;
       });
       try {
         await _controller.start();
+        if (mounted) setState(() => _status = _CameraStatus.ready);
       } catch (_) {
-        // Picked up by errorBuilder; nothing to do here.
+        // errorBuilder will fire and call _reportError.
       }
     } else {
       await _controller.stop();
     }
+  }
+
+  /// Called from `errorBuilder` (which runs during build, so we must defer
+  /// setState). Also checks `permission_handler` to distinguish a one-off
+  /// deny from a "Don't ask again" deny so the fallback can show the right
+  /// action.
+  void _reportError(MobileScannerException error) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final permDenied =
+          error.errorCode == MobileScannerErrorCode.permissionDenied;
+      final permanently = permDenied
+          ? await Permission.camera.isPermanentlyDenied
+          : false;
+      if (!mounted) return;
+      setState(() {
+        _status = _CameraStatus.error;
+        _lastError = error;
+        _permanentlyDenied = permanently;
+      });
+    });
+  }
+
+  /// Retry handler from the fallback widget. If the user permanently denied
+  /// camera access, the only fix is the OS Settings app; otherwise re-issue
+  /// `start()` and hope they hit "Allow" this time.
+  Future<void> _retry() async {
+    if (_permanentlyDenied) {
+      await openAppSettings();
+      // Re-check on the next lifecycle resume — didChangeAppLifecycleState
+      // will fire when the user returns from Settings.
+      return;
+    }
+    await _setActive(true);
   }
 
   // Route lifecycle: stop the camera when another screen is pushed over us
@@ -128,29 +180,95 @@ class _BarcodeCameraState extends State<BarcodeCamera>
         color: const Color(0xFF0D1A10),
         borderRadius: BorderRadius.circular(24),
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: _onDetect,
-            errorBuilder: (context, error) {
-              _error = error.errorDetails?.message ?? error.errorCode.name;
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: NutriLabel(
-                    'Câmara indisponível: $_error',
-                    textAlign: TextAlign.center,
-                    variant: NutriLabelVariant.small,
-                    color: AppColors.textMuted,
-                  ),
+      child: _status == _CameraStatus.error
+          ? _CameraFallback(
+              error: _lastError,
+              permanentlyDenied: _permanentlyDenied,
+              onRetry: _retry,
+            )
+          : Stack(
+              alignment: Alignment.center,
+              children: [
+                MobileScanner(
+                  controller: _controller,
+                  onDetect: _onDetect,
+                  errorBuilder: (context, error) {
+                    _reportError(error);
+                    // Render nothing here — the next frame swaps to
+                    // _CameraFallback via setState in _reportError.
+                    return const SizedBox.expand();
+                  },
                 ),
-              );
-            },
-          ),
-          _ViewfinderOverlay(),
-        ],
+                _ViewfinderOverlay(),
+              ],
+            ),
+    );
+  }
+}
+
+/// Renders when the camera can't start. Shows a localized message based on
+/// the error code and a single primary action: "Abrir Definições" if the
+/// permission is permanently denied (only the OS can grant it back), or
+/// "Tentar novamente" for transient / first-time deny / hardware errors.
+class _CameraFallback extends StatelessWidget {
+  final MobileScannerException? error;
+  final bool permanentlyDenied;
+  final VoidCallback onRetry;
+
+  const _CameraFallback({
+    required this.error,
+    required this.permanentlyDenied,
+    required this.onRetry,
+  });
+
+  String get _message {
+    final code = error?.errorCode;
+    if (permanentlyDenied) {
+      return 'Acesso à câmara recusado. Concede a permissão nas definições para continuar.';
+    }
+    return switch (code) {
+      MobileScannerErrorCode.permissionDenied =>
+        'Acesso à câmara recusado. Toca em tentar novamente para autorizar.',
+      MobileScannerErrorCode.unsupported =>
+        'Câmara não suportada neste dispositivo.',
+      _ => 'Falha ao iniciar a câmara. Tenta de novo.',
+    };
+  }
+
+  IconData get _icon {
+    if (permanentlyDenied ||
+        error?.errorCode == MobileScannerErrorCode.permissionDenied) {
+      return Icons.lock_outline;
+    }
+    return Icons.videocam_off;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(_icon, color: AppColors.textMuted, size: 40),
+            const SizedBox(height: 16),
+            NutriLabel(
+              _message,
+              textAlign: TextAlign.center,
+              variant: NutriLabelVariant.small,
+              color: AppColors.textMuted,
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 220,
+              child: NutriButton(
+                label: permanentlyDenied ? 'Abrir Definições' : 'Tentar novamente',
+                onPressed: onRetry,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
