@@ -24,7 +24,7 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       return user;
     } catch (e, st) {
       logger.e('AuthNotifier: error fetching user', error: e, stackTrace: st);
-      throw e;
+      rethrow;
     }
   }
 
@@ -33,7 +33,7 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     logger.d('AuthNotifier: checking existing session');
     state = const AsyncValue.loading();
     try {
-      final uid = await authRepository.getCurrentUser();
+      final uid = authRepository.getCurrentUser();
       if (uid == null) {
         logger.d('AuthNotifier: no existing session found');
         state = const AsyncValue.data(null);

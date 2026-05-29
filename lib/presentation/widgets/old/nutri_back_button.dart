@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
 
-//TODO: Rever.
-// Tamanho hardcoded.
 class NutriBackButton extends StatelessWidget {
   final VoidCallback? onPressed;
 

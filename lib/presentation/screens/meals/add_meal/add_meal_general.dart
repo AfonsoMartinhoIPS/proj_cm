@@ -56,7 +56,12 @@ class AddMealGeneralInfo extends StatelessWidget {
           color: AppColors.textMuted,
         ),
         const SizedBox(height: 8),
-        _MealTypeChips(selected: mealType, onChanged: onMealTypeChanged),
+        NutriChipSelector(
+          items: MealType.values,
+          selected: mealType,
+          onChanged: onMealTypeChanged,
+          label: (mealType) => mealType.label,
+        ),
         const SizedBox(height: 20),
         const NutriLabel(
           'DATA',
@@ -66,92 +71,8 @@ class AddMealGeneralInfo extends StatelessWidget {
           color: AppColors.textMuted,
         ),
         const SizedBox(height: 8),
-        _DateField(date: date, onTap: () => _pickDate(context)),
+        NutriDateField(date: date, onTap: () => _pickDate(context)),
       ],
-    );
-  }
-}
-
-/// Row of selectable chips, one per [MealType]. The selected chip is filled
-/// with [AppColors.primary]; unselected chips show the muted surface tone.
-class _MealTypeChips extends StatelessWidget {
-  final MealType selected;
-  final ValueChanged<MealType> onChanged;
-
-  const _MealTypeChips({required this.selected, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: MealType.values.map((mealType) {
-        final isSelected = mealType == selected;
-        return GestureDetector(
-          onTap: () => onChanged(mealType),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.primary : AppColors.surfaceDark,
-              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-              border: Border.all(
-                color: isSelected ? AppColors.primary : AppColors.border,
-              ),
-            ),
-            child: NutriLabel(
-              mealType.label,
-              variant: NutriLabelVariant.small,
-              color: isSelected
-                  ? AppColors.onBackground
-                  : AppColors.textMuted,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-/// Tappable surface displaying the current date as DD/MM/YYYY. Tapping it
-/// triggers the parent-provided [onTap] callback (which opens the date picker).
-class _DateField extends StatelessWidget {
-  final DateTime date;
-  final VoidCallback onTap;
-
-  const _DateField({required this.date, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final formatted = formatDmy(date);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          // TODO: replace with NutriCard widget
-          color: AppColors.surfaceDark,
-          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.calendar_today,
-              color: AppColors.secondary,
-              size: 18,
-            ),
-            const SizedBox(width: 12),
-            NutriLabel(
-              formatted,
-              variant: NutriLabelVariant.body,
-              color: AppColors.onBackground,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

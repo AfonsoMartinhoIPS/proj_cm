@@ -72,10 +72,10 @@ void main() {
         // Act
         // In production, this calls _db.doc(...).set(...)
         // We verify the contract: no exception thrown
-        final shouldNotThrow = () async {
+        Future<dynamic> shouldNotThrow() async {
           // This represents the save operation
           return Future.value();
-        };
+        }
 
         // Assert
         test_package.expect(shouldNotThrow(), completes);

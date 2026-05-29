@@ -44,7 +44,7 @@ class OnboardingState {
       weight: weight ?? this.weight,
       height: height ?? this.height,
       objective: objective ?? this.objective,
-      nutritionGoals: calculatedGoals ?? this.nutritionGoals,
+      nutritionGoals: calculatedGoals ?? nutritionGoals,
     );
   }
 
