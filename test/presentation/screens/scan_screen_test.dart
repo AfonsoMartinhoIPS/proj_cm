@@ -83,11 +83,9 @@ void main() {
                     onPressed: () {
                       showModalBottomSheet(
                         context: tester.element(find.byType(Scaffold)),
-                        builder: (_) => Container(
-                          child: const TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Enter barcode',
-                            ),
+                        builder: (_) => const TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Enter barcode',
                           ),
                         ),
                       );

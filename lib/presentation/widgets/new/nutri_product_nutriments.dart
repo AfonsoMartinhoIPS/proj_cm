@@ -6,11 +6,11 @@ import 'package:nutri_scan/domain/entities/nutriments.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
 import 'package:nutri_scan/presentation/widgets/new/nutri_label.dart';
 
-class ProductNutritionTable extends StatelessWidget {
+class NutriProductNutritionTable extends StatelessWidget {
 
   
   final Product product;
-  ProductNutritionTable({super.key, required this.product});
+  const NutriProductNutritionTable({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {

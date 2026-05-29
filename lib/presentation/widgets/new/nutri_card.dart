@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
 
-/// Standard surface card used across the app - rounded corners, bordered,
-/// fills with [AppColors.surface] by default. Pick a `variant` to switch
-/// to the darker surface used inside other cards.
+/// Variante de cor para o [NutriCard].
 enum NutriCardVariant { surface, surfaceDark }
 
+/// Card de superfície padronizado com cantos arredondados e borda.
+///
+/// Componente base para agrupar conteúdo com estilo consistente.
+/// Suporta duas variántes de cor ([surface] e [surfaceDark]) e personalizacao de padding e margem.
 class NutriCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;

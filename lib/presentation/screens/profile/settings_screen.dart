@@ -25,7 +25,7 @@ class SettingsScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(AppSizes.lg),
           children: [
-            const _SectionLabel('TEMA'),
+            const NutriSectionLabel('TEMA'),
             const SizedBox(height: AppSizes.sm),
             NutriCard(
               padding: const EdgeInsets.symmetric(vertical: AppSizes.sm),
@@ -44,19 +44,19 @@ class SettingsScreen extends ConsumerWidget {
             ),
 
             const SizedBox(height: AppSizes.lg),
-            const _SectionLabel('CONTA'),
+            const NutriSectionLabel('CONTA'),
             const SizedBox(height: AppSizes.sm),
             NutriCard(
               padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  _MenuItem(
+                  NutriMenuItem(
                     icon: Icons.tune,
                     label: 'Editar objetivos',
                     onTap: () => context.push('/profile/goals'),
                   ),
-                  const _Divider(),
-                  _MenuItem(
+                  const NutriDivider(),
+                  NutriMenuItem(
                     icon: Icons.info_outline,
                     label: 'Créditos',
                     onTap: () => context.push('/credits'),
@@ -68,7 +68,7 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: AppSizes.lg),
             NutriCard(
               padding: EdgeInsets.zero,
-              child: _MenuItem(
+              child: NutriMenuItem(
                 icon: Icons.logout,
                 label: 'Logout',
                 destructive: true,
@@ -88,25 +88,6 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String text;
-  const _SectionLabel(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: AppSizes.sm),
-      child: NutriLabel(
-        text,
-        variant: NutriLabelVariant.small,
-        fontWeight: FontWeight.bold,
-        letterSpacing: 1.2,
-        color: AppColors.textMuted,
       ),
     );
   }
@@ -163,62 +144,5 @@ class _ThemeOption extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _MenuItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool destructive;
-
-  const _MenuItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.destructive = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = destructive ? AppColors.error : AppColors.onBackground;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.md, vertical: AppSizes.md,
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: AppSizes.md),
-              Expanded(
-                child: NutriLabel(
-                  label,
-                  variant: NutriLabelVariant.body,
-                  color: color,
-                ),
-              ),
-              if (!destructive)
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textMuted,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Divider extends StatelessWidget {
-  const _Divider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Divider(height: 1, color: AppColors.border);
   }
 }
