@@ -32,6 +32,11 @@ import 'package:nutri_scan/presentation/screens/profile/credits_screen.dart';
 
 import 'package:nutri_scan/presentation/widgets/old_widgets.dart';
 
+/// Global RouteObserver. Subscribed by widgets (e.g. BarcodeCamera) that need
+/// to react when a route is pushed above or popped back to them, beyond what
+/// State lifecycle alone provides. Must be plumbed into [GoRouter.observers].
+final routeObserver = RouteObserver<ModalRoute<dynamic>>();
+
 class AppRoute {
   final String path;
   final String label;
@@ -84,7 +89,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: '/splash',
-    observers: [_RouteLogger()],
+    observers: [_RouteLogger(), routeObserver],
     refreshListenable: refresh,
     redirect: (context, state) {
       final auth = ref.read(authProvider);

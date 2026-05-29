@@ -22,7 +22,8 @@ class BarcodeCamera extends StatefulWidget {
   State<BarcodeCamera> createState() => _BarcodeCameraState();
 }
 
-class _BarcodeCameraState extends State<BarcodeCamera> {
+class _BarcodeCameraState extends State<BarcodeCamera>
+    with RouteAware, WidgetsBindingObserver {
   late final MobileScannerController _controller;
   bool _handled = false;
   String? _error;
@@ -41,12 +42,69 @@ class _BarcodeCameraState extends State<BarcodeCamera> {
       ],
       detectionSpeed: DetectionSpeed.normal,
     );
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Subscribe in didChangeDependencies (not initState) because ModalRoute.of
+    // requires an inherited widget that isn't ready in initState.
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) routeObserver.subscribe(this, route);
   }
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     super.dispose();
+  }
+
+  /// Turns the camera on/off and re-arms the handled flag so the next scan
+  /// after `_setActive(true)` fires `onBarcode` again. Swallows start()
+  /// errors — `errorBuilder` renders whatever MobileScanner reports.
+  Future<void> _setActive(bool active) async {
+    if (!mounted) return;
+    if (active) {
+      setState(() {
+        _handled = false;
+        _error = null;
+      });
+      try {
+        await _controller.start();
+      } catch (_) {
+        // Picked up by errorBuilder; nothing to do here.
+      }
+    } else {
+      await _controller.stop();
+    }
+  }
+
+  // Route lifecycle: stop the camera when another screen is pushed over us
+  // (e.g. /products/$barcode); restart when we become the top route again.
+  @override
+  void didPushNext() => _setActive(false);
+
+  @override
+  void didPopNext() => _setActive(true);
+
+  // App lifecycle: stop the camera when the app is backgrounded or paused,
+  // restart on resume. Saves battery + releases the sensor for other apps.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _setActive(true);
+        break;
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        _setActive(false);
+        break;
+    }
   }
 
   void _onDetect(BarcodeCapture capture) {
