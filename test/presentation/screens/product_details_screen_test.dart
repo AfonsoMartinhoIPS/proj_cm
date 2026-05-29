@@ -4,9 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nutri_scan/core/constants/app_colors.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
-import 'package:nutri_scan/presentation/screens/products/product_details_screen.dart';
 import '../../fixtures/product_fixtures.dart';
 
 void main() {

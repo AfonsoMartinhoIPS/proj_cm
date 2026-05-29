@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/core/router/app_router.dart';
 import 'package:nutri_scan/presentation/providers/theme_provider.dart';
 
 void main() async {

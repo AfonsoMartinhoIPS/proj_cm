@@ -7,7 +7,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import '../../fixtures/user_fixtures.dart';
-import '../../test_helpers.dart';
 
 class MockAuthRepository extends Mock {}
 
