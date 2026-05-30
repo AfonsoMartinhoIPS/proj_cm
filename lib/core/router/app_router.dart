@@ -19,6 +19,7 @@ import 'package:nutri_scan/presentation/screens/onboarding/calculation_screen.da
 import 'package:nutri_scan/presentation/screens/onboarding/nutrition_goals_screen.dart';
 import 'package:nutri_scan/presentation/screens/onboarding/confirm_screen.dart';
 
+import 'package:nutri_scan/presentation/screens/history/history_screen.dart';
 import 'package:nutri_scan/presentation/screens/home/home_screen.dart';
 import 'package:nutri_scan/presentation/screens/meals/meals_screen.dart';
 import 'package:nutri_scan/presentation/screens/products/products_screen.dart';
@@ -131,6 +132,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/profile/goals', builder: (_, _) => const GoalsEditorScreen()),
       GoRoute(path: '/credits',  builder: (_, _) => const CreditsScreen()),
+      GoRoute(path: '/history',  builder: (_, _) => const HistoryScreen()),
       
       // meals
       GoRoute(path: '/meals/add', builder: (context, state) => AddMealScreen(initialProduct: state.extra as Product?,)),
