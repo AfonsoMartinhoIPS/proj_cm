@@ -1,21 +1,30 @@
-// lib/presentation/screens/meals/add_meal_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
 
+/// Ecrã para adicionar uma nova refeição manualmente.
+///
+/// Permite ao utilizador introduzir o nome do produto, a quantidade em gramas
+/// e o tipo de refeição. Pode receber um [initialProduct] para pré‑preencher
+/// o nome e a quantidade padrão de 100 g.
 class AddMealScreen extends StatelessWidget {
-  const AddMealScreen({super.key, this.initialProduct});
-
+  /// Produto opcional para pré‑preencher o formulário.
   final Product? initialProduct;
+
+  /// Cria um [AddMealScreen].
+  ///
+  /// Se [initialProduct] for fornecido, o campo de nome será preenchido
+  /// automaticamente com o nome do produto.
+  const AddMealScreen({super.key, this.initialProduct});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: const NutriTopNavBar(showBackButton: true, title: 'Adicionar Refeição'),
       body: SafeArea(
         child: AddMealForm(initialProduct: initialProduct),
@@ -24,14 +33,22 @@ class AddMealScreen extends StatelessWidget {
   }
 }
 
+/// Formulário para adicionar uma refeição.
+///
+/// Contém os campos de nome do produto, quantidade em gramas e o tipo de
+/// refeição (pequeno‑almoço, almoço, jantar ou snack).
 class AddMealForm extends ConsumerStatefulWidget {
-  const AddMealForm({super.key, this.initialProduct});
+  /// Produto opcional para pré‑preencher o nome e a quantidade.
   final Product? initialProduct;
+
+  /// Cria um [AddMealForm].
+  const AddMealForm({super.key, this.initialProduct});
 
   @override
   ConsumerState<AddMealForm> createState() => _AddMealFormState();
 }
 
+/// Estado do [AddMealForm] que gere os campos de texto e a submissão.
 class _AddMealFormState extends ConsumerState<AddMealForm> {
   Product? selectedProduct;
   MealType selectedMealType = MealType.lunch;
@@ -47,39 +64,18 @@ class _AddMealFormState extends ConsumerState<AddMealForm> {
     }
 
     nameController.text = selectedProduct?.name ?? '';
-    servingGrams.text = '100'; // default to 100g
+    servingGrams.text = '100';
   }
 
+  /// Submete os dados da refeição.
+  ///
+  /// A implementação da lógica de submissão será adicionada posteriormente.
   void submit() {
-    /*
-    {
-      id: string                // UUID
-      mealType: "breakfast" | "lunch" | "dinner" | "snack"
-      productId: string
-      productBarcode: string
-      productName: string       // snapshot — avoids extra read to products collection
-      productImageUrl: string | null
-      servingGrams: number      // actual amount consumed
-      loggedAt: timestamp
-
-      // pre-computed for this serving: (nutrientPer100g / 100) * servingGrams
-      nutriments: {
-        calories: number
-        protein: number
-        carbs: number
-        fat: number
-      }
-    }
-    */
+    // Implementação futura
   }
 
   @override
   Widget build(BuildContext context) {
-    /*
-      1. Fetch product from DB
-
-    */
-
     return Center(
       child: Column(
         children: [
@@ -109,7 +105,6 @@ class _AddMealFormState extends ConsumerState<AddMealForm> {
               if (meal != null) setState(() => selectedMealType = meal);
             },
           ),
-
           NutriButton(
             label: 'Salvar Refeição',
             onPressed: submit,

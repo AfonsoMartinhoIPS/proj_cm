@@ -1,11 +1,15 @@
-// lib/presentation/screens/onboarding/nutrition_goals_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
+/// Terceiro passo do fluxo de onboarding — definição dos objetivos nutricionais.
+///
+/// Apresenta campos para o utilizador ajustar as calorias diárias e a
+/// distribuição de macronutrientes (proteínas, hidratos, gordura) e água.
+/// Os valores são pré‑preenchidos com base no perfil introduzido nos passos
+/// anteriores e podem ser alterados livremente.
 class NutritionGoalsScreen extends ConsumerStatefulWidget {
   const NutritionGoalsScreen({super.key});
 
@@ -14,6 +18,7 @@ class NutritionGoalsScreen extends ConsumerStatefulWidget {
       _NutritionGoalsScreenState();
 }
 
+/// Estado do [NutritionGoalsScreen] que gere os campos de texto e a submissão.
 class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
   final TextEditingController caloriesController = TextEditingController();
   final TextEditingController proteinController = TextEditingController();
@@ -24,7 +29,6 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
   @override
   void initState() {
     super.initState();
-    // calculate defaults if not yet set, so fields prefill
     final notifier = ref.read(onboardingProvider.notifier);
     if (ref.read(onboardingProvider).nutritionGoals == null) {
       notifier.calculateAndSetGoals();
@@ -47,6 +51,8 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
     super.dispose();
   }
 
+  /// Guarda os valores introduzidos no [onboardingProvider] e avança para a
+  /// confirmação final.
   void submit() {
     final calories = double.tryParse(caloriesController.text.trim()) ?? 0;
     final protein = double.tryParse(proteinController.text.trim()) ?? 0;
@@ -69,40 +75,37 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const NutriTopNavBar(
-        showBackButton: true,
-        title: '3 / 4',
-      ),
+      backgroundColor: colorScheme.surface,
+      appBar: const NutriTopNavBar(showBackButton: true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const SizedBox(height: 20),
+              const OnboardingStepIndicator(currentStep: 3, totalSteps: 4),
               const SizedBox(height: 30),
-              const NutriLabel(
+              NutriLabel(
                 'Os teus objetivos diários',
                 variant: NutriLabelVariant.display,
               ),
               const SizedBox(height: 12),
-              const NutriLabel(
+              NutriLabel(
                 'Calculados com base no teu perfil. Podes ajustar se quiseres.',
                 variant: NutriLabelVariant.small,
               ),
               const SizedBox(height: 40),
-              Container(
+              NutriCard(
+                variant: NutriCardVariant.surfaceDark,
                 padding: const EdgeInsets.symmetric(
                   vertical: 16,
                   horizontal: 12,
                 ),
-                decoration: BoxDecoration(
-                  // TODO: replace with NutriCard widget
-                  color: AppColors.surfaceDark,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: AppColors.border),
-                ),
+                borderRadius: BorderRadius.circular(25),
                 child: Column(
                   children: [
                     NutriTextField(
@@ -143,7 +146,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                 ),
               ),
               const Spacer(),
-              NutriButton(label: 'Próximo', onPressed: submit, fontSize: 16,),
+              NutriButton(label: 'Próximo', onPressed: submit, fontSize: 16),
               const SizedBox(height: 20),
             ],
           ),

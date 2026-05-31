@@ -1,5 +1,4 @@
-// PT date formatting helpers. Avoids pulling `intl` for a few labels.
-
+/// Dias da semana em português (por extenso).
 const ptWeekdays = [
   'Segunda-feira',
   'Terça-feira',
@@ -10,11 +9,29 @@ const ptWeekdays = [
   'Domingo',
 ];
 
+/// Abreviaturas dos dias da semana em português.
 const ptWeekdaysShort = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
+/// Abreviaturas dos meses do ano em português.
 const ptMonths = [
   'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
   'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez',
+];
+
+/// Nomes dos meses do ano em português (por extenso).
+const ptMonthsFull = [
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
 ];
 
 /// "DD/MM/YYYY" from a YYYY-MM-DD string.

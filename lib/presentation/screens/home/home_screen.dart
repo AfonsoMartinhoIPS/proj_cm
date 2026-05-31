@@ -9,33 +9,33 @@ import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/screens/meals/widgets/meal_entry_tile.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
-/// Home dashboard - shows today's intake, weekly bar chart, and today's meals.
-/// All data comes from [nutritionLogsProvider] (list of recent logs) and [authProvider]
-/// (current AppUser, for fallback goals).
+/// Painel principal (home) da aplicação.
+///
+/// Exibe o resumo de calorias do dia atual, um gráfico semanal de ingestão
+/// e a lista de refeições de hoje agrupadas por tipo.
+/// Os dados provêm do [nutritionLogsProvider] e do [authProvider].
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final AppUser? user = ref.watch(authProvider).value;
     final List<NutritionLog> nutritionLogs =
         ref.watch(nutritionLogsProvider).value ?? [];
 
     final today = todayKey();
-    // Pick today's log out of the list. May be null if user hasn't logged anything yet.
     final NutritionLog? todayLog = nutritionLogs
         .cast<NutritionLog?>()
         .firstWhere((log) => log!.date == today, orElse: () => null);
 
-    // Goals priority: log's snapshot (frozen on the day) → user's current goals → null.
     final NutritionGoals? goals = todayLog?.goals ?? user?.nutritionGoals;
     final double totalCalories = todayLog?.totalCalories ?? 0;
     final double totalProtein = todayLog?.totalProtein ?? 0;
     final double totalCarbs = todayLog?.totalCarbs ?? 0;
     final double totalFat = todayLog?.totalFat ?? 0;
-
 
     return Scaffold(
       appBar: NutriTopNavBar(
@@ -47,13 +47,13 @@ class HomeScreen extends ConsumerWidget {
             NutriLabel(
               'Olá, ${user?.displayName ?? "utilizador"}',
               variant: NutriLabelVariant.headline,
-              color: AppColors.onBackground,
+              color: colorScheme.onSurface,
             ),
             const SizedBox(height: 2),
             NutriLabel(
               formatPtHeader(DateTime.now()),
               variant: NutriLabelVariant.small,
-              color: AppColors.textMuted,
+              color: colorScheme.onSurfaceVariant,
             ),
           ],
         ),
@@ -62,83 +62,99 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(right: 20),
             child: GestureDetector(
               onTap: () => context.push('/profile'),
-              child: Container(
+              child: SizedBox(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(
-                  // TODO: replace with NutriCard widget
-                  color: AppColors.surface,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.primary, width: 2),
+                child: NutriCard(
+                  padding: EdgeInsets.zero,
+                  borderRadius: BorderRadius.circular(40),
+                  child: Center(
+                    child: Icon(Icons.person, color: colorScheme.onSurface),
+                  ),
                 ),
-                child: const Icon(Icons.person, color: AppColors.onBackground),
               ),
             ),
           ),
         ],
       ),
-    body: SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _CalorieCard(
-              totalCalories: totalCalories,
-              totalProtein: totalProtein,
-              totalCarbs: totalCarbs,
-              totalFat: totalFat,
-              goals: goals,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const NutriLabel(
-                  'Esta semana',
-                  variant: NutriLabelVariant.body,
-                  color: AppColors.textMuted,
-                ),
-                NutriButton.text(
-                  label: 'Ver mais →',
-                  onPressed: () => context.push('/history'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            _WeeklyChart(
-              nutritionLogs: nutritionLogs,
-              goalCalories: goals?.calories ?? 2000,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const NutriLabel(
-                  'Refeições de hoje',
-                  variant: NutriLabelVariant.body,
-                  color: AppColors.textMuted,
-                ),
-
-                NutriButton.text(
-                  label: 'Ver todas',
-                  onPressed: () => context.go('/meals'),
-                ),
-              ],
-            ),
-            _TodayMeals(nutritionLog: todayLog),
-            const SizedBox(height: 20),
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _CalorieCard(
+                totalCalories: totalCalories,
+                totalProtein: totalProtein,
+                totalCarbs: totalCarbs,
+                totalFat: totalFat,
+                goals: goals,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  NutriLabel(
+                    'Esta semana',
+                    variant: NutriLabelVariant.body,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  NutriButton.text(
+                    label: 'Ver mais →',
+                    onPressed: () => context.go('/meals?mode=week'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _WeeklyChart(
+                nutritionLogs: nutritionLogs,
+                goalCalories: goals?.calories ?? 2000,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  NutriLabel(
+                    'Refeições de hoje',
+                    variant: NutriLabelVariant.body,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  NutriButton.text(
+                    label: 'Ver todas',
+                    onPressed: () => context.go('/meals?mode=day'),
+                  ),
+                ],
+              ),
+              _TodayMeals(nutritionLog: todayLog),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
-    )
     );
   }
 }
 
-/// Main card: shows today's total calories vs daily goal, with progress bar
-/// and macro breakdown (protein / carbs / fat).
+/// Cartão principal com o resumo calórico do dia.
+///
+/// Mostra as calorias totais em relação à meta diária, uma barra de progresso
+/// e a distribuição dos três macronutrientes (proteína, hidratos, gordura).
 class _CalorieCard extends StatelessWidget {
+  /// Calorias totais consumidas hoje.
+  final double totalCalories;
+
+  /// Proteína total consumida hoje (em gramas).
+  final double totalProtein;
+
+  /// Hidratos de carbono totais consumidos hoje (em gramas).
+  final double totalCarbs;
+
+  /// Gordura total consumida hoje (em gramas).
+  final double totalFat;
+
+  /// Metas nutricionais do utilizador. Pode ser `null`.
+  final NutritionGoals? goals;
+
   const _CalorieCard({
     required this.totalCalories,
     required this.totalProtein,
@@ -147,26 +163,15 @@ class _CalorieCard extends StatelessWidget {
     required this.goals,
   });
 
-  final double totalCalories;
-  final double totalProtein;
-  final double totalCarbs;
-  final double totalFat;
-  final NutritionGoals? goals;
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final double goalCalories = goals?.calories ?? 2000;
-    // Clamp prevents progress bar from overflowing 100% if user exceeds goal.
     final double progress = (totalCalories / goalCalories).clamp(0.0, 1.0);
 
-    return Container(
+    return NutriCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        // TODO: replace with NutriCard widget
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white10),
-      ),
+      borderRadius: BorderRadius.circular(20),
       child: Column(
         children: [
           Row(
@@ -178,7 +183,7 @@ class _CalorieCard extends StatelessWidget {
                   NutriLabel(
                     'Calorias hoje'.toUpperCase(),
                     variant: NutriLabelVariant.small,
-                    color: AppColors.textMuted,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(height: 4),
                   NutriLabel.rich(
@@ -187,16 +192,16 @@ class _CalorieCard extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: totalCalories.toStringAsFixed(0),
-                          style: const TextStyle(
-                            color: AppColors.secondary,
+                          style: TextStyle(
+                            color: colorScheme.secondary,
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         TextSpan(
                           text: '\n de ${goalCalories.toStringAsFixed(0)} kcal',
-                          style: const TextStyle(
-                            color: AppColors.textMuted,
+                          style: TextStyle(
+                            color: colorScheme.onSurfaceVariant,
                             fontSize: 12,
                           ),
                         ),
@@ -211,13 +216,13 @@ class _CalorieCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: colorScheme.primary,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: NutriLabel(
                   '${(progress * 100).toStringAsFixed(0)}%',
                   variant: NutriLabelVariant.small,
-                  color: Colors.white,
+                  color: colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -228,32 +233,39 @@ class _CalorieCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: AppColors.surfaceDark,
-              color: AppColors.secondary,
+              backgroundColor: colorScheme.surfaceContainerHighest,
+              color: colorScheme.secondary,
               minHeight: 6,
             ),
           ),
           const SizedBox(height: 20),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _macro(
-                'Proteína',
-                totalProtein,
-                goals?.protein ?? 0,
-                AppColors.secondary,
+              Expanded(
+                child: NutriNutrientProgressBar(
+                  label: 'Proteína',
+                  current: totalProtein,
+                  goal: (goals?.protein ?? 0).toDouble(),
+                  color: colorScheme.secondary,
+                ),
               ),
-              _macro(
-                'Hidratos',
-                totalCarbs,
-                goals?.carbs ?? 0,
-                AppColors.primary,
+              const SizedBox(width: 12),
+              Expanded(
+                child: NutriNutrientProgressBar(
+                  label: 'Hidratos',
+                  current: totalCarbs,
+                  goal: (goals?.carbs ?? 0).toDouble(),
+                  color: colorScheme.primary,
+                ),
               ),
-              _macro(
-                'Gordura',
-                totalFat,
-                goals?.fat ?? 0,
-                AppColors.onBackground,
+              const SizedBox(width: 12),
+              Expanded(
+                child: NutriNutrientProgressBar(
+                  label: 'Gordura',
+                  current: totalFat,
+                  goal: (goals?.fat ?? 0).toDouble(),
+                  color: colorScheme.onSurface,
+                ),
               ),
             ],
           ),
@@ -261,62 +273,26 @@ class _CalorieCard extends StatelessWidget {
       ),
     );
   }
-
-  Widget _macro(
-    String label,
-    double currentGrams,
-    double goalGrams,
-    Color color,
-  ) {
-    // Avoid divide-by-zero if goal not configured.
-    final double progress = goalGrams > 0
-        ? (currentGrams / goalGrams).clamp(0.0, 1.0)
-        : 0.0;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        NutriLabel(
-          label.toUpperCase(),
-          variant: NutriLabelVariant.small,
-          color: AppColors.textMuted,
-        ),
-        const SizedBox(height: 6),
-        SizedBox(
-          width: 80,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(2),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: AppColors.surfaceDark,
-              color: color,
-              minHeight: 3,
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        NutriLabel(
-          '${currentGrams.toStringAsFixed(0)}g / ${goalGrams.toStringAsFixed(0)}g',
-          variant: NutriLabelVariant.small,
-          color: AppColors.textMuted,
-        ),
-      ],
-    );
-  }
 }
 
-/// Last-7-days bar chart of total calories per day.
-/// Bar height is scaled relative to (goal * 1.2) so a day at goal hits ~83%,
-/// leaving headroom for over-goal days without flattening normal days at 100%.
+/// Gráfico de barras dos últimos 7 dias.
+///
+/// Cada barra representa as calorias totais de um dia, dimensionadas
+/// relativamente à meta diária multiplicada por 1,2 (para dar margem a dias
+/// acima da meta). O dia atual é destacado com a cor primária.
 class _WeeklyChart extends StatelessWidget {
-  const _WeeklyChart({required this.nutritionLogs, required this.goalCalories});
-
+  /// Lista de registos de nutrição dos últimos dias.
   final List<NutritionLog> nutritionLogs;
+
+  /// Meta calórica diária de referência.
   final double goalCalories;
+
+  const _WeeklyChart({required this.nutritionLogs, required this.goalCalories});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final now = DateTime.now();
-    // Build the 7 days, oldest first → today last, so the chart reads left-to-right.
     final List<DateTime> days = List.generate(
       7,
       (i) => now.subtract(Duration(days: 6 - i)),
@@ -329,14 +305,10 @@ class _WeeklyChart extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: days.map((day) {
           final String dayKey = dateKey(day);
-
-          // Find the log for this day; null if user didn't log anything.
           final NutritionLog? dayLog = nutritionLogs
               .cast<NutritionLog?>()
               .firstWhere((log) => log!.date == dayKey, orElse: () => null);
           final double dayCalories = dayLog?.totalCalories ?? 0;
-
-          // Bar fraction (0.05 .. 1.0). Floor at 5% so zero-cal days still show a stub.
           final double barFraction = (dayCalories / (goalCalories * 1.2)).clamp(
             0.05,
             1.0,
@@ -350,19 +322,21 @@ class _WeeklyChart extends StatelessWidget {
                 width: 25,
                 height: 60 * barFraction,
                 decoration: BoxDecoration(
-                  color: isToday ? AppColors.primary : AppColors.surface,
+                  color: isToday ? colorScheme.primary : colorScheme.secondary,
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color: isToday ? AppColors.primary : Colors.white10,
+                    color: isToday ? colorScheme.primary : colorScheme.outline,
+                    width: 1.0,
                   ),
                 ),
               ),
               const SizedBox(height: 8),
-
               NutriLabel(
                 ptWeekdaysShort[day.weekday - 1],
                 variant: NutriLabelVariant.small,
-                color: isToday ? AppColors.secondary : AppColors.textMuted,
+                color: isToday
+                    ? colorScheme.secondary
+                    : colorScheme.onSurfaceVariant,
               ),
             ],
           );
@@ -372,14 +346,14 @@ class _WeeklyChart extends StatelessWidget {
   }
 }
 
-/// Today's entries grouped by [MealType]. Each section shows its subtotal
-/// kcal; entries render via [MealEntryTile]. Tapping a tile opens the day
-/// detail screen so the user can edit/delete from there (no inline mutation
-/// on the home screen - keeps this widget read-only).
+/// Lista das refeições de hoje agrupadas por tipo de refeição.
+///
+/// Se não existirem refeições registadas, exibe uma mensagem informativa.
 class _TodayMeals extends ConsumerWidget {
-  const _TodayMeals({required this.nutritionLog});
-
+  /// O registo de nutrição do dia de hoje. Pode ser `null`.
   final NutritionLog? nutritionLog;
+
+  const _TodayMeals({required this.nutritionLog});
 
   static const _mealLabels = {
     MealType.breakfast: 'Pequeno-almoço',
@@ -390,15 +364,16 @@ class _TodayMeals extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final List<MealEntry> entries =
         nutritionLog?.entries ?? const <MealEntry>[];
     if (entries.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 20),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
         child: NutriLabel(
           'Sem refeições registadas hoje.',
           variant: NutriLabelVariant.small,
-          color: AppColors.textMuted,
+          color: colorScheme.onSurfaceVariant,
         ),
       );
     }
@@ -425,9 +400,19 @@ class _TodayMeals extends ConsumerWidget {
   }
 }
 
+/// Bloco que representa um tipo de refeição (ex.: Pequeno‑almoço).
+///
+/// Mostra o nome do tipo de refeição, o subtotal de calorias e a lista das
+/// entradas correspondentes. O toque em qualquer entrada redireciona para o
+/// detalhe do dia (leitura apenas — as ações de editar/apagar são feitas lá).
 class _MealTypeBlock extends StatelessWidget {
+  /// Nome do tipo de refeição (ex.: "Pequeno-almoço").
   final String label;
+
+  /// Lista de entradas desse tipo de refeição.
   final List<MealEntry> entries;
+
+  /// Callback executado ao tocar numa entrada (abre o detalhe do dia).
   final VoidCallback onTap;
 
   const _MealTypeBlock({
@@ -438,6 +423,7 @@ class _MealTypeBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final subtotal = entries.fold<double>(0, (s, e) => s + e.calories);
     return Padding(
       padding: const EdgeInsets.only(top: 16),
@@ -446,7 +432,8 @@ class _MealTypeBlock extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.sm, vertical: AppSizes.xs,
+              horizontal: AppSizes.sm,
+              vertical: AppSizes.xs,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -456,26 +443,19 @@ class _MealTypeBlock extends StatelessWidget {
                   variant: NutriLabelVariant.small,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
-                  color: AppColors.textMuted,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 NutriLabel(
                   '${subtotal.toStringAsFixed(0)} kcal',
                   variant: NutriLabelVariant.small,
-                  color: AppColors.secondary,
+                  color: colorScheme.secondary,
                   fontWeight: FontWeight.w600,
                 ),
               ],
             ),
           ),
-          // Read-only on home: tap → day detail. We pass the same `onTap` for
-          // both edit + delete so the user is routed to detail instead of
-          // mutating from here.
           for (final e in entries)
-            MealEntryTile(
-              entry: e,
-              onEdit: onTap,
-              onDelete: onTap,
-            ),
+            MealEntryTile(entry: e, onEdit: onTap, onDelete: onTap),
         ],
       ),
     );

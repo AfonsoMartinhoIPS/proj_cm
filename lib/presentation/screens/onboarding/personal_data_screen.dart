@@ -1,12 +1,15 @@
-// lib/presentation/screens/onboarding/personal_data_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
+/// Primeiro passo do fluxo de onboarding — recolha de dados pessoais.
+///
+/// Pede ao utilizador o nome completo, data de nascimento, género, peso e
+/// altura. Estes dados são guardados no [onboardingProvider] e servem de
+/// base para o cálculo dos objetivos nutricionais nos passos seguintes.
 class PersonalDataScreen extends ConsumerStatefulWidget {
   const PersonalDataScreen({super.key});
 
@@ -14,6 +17,7 @@ class PersonalDataScreen extends ConsumerStatefulWidget {
   ConsumerState<PersonalDataScreen> createState() => _PersonalDataScreenState();
 }
 
+/// Estado do [PersonalDataScreen] que gere os campos de texto e a submissão.
 class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
@@ -22,8 +26,6 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
   DateTime? dateOfBirth;
   Gender gender = Gender.other;
 
-  /// Initialize the text controllers with existing onboarding data, if available. 
-  /// This allows users to go back and forth between steps without losing their input.
   @override
   void initState() {
     super.initState();
@@ -39,7 +41,6 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     gender = onboarding.gender;
   }
 
-  /// Dispose of the text controllers when the widget is removed from the widget tree to free up resources.
   @override
   void dispose() {
     nameController.dispose();
@@ -48,7 +49,8 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     super.dispose();
   }
 
-  /// Show a date picker to allow the user to select their date of birth.
+  /// Abre o seletor de data nativo para o utilizador escolher a data de
+  /// nascimento.
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -59,6 +61,8 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     if (picked != null) setState(() => dateOfBirth = picked);
   }
 
+  /// Valida os campos obrigatórios e avança para o próximo passo do
+  /// onboarding.
   void submit() {
     final name = nameController.text.trim();
     final weight = double.tryParse(weightController.text.trim());
@@ -92,12 +96,10 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const NutriTopNavBar(
-        showBackButton: true,
-        title: '1 / 4',
-      ),
+      backgroundColor: colorScheme.surface,
+      appBar: const NutriTopNavBar(showBackButton: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -105,12 +107,14 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const NutriLabel(
+              const OnboardingStepIndicator(currentStep: 1, totalSteps: 4),
+              const SizedBox(height: 30),
+              NutriLabel(
                 'Olá! Vamos\nconhecer-te',
                 variant: NutriLabelVariant.display,
               ),
               const SizedBox(height: 10),
-              const NutriLabel(
+              NutriLabel(
                 'Precisamos de alguns dados para personalizar a tua experiência.',
                 variant: NutriLabelVariant.small,
               ),
@@ -124,9 +128,27 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(child: _dateField()),
+                  Expanded(child: _dateField(colorScheme)),
                   const SizedBox(width: 15),
-                  Expanded(child: _genderField()),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        NutriLabel(
+                          'GÉNERO',
+                          variant: NutriLabelVariant.small,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        const SizedBox(height: 8),
+                        NutriChipSelector<Gender>(
+                          items: Gender.values,
+                          selected: gender,
+                          onChanged: (g) => setState(() => gender = g),
+                          label: (g) => g.label,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -161,21 +183,21 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
     );
   }
 
-  Widget _dateField() {
+  /// Campo de data de nascimento estilizado.
+  ///
+  /// Exibe a data selecionada ou o texto "Selecionar" caso ainda não tenha
+  /// sido escolhida. Ao ser tocado, abre o seletor de data nativo.
+  Widget _dateField(ColorScheme colorScheme) {
     return InkWell(
       onTap: _pickDate,
-      child: Container(
+      child: NutriCard(
+        variant: NutriCardVariant.surfaceDark,
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-        decoration: BoxDecoration(
-          // TODO: replace with NutriCard widget
-          color: AppColors.surfaceDark,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
-        ),
+        borderRadius: BorderRadius.circular(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const NutriLabel(
+            NutriLabel(
               'DATA DE NASCIMENTO',
               variant: NutriLabelVariant.small,
               fontWeight: FontWeight.bold,
@@ -186,51 +208,10 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                   ? 'Selecionar'
                   : '${dateOfBirth!.day}/${dateOfBirth!.month}/${dateOfBirth!.year}',
               variant: NutriLabelVariant.body,
-              color: dateOfBirth == null ? AppColors.border : null,
+              color: dateOfBirth == null ? colorScheme.outline : null,
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _genderField() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-      decoration: BoxDecoration(
-        // TODO: replace with NutriCard widget
-        color: AppColors.surfaceDark,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const NutriLabel(
-            'GÉNERO',
-            variant: NutriLabelVariant.small,
-            fontWeight: FontWeight.bold,
-          ),
-          DropdownButton<Gender>(
-            value: gender,
-            isExpanded: true,
-            underline: const SizedBox.shrink(),
-            dropdownColor: AppColors.surfaceDark,
-            style: const TextStyle(color: AppColors.onBackground, fontSize: 16),
-            onChanged: (g) => setState(() => gender = g ?? Gender.other),
-            items: const [
-              DropdownMenuItem(
-                value: Gender.female,
-                child: NutriLabel('Feminino'),
-              ),
-              DropdownMenuItem(
-                value: Gender.male,
-                child: NutriLabel('Masculino'),
-              ),
-              DropdownMenuItem(value: Gender.other, child: NutriLabel('Outro')),
-            ],
-          ),
-        ],
       ),
     );
   }

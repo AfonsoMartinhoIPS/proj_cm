@@ -2,15 +2,22 @@ import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 
+/// Contrato para operações de persistência dos registos diários de nutrição.
+///
+/// Define os métodos que qualquer implementação de repositório de registos
+/// de nutrição deve fornecer: obter um dia específico, adicionar/remover
+/// entradas, atualizar uma entrada, apagar um dia e registar o consumo de água.
 abstract class NutritionLogRepository {
+  /// Devolve o [NutritionLog] correspondente ao dia [date] para o utilizador
+  /// [uid], ou `null` se o documento não existir.
   Future<NutritionLog?> getLog(String uid, String date);
 
-  /// Append [entry] to the day's log at `nutrition_logs/{date}`.
+  /// Adiciona uma [entry] ao registo do dia [date].
   ///
-  /// If the log doc does not exist yet for that date it is created on the
-  /// fly via `set(..., merge: true)`. [goalsSnapshot] should be the user's
-  /// goals as of "today" - it gets frozen onto the doc so future goal edits
-  /// do not retroactively change historical days.
+  /// Se o documento do dia ainda não existir, este é criado automaticamente.
+  /// O parâmetro [goalsSnapshot] deve conter as metas nutricionais atuais do
+  /// utilizador; estas são congeladas no documento para que alterações futuras
+  /// às metas não afetem retroativamente dias históricos.
   Future<void> addEntry(
     String uid,
     String date,
@@ -18,17 +25,22 @@ abstract class NutritionLogRepository {
     NutritionGoals? goalsSnapshot,
   });
 
+  /// Remove a entrada identificada por [entryId] do registo do dia [date].
   Future<void> removeEntry(String uid, String date, String entryId);
 
-  /// Replace an existing entry (matched by [MealEntry.id]) with [entry].
-  /// No-op when the doc or the id is missing.
+  /// Substitui uma entrada existente (identificada pelo [MealEntry.id]) pela
+  /// nova [entry].
+  ///
+  /// Se o documento ou o identificador não existirem, a operação é ignorada.
   Future<void> updateEntry(String uid, String date, MealEntry entry);
 
-  /// Delete the whole `nutrition_logs/{date}` doc for [uid].
+  /// Apaga completamente o documento do dia [date] para o utilizador [uid].
   Future<void> deleteLog(String uid, String date);
 
-  /// Set the daily water total. Creates the doc with [goalsSnapshot] frozen in
-  /// when missing, same as [addEntry].
+  /// Define o total diário de água para o dia [date].
+  ///
+  /// Tal como [addEntry], cria o documento com as metas congeladas
+  /// ([goalsSnapshot]) se este ainda não existir.
   Future<void> updateWater(
     String uid,
     String date,
@@ -36,5 +48,9 @@ abstract class NutritionLogRepository {
     NutritionGoals? goalsSnapshot,
   });
 
+  /// Devolve uma lista de [NutritionLog] para as [dates] especificadas,
+  /// pertencentes ao utilizador [uid].
+  ///
+  /// Os documentos que não existirem são omitidos do resultado.
   Future<List<NutritionLog>> getLogs(String uid, List<String> dates);
 }

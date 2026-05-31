@@ -1,12 +1,15 @@
-// lib/presentation/screens/on_boarding/objectives_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
+/// Segundo passo do fluxo de onboarding — definição de objetivos.
+///
+/// Permite ao utilizador selecionar um objetivo principal relacionado com o
+/// peso (perder, manter ou ganhar) e, opcionalmente, objetivos secundários
+/// como melhorar o desempenho desportivo ou criar hábitos saudáveis.
 class ObjectivesScreen extends ConsumerStatefulWidget {
   const ObjectivesScreen({super.key});
 
@@ -14,26 +17,31 @@ class ObjectivesScreen extends ConsumerStatefulWidget {
   ConsumerState<ObjectivesScreen> createState() => _ObjectivesScreenState();
 }
 
+/// Estado do [ObjectivesScreen] que gere a seleção de objetivos e a navegação.
 class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
+  /// Objetivo principal selecionado (relacionado com o peso).
   Objective _selectedObjective = Objective.loseWeight;
 
+  /// Lista de objetivos secundários que o utilizador selecionou.
   final List<String> _selectedSecondaryObjectives = [
     'Melhorar desempenho desportivo',
   ];
 
-  // Lista com as opções disponíveis para o Toggler
+  /// Opções disponíveis para os objetivos secundários.
   final List<String> _otherObjectivesOptions = [
     'Melhorar desempenho desportivo',
     'Criar hábitos mais saudáveis',
     'Prevenir doenças relacionadas ao estilo de vida',
   ];
 
+  /// Define o objetivo principal e atualiza a interface.
   void _selectObjective(Objective objective) {
     setState(() {
       _selectedObjective = objective;
     });
   }
 
+  /// Adiciona ou remove um objetivo secundário da lista de selecionados.
   void _toggleSecondaryObjective(String option) {
     setState(() {
       if (_selectedSecondaryObjectives.contains(option)) {
@@ -44,22 +52,19 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
     });
   }
 
+  /// Guarda o objetivo principal no [onboardingProvider] e avança para o
+  /// passo seguinte (objetivos nutricionais).
   void submit() {
     ref.read(onboardingProvider.notifier).setObjective(_selectedObjective);
-    //TODO: Guardar objetivo secondario:
-    //ref.read(onboardingProvider.notifier).setSecondaryObjectives(_selectedSecondaryObjectives);
-
     context.push('/onboarding/nutrition-goals');
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const NutriTopNavBar(
-        showBackButton: true,
-        title: '2 / 4',
-      ),
+      backgroundColor: colorScheme.surface,
+      appBar: const NutriTopNavBar(showBackButton: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -67,34 +72,35 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const NutriLabel(
+              const OnboardingStepIndicator(currentStep: 2, totalSteps: 4),
+              const SizedBox(height: 30),
+              NutriLabel(
                 'Quais os teus\nobjetivos?',
                 variant: NutriLabelVariant.display,
               ),
               const SizedBox(height: 10),
-              const NutriLabel(
+              NutriLabel(
                 'Usamos estas informações para elaborar recomendações personalizadas.',
                 variant: NutriLabelVariant.small,
               ),
               const SizedBox(height: 30),
-              const NutriLabel(
+              NutriLabel(
                 'PESO',
                 variant: NutriLabelVariant.small,
                 fontWeight: FontWeight.bold,
               ),
               const SizedBox(height: 10),
-              _buildWeightSelector(),
+              _buildWeightSelector(colorScheme),
               const SizedBox(height: 30),
-              const NutriLabel(
+              NutriLabel(
                 'OUTROS',
                 variant: NutriLabelVariant.small,
                 fontWeight: FontWeight.bold,
               ),
               const SizedBox(height: 15),
               ..._otherObjectivesOptions.map((option) {
-                final isSelected = _selectedSecondaryObjectives.contains(
-                  option,
-                );
+                final isSelected =
+                    _selectedSecondaryObjectives.contains(option);
                 return NutriToggler(
                   title: option,
                   isSelected: isSelected,
@@ -111,13 +117,16 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
     );
   }
 
-  Widget _buildWeightSelector() {
-    return Container(
-      decoration: BoxDecoration(
-        // TODO: replace with NutriCard widget
-        color: AppColors.surfaceDark,
-        borderRadius: BorderRadius.circular(12),
-      ),
+  /// Constrói o seletor visual do objetivo de peso.
+  ///
+  /// Exibe as opções [Objective.loseWeight], [Objective.maintainWeight] e
+  /// [Objective.gainWeight] lado a lado dentro de um [NutriCard], destacando
+  /// a opção atualmente selecionada com a cor primária do tema.
+  Widget _buildWeightSelector(ColorScheme colorScheme) {
+    return NutriCard(
+      variant: NutriCardVariant.surfaceDark,
+      padding: EdgeInsets.zero,
+      borderRadius: BorderRadius.circular(12),
       child: Row(
         children: Objective.values.map((option) {
           final selected = _selectedObjective == option;
@@ -127,7 +136,7 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: selected ? AppColors.primary : Colors.transparent,
+                  color: selected ? colorScheme.primary : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: NutriLabel(
@@ -136,8 +145,8 @@ class _ObjectivesScreenState extends ConsumerState<ObjectivesScreen> {
                   textAlign: TextAlign.center,
                   fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                   color: selected
-                      ? AppColors.onBackground
-                      : AppColors.textMuted,
+                      ? colorScheme.onPrimary
+                      : colorScheme.onSurfaceVariant,
                 ),
               ),
             ),

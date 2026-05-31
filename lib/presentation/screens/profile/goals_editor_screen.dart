@@ -4,14 +4,14 @@ import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
-/// Editable nutrition goals - reuses the same form layout as the onboarding
-/// step but writes via `authProvider.updateGoals` (mutates the Firestore user
-/// doc directly, not the per-day log snapshots).
+/// Ecrã de edição dos objetivos nutricionais diários.
 ///
-/// Existing log snapshots stay frozen with the old goals - that's intentional
-/// (historical days reflect what was true at the time).
+/// Permite ajustar calorias, proteínas, hidratos, gordura e água.
+/// A gravação é feita diretamente no documento do utilizador através
+/// do [authProvider]. Os valores atuais são pré‑preenchidos a partir
+/// dos dados do utilizador autenticado.
 class GoalsEditorScreen extends ConsumerStatefulWidget {
   const GoalsEditorScreen({super.key});
 
@@ -19,6 +19,7 @@ class GoalsEditorScreen extends ConsumerStatefulWidget {
   ConsumerState<GoalsEditorScreen> createState() => _GoalsEditorScreenState();
 }
 
+/// Estado do [GoalsEditorScreen] que gere os controladores de texto e a submissão.
 class _GoalsEditorScreenState extends ConsumerState<GoalsEditorScreen> {
   late final TextEditingController _caloriesController;
   late final TextEditingController _proteinController;
@@ -58,6 +59,11 @@ class _GoalsEditorScreenState extends ConsumerState<GoalsEditorScreen> {
     super.dispose();
   }
 
+  /// Lê os valores dos campos e envia a atualização para o utilizador autenticado.
+  ///
+  /// Se as calorias forem inválidas (≤ 0), exibe uma mensagem de erro.
+  /// Caso contrário, inicia o estado de carregamento, chama o provider e,
+  /// após sucesso, fecha o ecrã.
   Future<void> _submit() async {
     final calories = double.tryParse(_caloriesController.text.trim()) ?? 0;
     final protein = double.tryParse(_proteinController.text.trim()) ?? 0;
@@ -88,8 +94,10 @@ class _GoalsEditorScreenState extends ConsumerState<GoalsEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: const NutriTopNavBar(
         showBackButton: true,
         title: 'Editar objetivos',
@@ -98,10 +106,10 @@ class _GoalsEditorScreenState extends ConsumerState<GoalsEditorScreen> {
         child: ListView(
           padding: const EdgeInsets.all(AppSizes.lg),
           children: [
-            const NutriLabel(
+            NutriLabel(
               'Ajusta os teus objetivos diários. As entradas históricas não vão ser alteradas.',
               variant: NutriLabelVariant.small,
-              color: AppColors.textMuted,
+              color: colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: AppSizes.lg),
             NutriCard(

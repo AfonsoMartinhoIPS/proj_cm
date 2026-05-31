@@ -4,9 +4,16 @@ import 'package:nutri_scan/data/models/app_user_model.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/domain/repositories/user_repository.dart';
 
+/// Implementação do [UserRepository] que utiliza o Firestore como backend.
+///
+/// Fornece métodos para obter, guardar e atualizar as metas nutricionais
+/// de um utilizador, interagindo diretamente com a coleção `users` do Firestore.
 class UserRepositoryImpl implements UserRepository {
   final _db = FirebaseFirestore.instance;
 
+  /// Obtém o [AppUser] correspondente ao [uid] a partir do Firestore.
+  ///
+  /// Devolve `null` se o documento não existir.
   @override
   Future<AppUser?> getUser(String uid) async {
     logger.d('Fetching user from Firestore: $uid');
@@ -19,6 +26,10 @@ class UserRepositoryImpl implements UserRepository {
     return AppUserModel.fromDoc(doc);
   }
 
+  /// Guarda um [AppUser] no Firestore.
+  ///
+  /// Utiliza `merge: true` para preservar campos existentes que não estejam
+  /// presentes no objeto fornecido.
   @override
   Future<void> saveUser(AppUser user) async {
     logger.d('Saving user to Firestore: ${user.uid} (${user.email})');
@@ -28,6 +39,10 @@ class UserRepositoryImpl implements UserRepository {
     logger.d('User saved successfully: ${user.uid}');
   }
 
+  /// Atualiza as metas nutricionais do utilizador identificado por [uid].
+  ///
+  /// Escreve diretamente os campos `calories`, `protein`, `carbs`, `fat`
+  /// e `water` dentro do mapa `nutritionGoals` no documento do utilizador.
   @override
   Future<void> updateGoals(String uid, NutritionGoals goals) async {
     logger.d('Updating goals for user: $uid');

@@ -1,32 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
-/// Section shown on `AddMealScreen` once a [Product] has been picked.
+/// Secção exibida no [AddMealScreen] após a seleção de um produto.
 ///
-/// Displays a compact product card (image + name + brand) with a "Mudar"
-/// shortcut to swap the selection, an editable serving-grams field, and the
-/// full [NutriProductNutritionTable] below.
-///
-/// All meal-form state lives on the parent screen - this widget is purely
-/// presentational and reports user input via [servingsController] / [onChange].
+/// Mostra um cartão com a imagem e o nome do produto, um campo para a
+/// quantidade em gramas e a tabela nutricional completa.
+/// Se [showChange] for `true`, apresenta um botão "Mudar" que permite
+/// trocar o produto selecionado, voltando ao [ProductPicker].
 class AddMealProductSelected extends StatelessWidget {
-  /// Product the user picked. Guaranteed non-null at this point in the flow.
+  /// O produto que o utilizador selecionou.
   final Product product;
 
-  /// Controller bound to the serving size (in grams). Owned by the parent.
+  /// Controlador ligado ao campo de quantidade (em gramas).
   final TextEditingController servingsController;
 
-  /// Fired when the user taps "Mudar" to swap to a different product.
-  /// Parent should clear its `selectedProduct` so the picker renders again.
-  /// Ignored when [showChange] is false.
+  /// Callback invocado quando o utilizador toca no botão "Mudar".
+  ///
+  /// Normalmente limpa a seleção atual para que o [ProductPicker] volte
+  /// a ser exibido. Ignorado se [showChange] for `false`.
   final VoidCallback onChange;
 
-  /// Whether the "Mudar" shortcut is rendered. Off in edit mode where the
-  /// product is locked to the entry being edited.
+  /// Se `true`, o botão "Mudar" é apresentado no topo da secção.
+  ///
+  /// Deve ser `false` em modo de edição, onde o produto está bloqueado.
+  ///
+  /// O valor padrão é `true`.
   final bool showChange;
 
+  /// Cria um [AddMealProductSelected].
+  ///
+  /// Os parâmetros [product], [servingsController] e [onChange] são
+  /// obrigatórios.
   const AddMealProductSelected({
     super.key,
     required this.product,
@@ -37,18 +42,19 @@ class AddMealProductSelected extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const NutriLabel(
+            NutriLabel(
               'PRODUTO',
               variant: NutriLabelVariant.small,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
-              color: AppColors.textMuted,
+              color: colorScheme.onSurfaceVariant,
             ),
             if (showChange)
               NutriButton.text(label: 'Mudar', onPressed: onChange),

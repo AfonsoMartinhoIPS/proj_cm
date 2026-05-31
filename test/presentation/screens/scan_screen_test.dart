@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nutri_scan/core/constants/app_colors.dart';
 
 void main() {
   group('ScanScreen Widget Tests', () {
@@ -113,7 +112,6 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              backgroundColor: AppColors.background,
               body: const Text('Content'),
             ),
           ),

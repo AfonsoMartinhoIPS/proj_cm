@@ -2,37 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/screens/scanner/widgets/barcode_camera.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
-/// Barcode scanner screen with two usage modes:
+/// Ecrã de scanner de código de barras com dois modos de funcionamento.
 ///
-/// 1. **Tab mode** (default, `returnBarcode: false`) - opened from the bottom
-///    nav. On scan or manual entry, pushes `/products/$barcode` so the user
-///    lands on the product detail screen.
+/// 1. **Modo separador** (padrão, `returnBarcode: false`) — aberto a partir da
+///    navegação inferior. Ao detetar ou inserir um código, navega para
+///    `/products/$barcode`.
 ///
-/// 2. **Pick mode** (`returnBarcode: true`) - opened from flows that need a
-///    barcode result (e.g. AddMealScreen's product picker). On scan or manual
-///    entry, pops the route with the barcode string as the result, so the
-///    caller can `await context.push<String>(...)` and use the returned value.
+/// 2. **Modo de seleção** (`returnBarcode: true`) — usado por fluxos que
+///    precisam de um código de barras como resultado (ex.: `ProductPicker`).
+///    Ao detetar ou inserir um código, fecha a rota devolvendo o código como
+///    resultado (`context.pop(barcode)`).
 ///
-/// The split exists because `/scan` (tab) lives inside the `ShellRoute` -
-/// pushing it from a screen outside the shell would mount a second `MainShell`
-/// and trigger duplicate Hero key reservations. The pick variant is registered
-/// at top level so it can be pushed safely from anywhere.
-///
-/// This screen is intentionally stateless. Both input sources ([BarcodeCamera]
-/// and [_ManualBarcodeSheet]) own their own state and report up via a
-/// `ValueChanged<String>` callback. The screen's only job is deciding what to
-/// do with the resulting barcode (pop vs push).
+/// Ambos os modos partilham a mesma interface: a câmara ao vivo do
+/// [BarcodeCamera] e o botão para entrada manual.
 class ScanScreen extends StatelessWidget {
-  /// When `true`, scanner ends by popping the route with the barcode string.
-  /// When `false`, scanner ends by pushing the product details route.
+  /// Quando `true`, o scanner termina devolvendo o código de barras.
+  ///
+  /// Quando `false` (padrão), o scanner navega para os detalhes do produto.
   final bool returnBarcode;
 
+  /// Cria um [ScanScreen].
+  ///
+  /// O parâmetro [returnBarcode] controla o comportamento após a leitura.
   const ScanScreen({super.key, this.returnBarcode = false});
 
+  /// Trata o código de barras recebido, seja da câmara ou da folha manual.
+  ///
+  /// No modo de seleção, fecha o ecrã com o código; caso contrário, navega
+  /// para a página de detalhes do produto.
   void _handleBarcode(BuildContext context, String barcode) {
-    logger.d('ScanScreen: handle barcode=$barcode (returnBarcode=$returnBarcode)');
+    logger.d(
+      'ScanScreen: handle barcode=$barcode (returnBarcode=$returnBarcode)',
+    );
     if (returnBarcode) {
       context.pop(barcode);
     } else {
@@ -40,17 +43,15 @@ class ScanScreen extends StatelessWidget {
     }
   }
 
+  /// Abre a folha inferior para inserção manual de um código de barras.
   void _openManualEntry(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => _ManualBarcodeSheet(
-        // Sheet pops itself, then we resolve via the same handler the camera
-        // path uses. Single source of truth for "what happens with a barcode".
         onBarcode: (code) => _handleBarcode(context, code),
       ),
     );
@@ -58,8 +59,9 @@ class ScanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: NutriTopNavBar(
         showBackButton: returnBarcode,
         title: 'Scan Barcode',
@@ -73,23 +75,20 @@ class ScanScreen extends StatelessWidget {
                 onBarcode: (code) => _handleBarcode(context, code),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
               child: NutriLabel(
                 'Aponta a câmara para o código de barras do produto',
                 textAlign: TextAlign.center,
-                color: AppColors.textMuted,
+                color: colorScheme.onSurfaceVariant,
                 variant: NutriLabelVariant.body,
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(24),
-              child: OutlinedButton(
+              child: NutriButton.transparent(
+                label: 'Inserir código manualmente',
                 onPressed: () => _openManualEntry(context),
-                child: const NutriLabel(
-                  'Inserir código manualmente',
-                  variant: NutriLabelVariant.body,
-                ),
               ),
             ),
             const Spacer(),
@@ -100,18 +99,24 @@ class ScanScreen extends StatelessWidget {
   }
 }
 
-/// Bottom sheet for entering a barcode by hand. Owns its [TextEditingController]
-/// for the field lifecycle and nothing else - routing decisions live on the
-/// parent screen via [onBarcode].
+/// Folha inferior para inserção manual de um código de barras.
+///
+/// Contém um campo de texto para o código e um botão para submeter a pesquisa.
+/// A decisão de navegação é delegada ao ecrã principal através de [onBarcode].
 class _ManualBarcodeSheet extends StatefulWidget {
+  /// Callback invocado quando o utilizador submete um código de barras válido.
   final ValueChanged<String> onBarcode;
 
+  /// Cria uma [_ManualBarcodeSheet].
+  ///
+  /// O parâmetro [onBarcode] é obrigatório.
   const _ManualBarcodeSheet({required this.onBarcode});
 
   @override
   State<_ManualBarcodeSheet> createState() => _ManualBarcodeSheetState();
 }
 
+/// Estado da [_ManualBarcodeSheet] que gere o campo de texto e a submissão.
 class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
   final TextEditingController _barcodeController = TextEditingController();
 
@@ -121,6 +126,10 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
     super.dispose();
   }
 
+  /// Valida e submete o código de barras introduzido.
+  ///
+  /// Se o campo estiver vazio, exibe uma mensagem de erro.
+  /// Caso contrário, fecha a folha e invoca [onBarcode].
   void _submit() {
     final barcode = _barcodeController.text.trim();
     if (barcode.isEmpty) {
@@ -133,17 +142,18 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // Bottom padding picks up keyboard inset so the field stays visible.
+    final colorScheme = Theme.of(context).colorScheme;
     final viewInsets = MediaQuery.of(context).viewInsets.bottom;
+
     return Padding(
       padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + viewInsets),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const NutriLabel(
+          NutriLabel(
             'Inserir código de barras',
-            color: AppColors.onBackground,
+            color: colorScheme.onSurface,
             variant: NutriLabelVariant.body,
             fontWeight: FontWeight.bold,
           ),
@@ -159,14 +169,7 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
             onSubmitted: (_) => _submit(),
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _submit,
-            child: const NutriLabel(
-              'Procurar produto',
-              variant: NutriLabelVariant.body,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          NutriButton(label: 'Procurar produto', onPressed: _submit),
         ],
       ),
     );

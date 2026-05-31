@@ -1,42 +1,77 @@
+/// Tipos de refeição suportados pela aplicação.
+///
+/// Cada valor tem um rótulo em português associado, utilizado na interface.
 enum MealType {
+  /// Pequeno-almoço.
   breakfast(label: 'Pequeno-almoço'),
+
+  /// Almoço.
   lunch(label: 'Almoço'),
+
+  /// Jantar.
   dinner(label: 'Jantar'),
+
+  /// Snack / lanche.
   snack(label: 'Snack');
 
+  /// Rótulo em português do tipo de refeição.
   final String label;
+
+  /// Cria um [MealType] com o [label] especificado.
   const MealType({required this.label});
 }
 
-/// A single logged meal item inside a daily [NutritionLog].
+/// Uma entrada individual de refeição registada num [NutritionLog] diário.
 ///
-/// Nutrient totals are stored **already scaled to the consumed serving** -
-/// i.e. `calories` is the total kcal for `servingGrams` grams of this product,
-/// not the per-100g rate. This means reading the doc never requires the
-/// caller to do any math: just display the value.
+/// Os totais nutricionais (calorias, proteínas, hidratos, gordura) são
+/// armazenados **já escalados para a porção consumida** — ou seja,
+/// [calories] representa as kcal totais para [servingGrams] gramas do
+/// produto, e não o valor por 100 g. Isto permite que a leitura do documento
+/// nunca exija cálculos por parte de quem o consulta.
 ///
-/// The scaling is performed once at log time (in `AddMealScreen._submit`)
-/// from the product's per-100g [Nutriments]. Stored values are frozen - they
-/// won't change if the global product is updated later.
+/// O escalonamento é feito uma única vez no momento do registo (em
+/// `AddMealScreen._submit`) a partir dos [Nutriments] por 100 g do produto.
+/// Os valores armazenados são congelados — não serão alterados se o produto
+/// global for atualizado posteriormente.
 class MealEntry {
+  /// Identificador único da entrada (geralmente um timestamp em milissegundos).
   final String id;
+
+  /// Código de barras do produto consumido.
   final String productBarcode;
+
+  /// Nome do produto (snapshot no momento do registo).
   final String productName;
+
+  /// URL da imagem do produto (snapshot), se disponível.
   final String? productImageUrl;
+
+  /// Tipo de refeição a que esta entrada pertence.
   final MealType mealType;
 
-  /// Grams of the product consumed in this entry.
+  /// Quantidade consumida do produto, em gramas.
   final double servingGrams;
 
-  // Scaled-for-serving nutrient totals. All values are in their natural units
-  // (kcal for calories, grams for macros).
+  /// Total de calorias para a porção consumida (kcal).
   final double calories;
+
+  /// Total de proteínas para a porção consumida (g).
   final double protein;
+
+  /// Total de hidratos de carbono para a porção consumida (g).
   final double carbs;
+
+  /// Total de lípidos para a porção consumida (g).
   final double fat;
 
+  /// Data e hora em que a entrada foi registada.
   final DateTime loggedAt;
 
+  /// Cria uma [MealEntry].
+  ///
+  /// Os parâmetros [id], [productBarcode], [productName], [mealType],
+  /// [servingGrams], [calories], [protein], [carbs], [fat] e [loggedAt]
+  /// são obrigatórios.
   const MealEntry({
     required this.id,
     required this.productBarcode,
@@ -51,10 +86,15 @@ class MealEntry {
     required this.loggedAt,
   });
 
-  // Convenience aliases so existing call sites (`entry.totalCalories`) keep
-  // working. They just return the stored value - no math.
+  /// Alias de conveniência para [calories].
   double get totalCalories => calories;
+
+  /// Alias de conveniência para [protein].
   double get totalProtein => protein;
+
+  /// Alias de conveniência para [carbs].
   double get totalCarbs => carbs;
+
+  /// Alias de conveniência para [fat].
   double get totalFat => fat;
 }

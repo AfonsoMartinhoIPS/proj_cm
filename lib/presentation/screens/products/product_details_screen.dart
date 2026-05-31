@@ -1,30 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/data/repositories/product_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
 import 'package:nutri_scan/domain/entities/saved_product.dart';
 import 'package:nutri_scan/presentation/providers/saved_products_provider.dart';
 
-/// Fetches the full Product from `products/{barcode}` (or API fallback via repo).
-/// `.family` lets each barcode have its own cached entry.
+/// Provider que carrega um [Product] a partir de um código de barras.
+///
+/// Utiliza o [ProductRepositoryImpl] para obter o produto, seja da cache
+/// local (Firestore) ou da API externa (Open Food Facts). Como é um
+/// [FutureProvider.family], cada código de barras tem a sua própria
+/// entrada em cache.
 final productByBarcodeProvider = FutureProvider.family<Product?, String>(
   (ref, barcode) => ProductRepositoryImpl().getByBarcode(barcode),
 );
 
+/// Ecrã de detalhes de um produto.
+///
+/// Mostra a imagem do produto, a tabela nutricional e botões de ação
+/// (guardar/remover e adicionar a uma refeição). Se o produto já estiver
+/// guardado, exibe também a secção de notas associadas.
 class ProductDetailsScreen extends ConsumerWidget {
-  const ProductDetailsScreen({super.key, required this.barcode});
-
+  /// O código de barras do produto a exibir.
   final String barcode;
+
+  /// Cria um [ProductDetailsScreen].
+  ///
+  /// O parâmetro [barcode] é obrigatório.
+  const ProductDetailsScreen({super.key, required this.barcode});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final asyncProduct = ref.watch(productByBarcodeProvider(barcode));
 
-    // Watch the saved list and pick the one matching this barcode (null if not saved yet).
-    // When user taps "Guardar" → provider list changes → rebuild → savedProduct goes from null → SavedProduct.
     final SavedProduct? savedProduct = ref
         .watch(savedProductsProvider)
         .value
@@ -32,22 +43,26 @@ class ProductDetailsScreen extends ConsumerWidget {
         .firstWhere((s) => s!.barcode == barcode, orElse: () => null);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: NutriTopNavBar(showBackButton: true, title: 'Detalhes do Produto'),
+      backgroundColor: colorScheme.surface,
+      appBar: NutriTopNavBar(
+        showBackButton: true,
+        title: 'Detalhes do Produto',
+      ),
       body: asyncProduct.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: NutriLabel( 
+          child: NutriLabel(
             'Erro: $e',
-            color: AppColors.textMuted
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
         data: (product) {
           if (product == null) {
-            return const Center(
-              child: NutriLabel( 
+            return Center(
+              child: NutriLabel(
                 'Produto não encontrado.',
-                color: AppColors.textMuted), 
+                color: colorScheme.onSurfaceVariant,
+              ),
             );
           }
           return SingleChildScrollView(
@@ -55,7 +70,10 @@ class ProductDetailsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _ProductHeader(product: product),
+                NutriProductThumbnail(
+                  url: product.imageUrl ?? product.imageThumbnailUrl,
+                  size: 90,
+                ),
                 const SizedBox(height: 24),
                 NutriProductNutritionTable(product: product),
                 const SizedBox(height: 24),
@@ -74,14 +92,26 @@ class ProductDetailsScreen extends ConsumerWidget {
   }
 }
 
+/// Botões de ação do ecrã de detalhes do produto.
+///
+/// Apresenta dois botões lado a lado:
+/// - Guardar / Remover o produto dos favoritos.
+/// - Adicionar o produto a uma refeição.
 class _ActionButtons extends ConsumerWidget {
-  const _ActionButtons({required this.product, required this.isSaved});
-
+  /// O produto em exibição.
   final Product product;
+
+  /// Indica se o produto já está guardado nos favoritos.
   final bool isSaved;
+
+  /// Cria os [_ActionButtons].
+  ///
+  /// Os parâmetros [product] e [isSaved] são obrigatórios.
+  const _ActionButtons({required this.product, required this.isSaved});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Expanded(
@@ -89,7 +119,7 @@ class _ActionButtons extends ConsumerWidget {
             label: isSaved ? 'Remover' : 'Guardar',
             icon: Icon(
               isSaved ? Icons.bookmark : Icons.bookmark_outline,
-              color: AppColors.secondary,
+              color: colorScheme.secondary,
               size: 18,
             ),
             onPressed: () {
@@ -108,9 +138,9 @@ class _ActionButtons extends ConsumerWidget {
         Expanded(
           child: NutriButton(
             label: 'Add refeição',
-            icon: const Icon(
+            icon: Icon(
               Icons.restaurant,
-              color: AppColors.onBackground,
+              color: colorScheme.onSurface,
               size: 18,
             ),
             onPressed: () => context.push('/meals/add', extra: product),
@@ -121,16 +151,24 @@ class _ActionButtons extends ConsumerWidget {
   }
 }
 
+/// Secção de notas de um produto guardado.
+///
+/// Exibe a lista de notas existentes (com data) e permite adicionar novas
+/// notas ou remover notas antigas.
 class _NotesSection extends ConsumerWidget {
-  const _NotesSection({required this.savedProduct});
-
+  /// O produto guardado cujas notas serão geridas.
   final SavedProduct savedProduct;
 
+  /// Cria uma [_NotesSection].
+  ///
+  /// O parâmetro [savedProduct] é obrigatório.
+  const _NotesSection({required this.savedProduct});
+
+  /// Abre a folha inferior para adicionar uma nova nota.
   void _openAddSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -138,7 +176,7 @@ class _NotesSection extends ConsumerWidget {
         onSubmit: (text) {
           final updated = [
             ...savedProduct.notes,
-            SavedProductNote(text: text, createdAt: DateTime.now()), 
+            SavedProductNote(text: text, createdAt: DateTime.now()),
           ];
           ref
               .read(savedProductsProvider.notifier)
@@ -148,6 +186,7 @@ class _NotesSection extends ConsumerWidget {
     );
   }
 
+  /// Remove a nota na posição [index] da lista de notas do produto.
   void _removeNote(WidgetRef ref, int index) {
     final updated = [...savedProduct.notes]..removeAt(index);
     ref
@@ -157,39 +196,37 @@ class _NotesSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
+    final colorScheme = Theme.of(context).colorScheme;
+    return NutriCard(
+      variant: NutriCardVariant.surfaceDark,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        // TODO: replace with NutriCard widget
-        color: AppColors.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
+      borderRadius: BorderRadius.circular(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const NutriLabel(
+              NutriLabel(
                 'NOTAS',
-                color: AppColors.textMuted,
+                color: colorScheme.onSurfaceVariant,
                 variant: NutriLabelVariant.small,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.bold,
               ),
               NutriLabel(
                 'Guardado em ${_fmt(savedProduct.savedAt)}',
-                color: AppColors.textMuted,
+                color: colorScheme.onSurfaceVariant,
                 variant: NutriLabelVariant.small,
               ),
             ],
           ),
           const SizedBox(height: 12),
           if (savedProduct.notes.isEmpty)
-            const NutriLabel(
+            NutriLabel(
               'Ainda não adicionaste notas a este produto.',
-              color: AppColors.textMuted, variant: NutriLabelVariant.body,
+              color: colorScheme.onSurfaceVariant,
+              variant: NutriLabelVariant.body,
             )
           else
             ...List.generate(savedProduct.notes.length, (i) {
@@ -203,24 +240,24 @@ class _NotesSection extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          NutriLabel( 
+                          NutriLabel(
                             note.text,
-                              color: AppColors.onBackground,
-                              variant: NutriLabelVariant.body,
+                            color: colorScheme.onSurface,
+                            variant: NutriLabelVariant.body,
                           ),
                           const SizedBox(height: 2),
-                            NutriLabel( 
+                          NutriLabel(
                             _fmt(note.createdAt),
-                              color: AppColors.textMuted,
-                              variant: NutriLabelVariant.small,
-                            ),
+                            color: colorScheme.onSurfaceVariant,
+                            variant: NutriLabelVariant.small,
+                          ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.delete_outline,
-                        color: AppColors.textMuted,
+                        color: colorScheme.onSurfaceVariant,
                         size: 18,
                       ),
                       onPressed: () => _removeNote(ref, i),
@@ -231,10 +268,10 @@ class _NotesSection extends ConsumerWidget {
               );
             }),
           const SizedBox(height: 8),
-          NutriButton.text( 
+          NutriButton.text(
             label: 'Adicionar nota',
             fontSize: 13,
-            icon: const Icon(Icons.add, color: AppColors.secondary, size: 16),
+            icon: Icon(Icons.add, color: colorScheme.secondary, size: 16),
             onPressed: () => _openAddSheet(context, ref),
           ),
         ],
@@ -242,20 +279,28 @@ class _NotesSection extends ConsumerWidget {
     );
   }
 
+  /// Formata uma data no formato DD/MM/AAAA.
   String _fmt(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 }
 
-/// Bottom sheet for composing a new note. Owns its TextEditingController.
+/// Folha inferior para adicionar uma nova nota a um produto guardado.
+///
+/// Contém um campo de texto multilinha e um botão para guardar a nota.
 class _AddNoteSheet extends StatefulWidget {
-  const _AddNoteSheet({required this.onSubmit});
-
+  /// Callback invocado quando o utilizador submete uma nota válida.
   final void Function(String text) onSubmit;
+
+  /// Cria uma [_AddNoteSheet].
+  ///
+  /// O parâmetro [onSubmit] é obrigatório.
+  const _AddNoteSheet({required this.onSubmit});
 
   @override
   State<_AddNoteSheet> createState() => _AddNoteSheetState();
 }
 
+/// Estado da [_AddNoteSheet] que gere o campo de texto e a submissão.
 class _AddNoteSheetState extends State<_AddNoteSheet> {
   final TextEditingController _controller = TextEditingController();
 
@@ -265,6 +310,10 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
     super.dispose();
   }
 
+  /// Valida e submete a nota introduzida.
+  ///
+  /// Se o campo estiver vazio, exibe uma mensagem de erro.
+  /// Caso contrário, fecha a folha e invoca [onSubmit].
   void _submit() {
     final text = _controller.text.trim();
     if (text.isEmpty) {
@@ -277,6 +326,7 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final viewInsets = MediaQuery.of(context).viewInsets.bottom;
     return Padding(
       padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + viewInsets),
@@ -284,11 +334,11 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const NutriLabel( 
+          NutriLabel(
             'Nova nota',
-              color: AppColors.onBackground,
-              variant: NutriLabelVariant.bodyLarge,
-              fontWeight: FontWeight.bold,
+            color: colorScheme.onSurface,
+            variant: NutriLabelVariant.bodyLarge,
+            fontWeight: FontWeight.bold,
           ),
           const SizedBox(height: 12),
           NutriTextField(
@@ -304,84 +354,6 @@ class _AddNoteSheetState extends State<_AddNoteSheet> {
           NutriButton(label: 'Guardar Nota', onPressed: _submit),
         ],
       ),
-    );
-  }
-}
-
-class _ProductHeader extends StatelessWidget {
-  const _ProductHeader({required this.product});
-
-  final Product product;
-
-  @override
-  Widget build(BuildContext context) {
-    final url = product.imageUrl ?? product.imageThumbnailUrl;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 90,
-          height: 90,
-          decoration: BoxDecoration(
-            // TODO: replace with NutriCard widget
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
-          ),
-          clipBehavior: Clip.antiAlias,
-          alignment: Alignment.center,
-          child: (url != null && url.isNotEmpty)
-              ? Image.network(
-                  url,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => const Icon(
-                    Icons.image_not_supported,
-                    color: AppColors.textMuted,
-                  ),
-                )
-              : const Icon(
-                  Icons.fastfood,
-                  color: AppColors.textMuted,
-                  size: 32,
-                ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              NutriLabel( 
-                product.name,
-                  color: AppColors.onBackground,
-                  variant: NutriLabelVariant.bodyLarge,
-                  fontWeight: FontWeight.bold,
-              ),
-              if ((product.brand ?? '').isNotEmpty) ...[
-                const SizedBox(height: 4),
-                NutriLabel(
-                  product.brand!,
-                    color: AppColors.textMuted,
-                  variant: NutriLabelVariant.body,
-                ),
-              ],
-              if ((product.displayQuantity ?? '').isNotEmpty) ...[
-                const SizedBox(height: 4),
-                NutriLabel( 
-                  product.displayQuantity!,
-                  variant: NutriLabelVariant.small,
-                    color: AppColors.textMuted,
-                ),
-              ],
-              const SizedBox(height: 6),
-              NutriLabel( 
-                'Cód: ${product.barcode}',
-                  color: AppColors.textMuted,
-                variant: NutriLabelVariant.small,
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

@@ -1,28 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
-/// Top section of `AddMealScreen` showing the two pieces of metadata that
-/// don't depend on a specific product: which meal of the day the entry is
-/// for, and on which date it was eaten.
+/// Secção superior do [AddMealScreen] com a informação genérica da refeição.
 ///
-/// Stateless - all values live on the parent screen and are pushed in via
-/// [mealType] and [date]. User input bubbles back through [onMealTypeChanged]
-/// and [onDateChanged].
+/// Permite ao utilizador escolher o tipo de refeição (pequeno‑almoço, almoço,
+/// jantar ou snack) e a data em que foi consumida. Estes dados não dependem
+/// do produto selecionado e são guardados diretamente no estado do ecrã pai.
 class AddMealGeneralInfo extends StatelessWidget {
-  /// Currently selected meal type. Highlighted chip in the picker row.
+  /// O tipo de refeição atualmente selecionado.
   final MealType mealType;
 
-  /// Date the meal was consumed. Defaults to "today" on the parent screen.
+  /// A data em que a refeição foi (ou será) consumida.
+  ///
+  /// Por defeito, no ecrã pai, é inicializada com a data atual.
   final DateTime date;
 
-  /// Fired when the user taps a different meal type chip.
+  /// Callback invocado quando o utilizador seleciona um tipo de refeição
+  /// diferente.
   final ValueChanged<MealType> onMealTypeChanged;
 
-  /// Fired when the user picks a new date in the date picker dialog.
+  /// Callback invocado quando o utilizador escolhe uma nova data no seletor.
   final ValueChanged<DateTime> onDateChanged;
 
+  /// Cria um [AddMealGeneralInfo].
+  ///
+  /// Todos os parâmetros são obrigatórios.
   const AddMealGeneralInfo({
     super.key,
     required this.mealType,
@@ -31,8 +34,10 @@ class AddMealGeneralInfo extends StatelessWidget {
     required this.onDateChanged,
   });
 
-  /// Opens the platform date picker. Restricted to the last 365 days so
-  /// users can backfill recent meals but not log into the future.
+  /// Abre o seletor de data nativo.
+  ///
+  /// A data está limitada aos últimos 365 dias, permitindo registar refeições
+  /// passadas mas impedindo datas futuras.
   Future<void> _pickDate(BuildContext context) async {
     final picked = await showDatePicker(
       context: context,
@@ -45,15 +50,16 @@ class AddMealGeneralInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const NutriLabel(
+        NutriLabel(
           'TIPO DE REFEIÇÃO',
           variant: NutriLabelVariant.small,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
-          color: AppColors.textMuted,
+          color: colorScheme.onSurfaceVariant,
         ),
         const SizedBox(height: 8),
         NutriChipSelector(
@@ -63,12 +69,12 @@ class AddMealGeneralInfo extends StatelessWidget {
           label: (mealType) => mealType.label,
         ),
         const SizedBox(height: 20),
-        const NutriLabel(
+        NutriLabel(
           'DATA',
           variant: NutriLabelVariant.small,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
-          color: AppColors.textMuted,
+          color: colorScheme.onSurfaceVariant,
         ),
         const SizedBox(height: 8),
         NutriDateField(date: date, onTap: () => _pickDate(context)),
