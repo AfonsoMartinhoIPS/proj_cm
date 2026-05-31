@@ -1,29 +1,55 @@
+/// Uma nota de texto associada a um produto guardado.
+///
+/// Cada nota contém o texto introduzido pelo utilizador e a data e hora em
+/// que foi criada.
 class SavedProductNote {
+  /// O conteúdo textual da nota.
   final String text;
+
+  /// O momento exato em que a nota foi criada.
   final DateTime createdAt;
 
+  /// Cria uma [SavedProductNote].
+  ///
+  /// Ambos os parâmetros são obrigatórios.
   const SavedProductNote({
     required this.text,
     required this.createdAt,
   });
 }
 
-/// Snapshot of a product the user has saved.
-/// Full product data lives in `products/{barcode}` - this only holds enough
-/// to render the saved list without a second read per item.
+/// Snapshot de um produto que o utilizador guardou.
+///
+/// Os dados completos do produto residem em `products/{barcode}` — esta
+/// classe mantém apenas a informação necessária para renderizar a lista de
+/// favoritos sem necessidade de uma segunda leitura por cada item.
 class SavedProduct {
+  /// Código de barras do produto.
   final String barcode;
+
+  /// Data e hora em que o produto foi guardado.
   final DateTime savedAt;
 
-  // snapshot for list rendering
+  /// Nome do produto (cópia do campo no documento original).
   final String name;
+
+  /// Marca do produto, se disponível.
   final String? brand;
+
+  /// URL da imagem do produto, se disponível.
   final String? imageUrl;
+
+  /// Calorias por 100 g/ml, se disponíveis.
   final double? caloriesPer100g;
 
-  // user-specific notes
+  /// Notas pessoais associadas a este produto.
+  ///
+  /// O valor padrão é uma lista vazia.
   final List<SavedProductNote> notes;
 
+  /// Cria um [SavedProduct].
+  ///
+  /// Os parâmetros [barcode], [savedAt] e [name] são obrigatórios.
   const SavedProduct({
     required this.barcode,
     required this.savedAt,
@@ -34,6 +60,11 @@ class SavedProduct {
     this.notes = const [],
   });
 
+  /// Cria uma cópia deste produto guardado, substituindo apenas os campos
+  /// fornecidos.
+  ///
+  /// Útil para atualizar os dados da snapshot quando o produto original é
+  /// alterado, ou para modificar as notas sem mutar o objeto original.
   SavedProduct copyWith({
     String? name,
     String? brand,

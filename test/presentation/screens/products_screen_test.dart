@@ -151,7 +151,6 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              backgroundColor: AppColors.background,
               body: const Text('Test'),
             ),
           ),

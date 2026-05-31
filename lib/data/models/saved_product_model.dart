@@ -2,7 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
 import 'package:nutri_scan/domain/entities/saved_product.dart';
 
+/// Modelo de dados para conversão entre documentos do Firestore e a entidade [SavedProduct].
+///
+/// Responsável por:
+/// - Converter um [DocumentSnapshot] do Firestore num [SavedProduct] (`fromDoc`).
+/// - Converter um [SavedProduct] num mapa pronto para ser escrito no Firestore (`toMap`).
+/// - Criar uma snapshot de [SavedProduct] a partir de um [Product] completo (`fromProduct`).
+/// - Analisar o campo `notes` de forma defensiva, suportando formatos legados (string única)
+///   e o formato atual (lista de mapas).
 class SavedProductModel {
+  /// Converte um [DocumentSnapshot] do Firestore num [SavedProduct].
+  ///
+  /// Devolve `null` se o documento não existir.
+  /// Os campos ausentes ou com tipos inesperados são tratados com valores padrão.
   static SavedProduct? fromDoc(DocumentSnapshot doc) {
     if (!doc.exists) return null;
     final map = doc.data() as Map<String, dynamic>;
@@ -17,6 +29,10 @@ class SavedProductModel {
     );
   }
 
+  /// Converte um [SavedProduct] num mapa adequado para escrita no Firestore.
+  ///
+  /// O campo `savedAt` é sempre preenchido com [FieldValue.serverTimestamp].
+  /// As notas são serializadas como uma lista de mapas com `text` e `createdAt`.
   static Map<String, dynamic> toMap(SavedProduct saved) {
     return {
       'savedAt': FieldValue.serverTimestamp(),
@@ -33,12 +49,14 @@ class SavedProductModel {
     };
   }
 
-  /// Defensive parse - handles three shapes:
-  ///   - null / missing → []
-  ///   - legacy: a single String           → one Note with that text
-  ///   - current: List<Map> of {text, createdAt}
-  /// Any list element that is not a Map is skipped so a corrupt doc
-  /// can't crash the screen.
+  /// Analisa o campo `notes` de forma defensiva, suportando três formatos:
+  ///
+  /// - `null` ou ausente → lista vazia.
+  /// - Formato legado: uma única `String` → uma nota com esse texto e data atual.
+  /// - Formato atual: `List<Map>` com as chaves `text` e `createdAt`.
+  ///
+  /// Qualquer elemento da lista que não seja um `Map` é ignorado para evitar
+  /// que um documento corrompido quebre o ecrã.
   static List<SavedProductNote> _parseNotes(dynamic raw) {
     if (raw == null) return const [];
     if (raw is String) {
@@ -50,14 +68,18 @@ class SavedProductModel {
         final map = Map<String, dynamic>.from(entry);
         return SavedProductNote(
           text: map['text'] as String? ?? '',
-          createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          createdAt:
+              (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         );
       }).toList();
     }
     return const [];
   }
 
-  /// Build a SavedProduct snapshot from a full Product.
+  /// Cria uma snapshot de [SavedProduct] a partir de um [Product] completo.
+  ///
+  /// Utilizado quando o utilizador guarda um produto pela primeira vez,
+  /// extraindo apenas os campos necessários para a lista de favoritos.
   static SavedProduct fromProduct(Product product) {
     return SavedProduct(
       barcode: product.barcode,

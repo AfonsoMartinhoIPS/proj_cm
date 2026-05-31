@@ -4,9 +4,13 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-/// Default [FirebaseOptions] for use with your Firebase apps.
+/// Opções padrão do Firebase geradas automaticamente pelo FlutterFire CLI.
 ///
-/// Example:
+/// Fornece as configurações necessárias para inicializar o Firebase em cada
+/// plataforma suportada (web, Android, iOS, etc.).  As plataformas não
+/// configuradas lançam [UnsupportedError] se forem utilizadas.
+///
+/// Exemplo de uso:
 /// ```dart
 /// import 'firebase_options.dart';
 /// // ...
@@ -15,6 +19,10 @@ import 'package:flutter/foundation.dart'
 /// );
 /// ```
 class DefaultFirebaseOptions {
+  /// Devolve as [FirebaseOptions] adequadas à plataforma em execução.
+  ///
+  /// Suporta web e Android. Outras plataformas (iOS, macOS, Windows, Linux)
+  /// lançam [UnsupportedError] porque ainda não foram configuradas.
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       return web;
@@ -49,6 +57,7 @@ class DefaultFirebaseOptions {
     }
   }
 
+  /// Configuração do Firebase para a plataforma web.
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyCgEK3h_71DgR8OQIXc_CLXMIhc_uZJZLs',
     appId: '1:258705131162:web:e556580ada03a086078123',
@@ -58,6 +67,7 @@ class DefaultFirebaseOptions {
     storageBucket: 'nutriscan-859af.firebasestorage.app',
   );
 
+  /// Configuração do Firebase para a plataforma Android.
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyATTGeeYrVepWzdVz2KwwLqYvfHlwJESWU',
     appId: '1:258705131162:android:08b1c7212143da09078123',

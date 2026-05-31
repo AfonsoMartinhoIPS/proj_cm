@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
+/// Quarto e último passo do fluxo de onboarding — confirmação dos dados.
+///
+/// Exibe um resumo de todas as informações recolhidas nos passos anteriores
+/// (dados pessoais, objetivos de peso e objetivos nutricionais) e permite
+/// ao utilizador confirmar e criar a conta.
 class ConfirmScreen extends ConsumerWidget {
   const ConfirmScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final s = ref.watch(onboardingProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const NutriTopNavBar(
-        showBackButton: true,
-        title: '4 / 4',
-      ),
+      backgroundColor: colorScheme.surface,
+      appBar: const NutriTopNavBar(showBackButton: true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -26,53 +28,36 @@ class ConfirmScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const NutriLabel(
+              const OnboardingStepIndicator(currentStep: 4, totalSteps: 4),
+              const SizedBox(height: 30),
+              NutriLabel(
                 'Confirma os\nteus dados',
                 variant: NutriLabelVariant.display,
               ),
               const SizedBox(height: 10),
-              const NutriLabel(
+              NutriLabel(
                 'Confirma os teus dados antes de criar a conta.',
                 variant: NutriLabelVariant.small,
               ),
               const SizedBox(height: 30),
-              Container(
+              NutriCard(
+                variant: NutriCardVariant.surfaceDark,
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  // TODO: replace with NutriCard widget
-                  color: AppColors.surfaceDark,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.border),
-                ),
+                borderRadius: BorderRadius.circular(20),
                 child: Column(
                   children: [
-                    _dataRow('Nome', s.name.isEmpty ? '-' : s.name),
-                    _dataRow('Idade', '${s.age} anos'),
-                    _dataRow('Sexo', _genderLabel(s.gender)),
-                    _dataRow('Altura', '${s.height} cm'),
-                    _dataRow('Peso', '${s.weight.toStringAsFixed(0)} kg'),
-                    _dataRow('Objectivo', s.objective?.label ?? '-'),
+                    _dataRow('Nome', s.name.isEmpty ? '-' : s.name, colorScheme),
+                    _dataRow('Idade', '${s.age} anos', colorScheme),
+                    _dataRow('Sexo', _genderLabel(s.gender), colorScheme),
+                    _dataRow('Altura', '${s.height} cm', colorScheme),
+                    _dataRow('Peso', '${s.weight.toStringAsFixed(0)} kg', colorScheme),
+                    _dataRow('Objectivo', s.objective?.label ?? '-', colorScheme),
                     if (s.nutritionGoals != null) ...[
-                      _dataRow(
-                        'Calorias',
-                        '${s.nutritionGoals!.calories.toStringAsFixed(0)} kcal',
-                      ),
-                      _dataRow(
-                        'Proteína',
-                        '${s.nutritionGoals!.protein.toStringAsFixed(0)} g',
-                      ),
-                      _dataRow(
-                        'Hidratos',
-                        '${s.nutritionGoals!.carbs.toStringAsFixed(0)} g',
-                      ),
-                      _dataRow(
-                        'Gordura',
-                        '${s.nutritionGoals!.fat.toStringAsFixed(0)} g',
-                      ),
-                      _dataRow(
-                        'Água',
-                        '${s.nutritionGoals!.water.toStringAsFixed(0)} ml',
-                      ),
+                      _dataRow('Calorias', '${s.nutritionGoals!.calories.toStringAsFixed(0)} kcal', colorScheme),
+                      _dataRow('Proteína', '${s.nutritionGoals!.protein.toStringAsFixed(0)} g', colorScheme),
+                      _dataRow('Hidratos', '${s.nutritionGoals!.carbs.toStringAsFixed(0)} g', colorScheme),
+                      _dataRow('Gordura', '${s.nutritionGoals!.fat.toStringAsFixed(0)} g', colorScheme),
+                      _dataRow('Água', '${s.nutritionGoals!.water.toStringAsFixed(0)} ml', colorScheme),
                     ],
                   ],
                 ),
@@ -90,13 +75,18 @@ class ConfirmScreen extends ConsumerWidget {
     );
   }
 
+  /// Converte um valor do enum [Gender] na sua representação textual em português.
   String _genderLabel(Gender g) => switch (g) {
     Gender.female => 'Feminino',
     Gender.male => 'Masculino',
     Gender.other => 'Outro',
   };
 
-  static Widget _dataRow(String label, String value) {
+  /// Constrói uma linha de resumo com um rótulo e um valor.
+  ///
+  /// O [label] é apresentado à esquerda com a cor de texto secundária,
+  /// e o [value] à direita em negrito.
+  static Widget _dataRow(String label, String value, ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -105,7 +95,7 @@ class ConfirmScreen extends ConsumerWidget {
           NutriLabel(
             label,
             variant: NutriLabelVariant.body,
-            color: AppColors.textMuted,
+            color: colorScheme.onSurfaceVariant,
           ),
           NutriLabel(
             value,

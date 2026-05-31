@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
-
+/// Ecrã de transição exibido durante o cálculo do plano nutricional.
+///
+/// Mostra uma animação de carregamento e uma lista de passos que estão a ser
+/// executados. Após alguns segundos, navega automaticamente para o ecrã de
+/// objetivos nutricionais.
 class CalculationScreen extends StatefulWidget {
   const CalculationScreen({super.key});
 
@@ -12,6 +15,7 @@ class CalculationScreen extends StatefulWidget {
   State<CalculationScreen> createState() => _CalculationScreenState();
 }
 
+/// Estado do [CalculationScreen] que gere o temporizador e a navegação.
 class _CalculationScreenState extends State<CalculationScreen> {
   @override
   void initState() {
@@ -23,8 +27,10 @@ class _CalculationScreenState extends State<CalculationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(30),
@@ -40,20 +46,20 @@ class _CalculationScreenState extends State<CalculationScreen> {
                     height: 150,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.primary.withValues(alpha: 0.12),
+                      color: colorScheme.primary.withValues(alpha: 0.12),
                       border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.18),
+                        color: colorScheme.primary.withValues(alpha: 0.18),
                         width: 2,
                       ),
                     ),
                   ),
-                  const NutriLabel('📊', variant: NutriLabelVariant.display,),
-                  const SizedBox(
+                  const NutriLabel('📊', variant: NutriLabelVariant.display),
+                  SizedBox(
                     width: 180,
                     height: 180,
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.secondary,
+                        colorScheme.secondary,
                       ),
                       strokeWidth: 2,
                     ),
@@ -61,21 +67,33 @@ class _CalculationScreenState extends State<CalculationScreen> {
                 ],
               ),
               const SizedBox(height: 50),
-              const NutriLabel(
+              NutriLabel(
                 'A calcular o teu plano...',
                 variant: NutriLabelVariant.headline,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),
-              const NutriLabel(
+              NutriLabel(
                 'Estamos a analisar os teus dados para criar metas de calorias e macros ideais para ti.',
                 variant: NutriLabelVariant.body,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 50),
-              _buildStep('Analisar perfil biométrico', isDone: true),
-              _buildStep('Ajustar metas de peso', isDone: true),
-              _buildStep('Finalizar recomendações', isDone: false),
+              _buildStep(
+                'Analisar perfil biométrico',
+                isDone: true,
+                colorScheme: colorScheme,
+              ),
+              _buildStep(
+                'Ajustar metas de peso',
+                isDone: true,
+                colorScheme: colorScheme,
+              ),
+              _buildStep(
+                'Finalizar recomendações',
+                isDone: false,
+                colorScheme: colorScheme,
+              ),
             ],
           ),
         ),
@@ -83,21 +101,31 @@ class _CalculationScreenState extends State<CalculationScreen> {
     );
   }
 
-  Widget _buildStep(String title, {required bool isDone}) {
+  /// Constrói um indicador visual de um passo do processo de cálculo.
+  ///
+  /// Exibe um ícone de concluído ou pendente, acompanhado do [title] do passo.
+  /// A cor e o ícone variam consoante o parâmetro [isDone].
+  Widget _buildStep(
+    String title, {
+    required bool isDone,
+    required ColorScheme colorScheme,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Icon(
             isDone ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: isDone ? AppColors.secondary : AppColors.border,
+            color: isDone ? colorScheme.secondary : colorScheme.outline,
             size: 20,
           ),
           const SizedBox(width: 12),
           NutriLabel(
             title,
             variant: NutriLabelVariant.body,
-            color: isDone ? AppColors.onBackground : AppColors.textMuted,
+            color: isDone
+                ? colorScheme.onSurface
+                : colorScheme.onSurfaceVariant,
           ),
         ],
       ),

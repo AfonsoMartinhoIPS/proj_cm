@@ -4,22 +4,25 @@ import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import 'package:nutri_scan/presentation/providers/theme_provider.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
-/// App settings: theme picker, account actions (edit goals, logout), about.
+/// Ecrã de definições da aplicação.
 ///
-/// Sections are flat - no nested screens; everything fits one scroll view.
-/// Logout requires confirm because it kills the session; router redirect
-/// handles the bounce to `/welcome` when authProvider emits null.
+/// Permite ao utilizador:
+/// - Selecionar o tema (Sistema / Claro / Escuro).
+/// - Aceder ao editor de objetivos.
+/// - Navegar para os créditos.
+/// - Terminar a sessão com confirmação prévia.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final themeMode = ref.watch(themeModeProvider).value ?? ThemeMode.system;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: const NutriTopNavBar(showBackButton: true, title: 'Definições'),
       body: SafeArea(
         child: ListView(
@@ -65,14 +68,12 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
 
-            const SizedBox(height: AppSizes.lg),
-            NutriCard(
-              padding: EdgeInsets.zero,
-              child: NutriMenuItem(
-                icon: Icons.logout,
-                label: 'Logout',
-                destructive: true,
-                onTap: () async {
+            const SizedBox(height: AppSizes.xl),
+            SizedBox(
+              width: double.infinity,
+              child: NutriButton(
+                label: 'Terminar sessão',
+                onPressed: () async {
                   final ok = await showNutriConfirmDialog(
                     context,
                     title: 'Terminar sessão?',
@@ -86,6 +87,7 @@ class SettingsScreen extends ConsumerWidget {
                 },
               ),
             ),
+            const SizedBox(height: AppSizes.lg),
           ],
         ),
       ),
@@ -93,17 +95,30 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
+/// Opção individual de tema dentro do seletor.
+///
+/// Exibe um ícone representativo, o nome do tema e um indicador visual
+/// do estado selecionado.
 class _ThemeOption extends StatelessWidget {
+  /// O modo de tema que esta opção representa.
   final ThemeMode mode;
+
+  /// Se esta opção está atualmente selecionada.
   final bool selected;
+
+  /// Callback invocado quando o utilizador toca na opção.
   final VoidCallback onTap;
 
+  /// Cria uma [_ThemeOption].
+  ///
+  /// Os parâmetros [mode], [selected] e [onTap] são obrigatórios.
   const _ThemeOption({
     required this.mode,
     required this.selected,
     required this.onTap,
   });
 
+  /// Mapeia cada [ThemeMode] para o seu rótulo em português e ícone associado.
   static const _labels = {
     ThemeMode.system: ('Sistema', Icons.brightness_auto),
     ThemeMode.light: ('Claro', Icons.light_mode),
@@ -112,31 +127,32 @@ class _ThemeOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final (label, icon) = _labels[mode]!;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.md, vertical: AppSizes.sm,
+            horizontal: AppSizes.md,
+            vertical: AppSizes.sm,
           ),
           child: Row(
             children: [
-              Icon(icon, color: AppColors.secondary, size: 20),
+              Icon(icon, color: colorScheme.secondary, size: 20),
               const SizedBox(width: AppSizes.md),
               Expanded(
                 child: NutriLabel(
                   label,
                   variant: NutriLabelVariant.body,
-                  color: AppColors.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               Icon(
-                selected
-                    ? Icons.check_circle
-                    : Icons.radio_button_unchecked,
-                color: selected ? AppColors.secondary : AppColors.textMuted,
+                selected ? Icons.check_circle : Icons.radio_button_unchecked,
+                color: selected ? colorScheme.secondary : colorScheme.onSurfaceVariant,
                 size: 20,
               ),
             ],

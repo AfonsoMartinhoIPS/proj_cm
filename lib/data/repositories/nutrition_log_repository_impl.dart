@@ -7,13 +7,17 @@ import 'package:nutri_scan/domain/entities/meal_entry.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/domain/repositories/nutrition_log_repository.dart';
 
+/// Implementação do [NutritionLogRepository] que utiliza o Firestore.
+///
+/// Gere os documentos diários de nutrição na coleção `users/{uid}/nutrition_logs/{date}`,
+/// suportando a adição, remoção e atualização de entradas, bem como o registo de água.
 class NutritionLogRepositoryImpl implements NutritionLogRepository {
   final _db = FirebaseFirestore.instance;
 
-  /// Serialise a [NutritionGoals] to a Firestore-friendly map.
-  /// Returns `null` when no goals are provided so the caller can skip writing
-  /// the field entirely (and therefore avoid clobbering an existing snapshot
-  /// with a null).
+  /// Converte um [NutritionGoals] num mapa compatível com o Firestore.
+  ///
+  /// Devolve `null` se as metas forem `null`, permitindo que o campo seja
+  /// omitido na escrita em vez de ser sobrescrito com `null`.
   Map<String, dynamic>? _goalsMap(NutritionGoals? goals) {
     if (goals == null) return null;
     return {
@@ -25,6 +29,9 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
     };
   }
 
+  /// Obtém o [NutritionLog] correspondente ao dia [date] para o utilizador [uid].
+  ///
+  /// Devolve `null` se o documento não existir.
   @override
   Future<NutritionLog?> getLog(String uid, String date) async {
     logger.d('NutritionLogRepository: getLog for $uid on $date');
@@ -34,19 +41,11 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
     return NutritionLogModel.fromMap(doc.data()!);
   }
 
-  /// Appends [entry] to the day's log.
+  /// Adiciona uma entrada de refeição ao registo do dia [date].
   ///
-  /// Single Firestore write via `set(..., merge: true)`:
-  ///   - When the doc is missing → creates it with date + goals snapshot +
-  ///     waterMl=0 + entries=[entry].
-  ///   - When the doc exists → merges (arrayUnion appends entry, waterMl
-  ///     untouched, goals re-written with the same map).
-  ///
-  /// The `goals` field is included on every call so the doc has a consistent
-  /// shape from creation onwards. The provider passes the user's current
-  /// goals - to keep history truly immutable across goal edits we'd need a
-  /// transaction that only writes goals on first creation, but for the
-  /// student-project scope this is fine.
+  /// Se o documento do dia ainda não existir, este é criado automaticamente
+  /// com as metas congeladas fornecidas em [goalsSnapshot]. A entrada é
+  /// anexada à lista existente através de `arrayUnion`.
   @override
   Future<void> addEntry(
     String uid,
@@ -59,8 +58,6 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
     final payload = <String, dynamic>{
       'date': date,
       'entries': FieldValue.arrayUnion([MealEntryModel.toMap(entry)]),
-      // `increment(0)` initialises waterMl to 0 on first create, no-op
-      // otherwise.
       'waterMl': FieldValue.increment(0),
     };
     final goalsMap = _goalsMap(goalsSnapshot);
@@ -69,6 +66,9 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
     await docRef.set(payload, SetOptions(merge: true));
   }
 
+  /// Remove a entrada com o [entryId] do registo do dia [date].
+  ///
+  /// Se o documento não existir, a operação é ignorada.
   @override
   Future<void> removeEntry(String uid, String date, String entryId) async {
     logger.d('NutritionLogRepository: removeEntry for $uid on $date');
@@ -82,8 +82,10 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
         .update({'entries': entries});
   }
 
-  /// Same lazy-create pattern as [addEntry] - handles the case where the
-  /// first interaction of the day is logging water (no meal yet).
+  /// Atualiza o total de água para o dia [date].
+  ///
+  /// Tal como [addEntry], cria o documento com as metas congeladas
+  /// se este ainda não existir.
   @override
   Future<void> updateWater(
     String uid,
@@ -103,9 +105,13 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
         .set(payload, SetOptions(merge: true));
   }
 
+  /// Substitui uma entrada existente (pelo [MealEntry.id]) pela nova [entry].
+  ///
+  /// Se o documento ou o identificador não existirem, a operação é ignorada.
   @override
   Future<void> updateEntry(String uid, String date, MealEntry entry) async {
-    logger.d('NutritionLogRepository: updateEntry ${entry.id} for $uid on $date');
+    logger.d(
+        'NutritionLogRepository: updateEntry ${entry.id} for $uid on $date');
     final docRef = _db.doc(FirestorePaths.nutritionLog(uid, date));
     final doc = await docRef.get();
     if (!doc.exists) return;
@@ -117,12 +123,16 @@ class NutritionLogRepositoryImpl implements NutritionLogRepository {
     await docRef.update({'entries': entries});
   }
 
+  /// Apaga completamente o documento do dia [date] para o utilizador [uid].
   @override
   Future<void> deleteLog(String uid, String date) async {
     logger.d('NutritionLogRepository: deleteLog for $uid on $date');
     await _db.doc(FirestorePaths.nutritionLog(uid, date)).delete();
   }
 
+  /// Obtém uma lista de [NutritionLog] para as [dates] especificadas.
+  ///
+  /// Os documentos que não existirem são omitidos do resultado.
   @override
   Future<List<NutritionLog>> getLogs(String uid, List<String> dates) async {
     final futures = dates.map((date) => getLog(uid, date));
