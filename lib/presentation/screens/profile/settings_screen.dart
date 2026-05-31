@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
+import 'package:nutri_scan/presentation/providers/notification_provider.dart';
 import 'package:nutri_scan/presentation/providers/theme_provider.dart';
 import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 
@@ -42,6 +43,11 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
+
+            const SizedBox(height: AppSizes.lg),
+            const NutriSectionLabel('NOTIFICAÇÕES'),
+            const SizedBox(height: AppSizes.sm),
+            const _NotificationSection(),
 
             const SizedBox(height: AppSizes.lg),
             const NutriSectionLabel('CONTA'),
@@ -88,6 +94,91 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Daily-reminder controls: enable toggle + time picker.
+///
+/// Both rows persist via [notificationPrefsProvider] → NotificationCoordinator.
+/// Toggling on triggers the OS permission prompt; denial reverts the switch
+/// and shows a snackbar. The time row is only interactive while enabled so
+/// users don't accidentally tweak a schedule that won't fire.
+class _NotificationSection extends ConsumerWidget {
+  const _NotificationSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(notificationPrefsProvider);
+    final prefs = async.value;
+
+    return NutriCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          SwitchListTile(
+            title: const NutriLabel(
+              'Lembrete diário',
+              variant: NutriLabelVariant.body,
+              color: AppColors.onBackground,
+            ),
+            subtitle: const NutriLabel(
+              'Resumo do progresso do dia',
+              variant: NutriLabelVariant.small,
+              color: AppColors.textMuted,
+            ),
+            value: prefs?.enabled ?? false,
+            onChanged: prefs == null
+                ? null
+                : (v) async {
+                    final ok = await ref
+                        .read(notificationPrefsProvider.notifier)
+                        .setEnabled(v);
+                    if (!context.mounted) return;
+                    if (v && !ok) {
+                      NutriFeedback.showError(
+                        context,
+                        'Permissão de notificações recusada',
+                      );
+                    } else {
+                      NutriFeedback.showInfo(
+                        context,
+                        v
+                            ? 'Lembretes ativados'
+                            : 'Lembretes desativados',
+                      );
+                    }
+                  },
+          ),
+          const NutriDivider(),
+          NutriMenuItem(
+            icon: Icons.access_time,
+            label: prefs == null
+                ? 'Hora do lembrete'
+                : 'Hora do lembrete · ${prefs.time.format(context)}',
+            onTap: prefs == null || !prefs.enabled
+                ? () => NutriFeedback.showInfo(
+                      context,
+                      'Ativa o lembrete primeiro',
+                    )
+                : () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: prefs.time,
+                    );
+                    if (picked == null || !context.mounted) return;
+                    await ref
+                        .read(notificationPrefsProvider.notifier)
+                        .setTime(picked);
+                    if (!context.mounted) return;
+                    NutriFeedback.showSuccess(
+                      context,
+                      'Hora atualizada para ${picked.format(context)}',
+                    );
+                  },
+          ),
+        ],
       ),
     );
   }

@@ -71,5 +71,13 @@
 		<!-- Permissions -->
 		<key>NSCameraUsageDescription</key>
 		<string>Grant access to your camera to start scanning</string>
+
+		<!-- Local notifications: required for flutter_local_notifications to
+		     present scheduled reminders while the app is in the background. -->
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>fetch</string>
+			<string>remote-notification</string>
+		</array>
 	</dict>
 </plist>

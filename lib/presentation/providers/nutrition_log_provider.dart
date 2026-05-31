@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/notifications/notification_coordinator.dart';
 import 'package:nutri_scan/data/repositories/nutrition_log_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
@@ -89,6 +90,32 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
         ? filtered
         : ([...filtered, updated]..sort((a, b) => a.date.compareTo(b.date)));
     state = AsyncValue.data(newList);
+
+    // Reschedule today's reminder so its body reflects the latest totals.
+    // No-op when the user hasn't enabled notifications.
+    await _maybeReschedule(user, newList);
+  }
+
+  /// Fire-and-forget reschedule of the daily reminder. Skips silently when
+  /// notifications are disabled or the date being mutated isn't today (no
+  /// reason to refresh the message for a past day's edit).
+  Future<void> _maybeReschedule(
+    AppUser user,
+    List<NutritionLog> logs,
+  ) async {
+    final today = todayKey();
+    final todayLog = logs.where((l) => l.date == today).firstOrNull;
+    final goals = user.nutritionGoals;
+    if (goals == null) return;
+    try {
+      await NotificationCoordinator.reschedule(
+        todayLog: todayLog,
+        goals: goals,
+      );
+    } catch (e, st) {
+      // Don't surface notification errors into the meal-log state.
+      logger.w('NutritionLogs: reschedule failed', error: e, stackTrace: st);
+    }
   }
 
   Future<void> addEntry(MealEntry entry, {String? date}) async {
@@ -182,9 +209,9 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
     try {
       await repo.deleteLog(user.uid, date);
       final current = state.value ?? [];
-      state = AsyncValue.data(
-        [for (final l in current) if (l.date != date) l],
-      );
+      final next = [for (final l in current) if (l.date != date) l];
+      state = AsyncValue.data(next);
+      await _maybeReschedule(user, next);
     } catch (e, st) {
       logger.e('NutritionLogs: deleteDay error', error: e, stackTrace: st);
       state = AsyncValue.error(e, st);
