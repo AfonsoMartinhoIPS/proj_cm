@@ -38,6 +38,14 @@ import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 /// State lifecycle alone provides. Must be plumbed into [GoRouter.observers].
 final routeObserver = RouteObserver<ModalRoute<dynamic>>();
 
+/// Singleton reference to the live [GoRouter] instance, captured the first
+/// time [routerProvider] resolves. Used by code that lives outside the
+/// widget tree (e.g. `NotificationService._onTap`) to navigate without
+/// needing a `BuildContext`. Null until the first build resolves the
+/// provider, which is fine because cold-launch notifications fall through
+/// to the splash → auth-redirect chain anyway.
+GoRouter? appRouter;
+
 /// Representa uma rota da barra de navegação inferior.
 ///
 /// Cada instância define o caminho, o rótulo, o ícone e o ecrã associado
@@ -139,7 +147,7 @@ class _AuthRefresh extends ChangeNotifier {
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = _AuthRefresh(ref);
 
-  return GoRouter(
+  final router = GoRouter(
     initialLocation: '/splash',
     observers: [_RouteLogger(), routeObserver],
     refreshListenable: refresh,
@@ -242,4 +250,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  appRouter = router;
+  return router;
 });

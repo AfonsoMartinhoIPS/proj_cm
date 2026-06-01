@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/debug/debug_seeder.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import 'package:nutri_scan/presentation/providers/notification_provider.dart';
 import 'package:nutri_scan/presentation/providers/theme_provider.dart';
@@ -73,6 +75,13 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
+
+            if (kDebugMode) ...[
+              const SizedBox(height: AppSizes.lg),
+              const NutriSectionLabel('DEBUG'),
+              const SizedBox(height: AppSizes.sm),
+              const _DebugSection(),
+            ],
 
             const SizedBox(height: AppSizes.xl),
             SizedBox(
@@ -177,6 +186,55 @@ class _NotificationSection extends ConsumerWidget {
                       context,
                       'Hora atualizada para ${picked.format(context)}',
                     );
+                  },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Debug-only stress-test controls. Rendered behind `kDebugMode` so it
+/// never ships in release. Seeds Firestore with fake products + meal
+/// entries via [DebugSeeder]; wipes them in one tap.
+class _DebugSection extends ConsumerWidget {
+  const _DebugSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authProvider).value;
+    return NutriCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          NutriMenuItem(
+            icon: Icons.dataset,
+            label: 'Seed (50 produtos + 100 refeições)',
+            onTap: user == null
+                ? () =>
+                    NutriFeedback.showError(context, 'Necessita sessão ativa')
+                : () async {
+                    NutriFeedback.showInfo(context, 'A criar dados…');
+                    final msg = await DebugSeeder.seed(user: user);
+                    if (!context.mounted) return;
+                    NutriFeedback.showSuccess(context, msg);
+                    ref.invalidate(authProvider);
+                  },
+          ),
+          const NutriDivider(),
+          NutriMenuItem(
+            icon: Icons.delete_sweep,
+            label: 'Wipe dados de teste',
+            destructive: true,
+            onTap: user == null
+                ? () =>
+                    NutriFeedback.showError(context, 'Necessita sessão ativa')
+                : () async {
+                    NutriFeedback.showInfo(context, 'A apagar…');
+                    final msg = await DebugSeeder.wipe(user: user);
+                    if (!context.mounted) return;
+                    NutriFeedback.showSuccess(context, msg);
+                    ref.invalidate(authProvider);
                   },
           ),
         ],

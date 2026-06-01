@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/notifications/notification_coordinator.dart';
 import 'package:nutri_scan/data/repositories/auth_repository_impl.dart';
 import 'package:nutri_scan/data/repositories/user_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
 /// Notifier que gere o estado de autenticação do utilizador.
@@ -106,6 +108,23 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     try {
       await userRepository.updateGoals(user.uid, goals);
       state = AsyncValue.data(user.copyWith(nutritionGoals: goals));
+
+      // Reschedule today's notification so its body reflects the new goal
+      // immediately instead of waiting for the next meal log to refresh it.
+      // Best-effort: swallow errors so notification plumbing can't surface
+      // as a goal-save failure.
+      try {
+        final logs = ref.read(nutritionLogsProvider).value ?? [];
+        final today = todayKey();
+        final todayLog = logs.where((l) => l.date == today).firstOrNull;
+        await NotificationCoordinator.reschedule(
+          todayLog: todayLog,
+          goals: goals,
+        );
+      } catch (e, st) {
+        logger.w('AuthNotifier: reschedule after goal change failed',
+            error: e, stackTrace: st);
+      }
     } catch (e, st) {
       logger.e('AuthNotifier: updateGoals error', error: e, stackTrace: st);
       state = AsyncValue.error(e, st);

@@ -178,11 +178,14 @@ class NotificationService {
     return fire;
   }
 
-  /// Tap handler. Deep-linking is intentionally a TODO: GoRouter doesn't
-  /// expose a static navigator and wiring a global key here is more cost
-  /// than benefit for a single-payload flow. Tapped notifications open the
-  /// app at its initial route which the splash + auth redirect handle.
+  /// Tap handler. Reads the route payload (e.g. `/`) and pushes via the
+  /// singleton [appRouter] reference. Null-safe: on cold launch the
+  /// router hasn't been built yet — splash → auth-redirect resolves to the
+  /// right screen anyway, so no extra cold-launch handling is needed.
   static void _onTap(NotificationResponse response) {
-    logger.d('NotificationService: tapped, payload=${response.payload}');
+    final payload = response.payload;
+    logger.d('NotificationService: tapped, payload=$payload');
+    if (payload == null || payload.isEmpty) return;
+    appRouter?.go(payload);
   }
 }
