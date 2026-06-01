@@ -5,7 +5,7 @@ import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/screens/meals/widgets/day_summary_card.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
 /// Nutrition history view.
 ///
@@ -81,7 +81,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     final async = ref.watch(nutritionLogsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: const NutriTopNavBar(showBackButton: true, title: 'Histórico'),
       body: SafeArea(
         child: async.when(
@@ -203,20 +202,21 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSizes.xl * 2),
       child: Column(
-        children: const [
+        children: [
           Icon(
             Icons.history,
             size: 48,
-            color: AppColors.textMuted,
+            color: colorScheme.onSurfaceVariant,
           ),
-          SizedBox(height: AppSizes.md),
+          const SizedBox(height: AppSizes.md),
           NutriLabel(
             'Nenhuma refeição registada neste período',
             variant: NutriLabelVariant.body,
-            color: AppColors.onBackground,
+            color: colorScheme.onSurface,
             textAlign: TextAlign.center,
           ),
         ],

@@ -74,3 +74,6 @@ CLAUDE*
 docs/
 .env
 .env*
+env.json
+env*.json
+.aider*

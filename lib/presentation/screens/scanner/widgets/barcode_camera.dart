@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 /// Live-camera barcode scanner with a corner-bracket viewfinder overlay.
@@ -26,8 +26,14 @@ import 'package:permission_handler/permission_handler.dart';
 /// "Abrir Definições" depending on whether the permission was permanently
 /// denied.
 class BarcodeCamera extends StatefulWidget {
+  /// Callback invocado quando um código de barras válido é detetado.
+  ///
+  /// Recebe a string do código (ex.: "5601234567890").
   final ValueChanged<String> onBarcode;
 
+  /// Cria um [BarcodeCamera].
+  ///
+  /// O parâmetro [onBarcode] é obrigatório.
   const BarcodeCamera({super.key, required this.onBarcode});
 
   @override
@@ -173,6 +179,7 @@ class _BarcodeCameraState extends State<BarcodeCamera>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       clipBehavior: Clip.antiAlias,
@@ -194,12 +201,10 @@ class _BarcodeCameraState extends State<BarcodeCamera>
                   onDetect: _onDetect,
                   errorBuilder: (context, error) {
                     _reportError(error);
-                    // Render nothing here — the next frame swaps to
-                    // _CameraFallback via setState in _reportError.
                     return const SizedBox.expand();
                   },
                 ),
-                _ViewfinderOverlay(),
+                _ViewfinderOverlay(color: colorScheme.secondary),
               ],
             ),
     );
@@ -245,19 +250,20 @@ class _CameraFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(_icon, color: AppColors.textMuted, size: 40),
+            Icon(_icon, color: colorScheme.onSurfaceVariant, size: 40),
             const SizedBox(height: 16),
             NutriLabel(
               _message,
               textAlign: TextAlign.center,
               variant: NutriLabelVariant.small,
-              color: AppColors.textMuted,
+              color: colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -277,6 +283,10 @@ class _CameraFallback extends StatelessWidget {
 /// Corner-bracket viewfinder. Purely decorative - the scanner reads anywhere
 /// in the camera frame, the brackets just guide the user.
 class _ViewfinderOverlay extends StatelessWidget {
+  final Color color;
+
+  const _ViewfinderOverlay({required this.color});
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -292,7 +302,7 @@ class _ViewfinderOverlay extends StatelessWidget {
             child: Container(
               width: 180,
               height: 2,
-              color: AppColors.secondary.withValues(alpha: 0.5),
+              color: color.withValues(alpha: 0.5),
             ),
           ),
         ],
@@ -319,16 +329,16 @@ class _ViewfinderOverlay extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             top: isTop
-                ? const BorderSide(color: AppColors.secondary, width: 3)
+                ? BorderSide(color: color, width: 3)
                 : BorderSide.none,
             bottom: !isTop
-                ? const BorderSide(color: AppColors.secondary, width: 3)
+                ? BorderSide(color: color, width: 3)
                 : BorderSide.none,
             left: isLeft
-                ? const BorderSide(color: AppColors.secondary, width: 3)
+                ? BorderSide(color: color, width: 3)
                 : BorderSide.none,
             right: !isLeft
-                ? const BorderSide(color: AppColors.secondary, width: 3)
+                ? BorderSide(color: color, width: 3)
                 : BorderSide.none,
           ),
         ),

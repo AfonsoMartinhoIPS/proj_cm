@@ -9,7 +9,7 @@ import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/screens/meals/add_meal/add_meal_general.dart';
 import 'package:nutri_scan/presentation/screens/meals/add_meal/add_meal_product_selected.dart';
 import 'package:nutri_scan/presentation/screens/products/widgets/product_picker.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
 /// Add/edit screen for a [MealEntry].
 ///
@@ -19,10 +19,8 @@ import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
 ///     Hands a freshly-built entry to `nutritionLogsProvider.addEntry`.
 ///   * **Edit**: [editingEntry] + [editingDate] required. Product is locked
 ///     (refetched once via [ProductRepositoryImpl] for its per-100g
-///     [Nutriments]); user can only change meal type and serving grams.
-///     Date is locked too - moving an entry across days is out of scope and
-///     would require a delete-on-old + add-on-new transaction.
-///     Save calls `nutritionLogsProvider.updateEntry`.
+///     [Nutriments]); user can change meal type, serving grams and date.
+///     Date changes route through `moveEntry` (remove + add across days).
 ///
 /// Can also be opened in add-mode with a pre-selected [initialProduct]
 /// (e.g. from product details pushing `/meals/add` with `extra: product`).
@@ -157,7 +155,6 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: NutriTopNavBar(
         showBackButton: true,
         title: _isEditing ? 'Editar refeição' : 'Adicionar refeição',

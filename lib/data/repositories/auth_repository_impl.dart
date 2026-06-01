@@ -3,14 +3,24 @@ import 'package:nutri_scan/core/utils/logger.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/domain/repositories/auth_repository.dart';
 
+/// Implementação do [AuthRepository] que utiliza o Firebase Authentication.
+///
+/// Fornece métodos para verificar a sessão atual, iniciar sessão, registar
+/// novos utilizadores e terminar a sessão.
 class AuthRepositoryImpl implements AuthRepository {
-
+  /// Devolve o identificador do utilizador atualmente autenticado,
+  /// ou `null` se não existir uma sessão ativa.
   @override
   String? getCurrentUser() {
     logger.d('Getting current user from FirebaseAuth');
     return FirebaseAuth.instance.currentUser?.uid;
   }
 
+  /// Inicia sessão com [email] e [password].
+  ///
+  /// Devolve o identificador do utilizador autenticado ou `null` se as
+  /// credenciais forem inválidas. Em caso de erro, relança a exceção
+  /// [FirebaseAuthException].
   @override
   Future<String?> login(String email, String password) async {
     try {
@@ -34,12 +44,19 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Termina a sessão do utilizador atualmente autenticado.
   @override
   Future<void> logout() async {
     logger.d('Logging out user');
     await FirebaseAuth.instance.signOut();
   }
 
+  /// Regista um novo utilizador com os dados fornecidos.
+  ///
+  /// Devolve um [AppUser] completo em caso de sucesso, ou `null` se o registo
+  /// falhar.  As metas nutricionais e o objetivo de peso são definidos como
+  /// `null` — esses valores são posteriormente preenchidos pelo fluxo de
+  /// onboarding.
   @override
   Future<AppUser?> register({
     required String email,

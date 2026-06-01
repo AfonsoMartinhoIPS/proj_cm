@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/core.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
+/// Ecrã de registo de uma nova conta.
+///
+/// Recolhe o nome, email e palavra‑passe do utilizador e submete os dados
+/// através do [authProvider] em conjunto com as informações de onboarding
+/// já recolhidas. Inclui validação local para garantir que todos os campos
+/// estão preenchidos e que as palavras‑passe coincidem.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -13,6 +18,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
+/// Estado do [RegisterScreen] que gere os campos de texto e a submissão.
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -29,6 +35,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  /// Valida os campos e submete o registo.
+  ///
+  /// Verifica se todos os campos estão preenchidos e se as palavras‑passe
+  /// coincidem. Em caso de erro, exibe uma snackbar. Se tudo estiver correto,
+  /// transfere as credenciais para o [onboardingProvider] e invoca o registo
+  /// no [authProvider].
   void submit() {
     final name = nameController.text.trim();
     final email = emailController.text.trim();
@@ -39,11 +51,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-          NutriFeedback.showSnackBar(
-            context,
-            'Preenche todos os campos',
-            NutriFeedbackType.error,
-          );
+      NutriFeedback.showSnackBar(
+        context,
+        'Preenche todos os campos',
+        NutriFeedbackType.error,
+      );
       return;
     }
 
@@ -65,6 +77,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final authState = ref.watch(authProvider);
 
     ref.listen(authProvider, (_, next) {
@@ -78,12 +91,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             e.toString(),
             NutriFeedbackType.error,
           );
-        }
+        },
       );
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: const NutriTopNavBar(
         showBackButton: true,
         title: 'Cria Conta',
@@ -95,12 +108,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const NutriLabel(
+              NutriLabel(
                 'Cria Conta',
                 variant: NutriLabelVariant.display,
               ),
               const SizedBox(height: 10),
-              const NutriLabel(
+              NutriLabel(
                 'Regista-te para começar a monitorizar a tua nutrição.',
                 variant: NutriLabelVariant.small,
               ),
@@ -142,12 +155,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     height: 20,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: colorScheme.outline),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.check,
                       size: 14,
-                      color: AppColors.secondary,
+                      color: colorScheme.secondary,
                     ),
                   ),
                   const SizedBox(width: 12),

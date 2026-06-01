@@ -6,13 +6,23 @@ import 'package:nutri_scan/domain/entities/product.dart';
 import 'package:nutri_scan/domain/entities/saved_product.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 
-/// Default page size when loading saved products.
+/// Tamanho de página padrão ao carregar produtos guardados.
 const _defaultPageSize = 50;
 
+/// Notifier que gere a lista de produtos guardados pelo utilizador autenticado.
+///
+/// Suporta guardar, remover, atualizar notas e paginação.  Utiliza o
+/// [ProductRepositoryImpl] para interagir com a camada de dados e reage
+/// automaticamente a alterações no [authProvider] (limpando a lista quando
+/// o utilizador sai).
 class SavedProductsNotifier extends AsyncNotifier<List<SavedProduct>> {
   final repo = ProductRepositoryImpl();
   int _count = _defaultPageSize;
 
+  /// Constrói o estado inicial da lista de produtos guardados.
+  ///
+  /// Se o utilizador não estiver autenticado, devolve uma lista vazia.
+  /// Caso contrário, carrega os primeiros [_defaultPageSize] produtos.
   @override
   Future<List<SavedProduct>> build() async {
     final user = ref.watch(authProvider).value;
@@ -23,13 +33,17 @@ class SavedProductsNotifier extends AsyncNotifier<List<SavedProduct>> {
     return _fetch(user.uid, _count);
   }
 
+  /// Obtém os produtos guardados do utilizador com o [uid] especificado,
+  /// limitados a [count] registos.
   Future<List<SavedProduct>> _fetch(String uid, int count) async {
     logger.d('SavedProducts: fetching $count saved for $uid');
     return repo.getSavedProducts(uid, count);
   }
 
-  /// Save a product (from scan, search, etc) to the user's saved list.
-  /// Builds a snapshot from the Product - full data stays in `products/{barcode}`.
+  /// Guarda um [Product] na lista de favoritos do utilizador.
+  ///
+  /// Cria uma snapshot do produto para armazenamento leve; os dados
+  /// completos continuam em `products/{barcode}`.
   Future<void> saveProduct(Product product) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
@@ -43,7 +57,10 @@ class SavedProductsNotifier extends AsyncNotifier<List<SavedProduct>> {
     }
   }
 
-  /// Replace the entire notes array for a saved product.
+  /// Substitui toda a lista de notas de um produto guardado.
+  ///
+  /// [barcode] identifica o produto e [notes] é a nova lista completa de
+  /// notas que será persistida.
   Future<void> setNotes(String barcode, List<SavedProductNote> notes) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
@@ -57,6 +74,10 @@ class SavedProductsNotifier extends AsyncNotifier<List<SavedProduct>> {
     }
   }
 
+  /// Remove um produto da lista de favoritos do utilizador.
+  ///
+  /// Apenas o documento em `users/{uid}/saved_products/{barcode}` é afetado;
+  /// os dados originais em `products/{barcode}` permanecem inalterados.
   Future<void> removeProduct(String barcode) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
@@ -70,7 +91,10 @@ class SavedProductsNotifier extends AsyncNotifier<List<SavedProduct>> {
     }
   }
 
-  /// Increase the page size and refetch.
+  /// Aumenta o tamanho da página e recarrega os dados.
+  ///
+  /// Útil para implementar "scroll infinito" — por predefinição adiciona
+  /// mais 50 produtos ao limite de carregamento.
   Future<void> loadMore({int extra = 50}) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
@@ -81,5 +105,9 @@ class SavedProductsNotifier extends AsyncNotifier<List<SavedProduct>> {
   }
 }
 
+/// Provider que expõe a lista de produtos guardados do utilizador atual.
+///
+/// Reage automaticamente a alterações no [authProvider], recarregando os
+/// dados quando o utilizador muda.
 final savedProductsProvider =
     AsyncNotifierProvider<SavedProductsNotifier, List<SavedProduct>>(SavedProductsNotifier.new);

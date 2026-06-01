@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
-import 'package:nutri_scan/presentation/widgets/new_widgets.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
-/// Single-entry row used inside [DayDetailScreen].
+/// Linha individual de uma entrada de refeição, usada em listas.
 ///
-/// Thumbnail + product name + serving grams on the left, kcal on the right,
-/// trailing delete button. Whole row is tappable → [onEdit].
+/// Exibe a miniatura do produto, o nome, a quantidade em gramas e as calorias.
+/// Ao ser tocada, invoca o callback [onEdit]. O ícone de apagar no final
+/// dispara o callback [onDelete].
 class MealEntryTile extends StatelessWidget {
+  /// A entrada de refeição cujos dados serão exibidos.
   final MealEntry entry;
+
+  /// Callback invocado quando o utilizador toca na linha (editar).
   final VoidCallback onEdit;
+
+  /// Callback invocado quando o utilizador toca no ícone de apagar.
   final VoidCallback onDelete;
 
+  /// Cria um [MealEntryTile].
+  ///
+  /// Os parâmetros [entry], [onEdit] e [onDelete] são obrigatórios.
   const MealEntryTile({
     super.key,
     required this.entry,
@@ -21,7 +30,7 @@ class MealEntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = entry.productImageUrl;
+    final colorScheme = Theme.of(context).colorScheme;
     final grams = entry.servingGrams.toStringAsFixed(0);
     final kcal = entry.calories.toStringAsFixed(0);
 
@@ -37,31 +46,10 @@ class MealEntryTile extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceDark,
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                  border: Border.all(color: AppColors.border),
-                ),
-                clipBehavior: Clip.antiAlias,
-                alignment: Alignment.center,
-                child: (url != null && url.isNotEmpty)
-                    ? Image.network(
-                        url,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => const Icon(
-                          Icons.fastfood,
-                          color: AppColors.textMuted,
-                          size: 20,
-                        ),
-                      )
-                    : const Icon(
-                        Icons.fastfood,
-                        color: AppColors.textMuted,
-                        size: 20,
-                      ),
+              NutriProductThumbnail(
+                url: entry.productImageUrl,
+                size: 40,
+                fallbackIcon: Icons.fastfood,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -71,7 +59,7 @@ class MealEntryTile extends StatelessWidget {
                     NutriLabel(
                       entry.productName,
                       variant: NutriLabelVariant.body,
-                      color: AppColors.onBackground,
+                      color: colorScheme.onSurface,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -79,7 +67,7 @@ class MealEntryTile extends StatelessWidget {
                     NutriLabel(
                       '${grams}g',
                       variant: NutriLabelVariant.small,
-                      color: AppColors.textMuted,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ],
                 ),
@@ -88,12 +76,12 @@ class MealEntryTile extends StatelessWidget {
               NutriLabel(
                 '$kcal kcal',
                 variant: NutriLabelVariant.small,
-                color: AppColors.secondary,
+                color: colorScheme.secondary,
                 fontWeight: FontWeight.w600,
               ),
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 20),
-                color: AppColors.textMuted,
+                color: colorScheme.onSurfaceVariant,
                 tooltip: 'Apagar',
                 onPressed: onDelete,
               ),
