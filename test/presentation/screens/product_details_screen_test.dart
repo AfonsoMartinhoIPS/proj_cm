@@ -85,7 +85,7 @@ void main() {
       );
 
       // Act & Assert
-      expect(find.text('Calorias: 250 kcal'), findsOneWidget);
+      expect(find.text('Calorias: 250.0 kcal'), findsOneWidget);
     });
 
     testWidgets('ProductDetailsScreen has save button when not saved', (

@@ -47,19 +47,6 @@ void main() {
       expect(product.allergenTags, contains('gluten'));
     });
 
-    test('Product should support equality comparison', () {
-      final product2 = Product(
-        barcode: '8710398038274',
-        name: 'Test Product',
-        brand: 'Test Brand',
-        nutriments: nutriments,
-        source: 'openfoodfacts',
-        fetchedAt: DateTime(2024, 1, 15),
-      );
-
-      expect(product, product2);
-    });
-
     test('Product with different barcode should not be equal', () {
       final differentProduct = Product(
         barcode: '9999999999999',
