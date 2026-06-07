@@ -140,6 +140,13 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if request.auth != null;
     }
+    // Feedback é uma coleção write-only do ponto de vista do utilizador.
+    // A equipa lê via Firebase Console; o cliente nunca lê de volta.
+    match /feedback/{doc} {
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid;
+      allow read, update, delete: if false;
+    }
   }
 }
 ```
@@ -202,7 +209,12 @@ users/{uid}/nutrition_logs/{YYYY-MM-DD}
 products/{barcode}      (cache partilhado de OpenFoodFacts)
 ├── barcode, name, brand, nutriments, imageUrl, allergenTags
 ├── nutriscore, novaGroup, source, fetchedAt
+
+feedback/{auto-id}      (write-only do utilizador, lido na console)
+├── uid, email, device, osVersion, model
+├── message, createdAt (serverTimestamp)
 ```
+
 
 ---
 

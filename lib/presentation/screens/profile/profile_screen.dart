@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/data/repositories/feedback_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/domain/entities/feedback_entry.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
@@ -79,15 +82,15 @@ class ProfileScreen extends ConsumerWidget {
 ///
 /// Recolhe automaticamente informações do dispositivo (sistema operativo,
 /// versão e modelo) e permite ao utilizador escrever uma mensagem de feedback.
-class _FeedbackSheet extends StatefulWidget {
+class _FeedbackSheet extends ConsumerStatefulWidget {
   const _FeedbackSheet();
 
   @override
-  State<_FeedbackSheet> createState() => _FeedbackSheetState();
+  ConsumerState<_FeedbackSheet> createState() => _FeedbackSheetState();
 }
 
 /// Estado da [_FeedbackSheet] que gere os campos de texto e a submissão.
-class _FeedbackSheetState extends State<_FeedbackSheet> {
+class _FeedbackSheetState extends ConsumerState<_FeedbackSheet> {
   late final TextEditingController _deviceController;
   late final TextEditingController _osVersionController;
   late final TextEditingController _modelController;
@@ -133,12 +136,48 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
     super.dispose();
   }
 
-  /// Submete o feedback (simulação).
+  bool _submitting = false;
+
+  /// Submete o feedback para o Firestore via [FeedbackRepositoryImpl].
   ///
-  /// A lógica real de envio será implementada posteriormente.
-  void _submit() {
-    Navigator.of(context).pop();
-    NutriFeedback.showSuccess(context, 'Feedback enviado (simulação)');
+  /// Valida que a mensagem não está vazia e que há um utilizador
+  /// autenticado (necessário pelas regras de segurança). Em caso de erro
+  /// de rede / permissão, exibe o erro mas mantém a folha aberta para o
+  /// utilizador poder tentar de novo sem perder o texto escrito.
+  Future<void> _submit() async {
+    final message = _feedbackController.text.trim();
+    if (message.isEmpty) {
+      NutriFeedback.showError(context, 'Escreve uma mensagem antes de enviar');
+      return;
+    }
+    final user = ref.read(authProvider).value;
+    if (user == null) {
+      NutriFeedback.showError(context, 'Sessão expirada');
+      return;
+    }
+
+    setState(() => _submitting = true);
+    try {
+      await FeedbackRepositoryImpl().submit(
+        FeedbackEntry(
+          uid: user.uid,
+          email: user.email,
+          device: _deviceController.text.trim(),
+          osVersion: _osVersionController.text.trim(),
+          model: _modelController.text.trim(),
+          message: message,
+        ),
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      NutriFeedback.showSuccess(context, 'Feedback enviado. Obrigado!');
+    } catch (e, st) {
+      logger.e('FeedbackSheet: submit failed', error: e, stackTrace: st);
+      if (!mounted) return;
+      NutriFeedback.showError(context, 'Não foi possível enviar. Tenta de novo.');
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   @override
@@ -190,7 +229,8 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
             const SizedBox(height: 24),
             NutriButton(
               label: 'Enviar Feedback',
-              onPressed: _submit,
+              isLoading: _submitting,
+              onPressed: _submitting ? null : _submit,
             ),
           ],
         ),

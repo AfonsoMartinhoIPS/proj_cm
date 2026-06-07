@@ -26,4 +26,9 @@ class FirestorePaths {
   /// Caminho para a coleção de registos nutricionais de um utilizador
   /// (`users/{uid}/nutrition_logs`).
   static String nutritionLogs(String uid) => 'users/$uid/nutrition_logs';
+
+  /// Caminho para a coleção global de feedback enviado pelos utilizadores
+  /// (`feedback`). Cada documento usa um id auto-gerado pelo Firestore;
+  /// a equipa consome esta coleção off-band pela Firebase Console.
+  static const String feedback = 'feedback';
 }
