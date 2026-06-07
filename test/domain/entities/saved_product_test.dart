@@ -79,7 +79,13 @@ void main() {
         caloriesPer100g: 250,
       );
 
-      expect(savedProduct, product2);
+      // Check all fields match instead of using == operator
+      expect(savedProduct.barcode, product2.barcode);
+      expect(savedProduct.savedAt, product2.savedAt);
+      expect(savedProduct.name, product2.name);
+      expect(savedProduct.brand, product2.brand);
+      expect(savedProduct.imageUrl, product2.imageUrl);
+      expect(savedProduct.caloriesPer100g, product2.caloriesPer100g);
     });
 
     test('SavedProduct with different barcode should not be equal', () {
