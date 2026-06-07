@@ -19,8 +19,12 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 /// Estado do [RegisterScreen] que gere os campos de texto e a submissão.
+///
+/// Apenas pede email + password (+ confirmação). O nome já foi recolhido
+/// no primeiro passo do onboarding (`PersonalDataScreen`) e vive no
+/// [onboardingProvider]; pedir de novo aqui levaria a duplicação ou
+/// sobreposição silenciosa do valor.
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -28,7 +32,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   void dispose() {
-    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -40,14 +43,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   /// Verifica se todos os campos estão preenchidos e se as palavras‑passe
   /// coincidem. Em caso de erro, exibe uma snackbar. Se tudo estiver correto,
   /// transfere as credenciais para o [onboardingProvider] e invoca o registo
-  /// no [authProvider].
+  /// no [authProvider] com o estado de onboarding já completo (incluindo o
+  /// nome recolhido na `PersonalDataScreen`).
   void submit() {
-    final name = nameController.text.trim();
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
+    final onboarding = ref.read(onboardingProvider);
 
-    if (name.isEmpty ||
+    if (onboarding.name.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
@@ -71,8 +75,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     ref
         .read(onboardingProvider.notifier)
         .setCredentials(email: email, password: password);
-    final onboarding = ref.read(onboardingProvider).copyWith(name: name);
-    ref.read(authProvider.notifier).register(onboarding);
+    ref.read(authProvider.notifier).register(ref.read(onboardingProvider));
   }
 
   @override
@@ -118,13 +121,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 variant: NutriLabelVariant.small,
               ),
               const SizedBox(height: 35),
-              NutriTextField(
-                controller: nameController,
-                label: 'Nome Completo',
-                hint: 'Ana Ferreira',
-                icon: Icons.person,
-              ),
-              const SizedBox(height: 20),
               NutriTextField(
                 controller: emailController,
                 label: 'Email',
