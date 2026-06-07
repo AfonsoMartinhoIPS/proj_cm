@@ -21,7 +21,13 @@ class _CalculationScreenState extends State<CalculationScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 4), () {
-      if (mounted) context.go('/onboarding/nutrition-goals');
+      // pushReplacement removes the calculation screen from the stack while
+      // keeping objectives_screen (and everything below it) — back from
+      // nutrition-goals therefore returns to objectives instead of either
+      // looping on the 4 s timer (context.go would clear the stack) or
+      // re-running the calculation animation (context.push would leave it
+      // mounted and the user back to a "calculating..." screen).
+      if (mounted) context.pushReplacement('/onboarding/nutrition-goals');
     });
   }
 

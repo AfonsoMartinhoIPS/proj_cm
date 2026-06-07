@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/components/nutri_wave_background.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
@@ -46,6 +48,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     ref.read(authProvider.notifier).login(email, password);
+  }
+
+  /// Envia um email de recuperação de palavra-passe via Firebase Auth.
+  ///
+  /// Exige que o campo de email esteja preenchido. O Firebase trata o envio
+  /// e responde com sucesso mesmo para emails inexistentes (anti-enumeração),
+  /// pelo que a mensagem de sucesso é neutra. Erros de formato de email são
+  /// surfaced via [NutriFeedback.showError].
+  Future<void> _resetPassword() async {
+    final email = emailController.text.trim();
+    if (email.isEmpty) {
+      NutriFeedback.showError(context, 'Introduz o email primeiro');
+      return;
+    }
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      if (!mounted) return;
+      NutriFeedback.showSuccess(
+        context,
+        'Email de recuperação enviado para $email',
+      );
+    } on FirebaseAuthException catch (e) {
+      logger.w('Password reset failed: ${e.code}');
+      if (!mounted) return;
+      NutriFeedback.showError(
+        context,
+        e.code == 'invalid-email'
+            ? 'Email inválido'
+            : 'Não foi possível enviar o email. Tenta de novo.',
+      );
+    }
   }
 
   @override
@@ -142,7 +175,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: NutriButton.text(
-                    onPressed: () {},
+                    onPressed: _resetPassword,
                     label: 'Esqueceste a password?',
                   ),
                 ),
