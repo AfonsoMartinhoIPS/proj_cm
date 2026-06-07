@@ -141,31 +141,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 icon: Icons.lock_reset_outlined,
                 obscureText: true,
               ),
-              const SizedBox(height: 30),
-              Row(
-                children: [
-                  Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: colorScheme.outline),
-                    ),
-                    child: Icon(
-                      Icons.check,
-                      size: 14,
-                      color: colorScheme.secondary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: NutriLabel(
-                      'Aceito os Termos de Serviço e a Política de Privacidade.',
-                      variant: NutriLabelVariant.small,
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 40),
               NutriButton(
                 label: 'Registar',
