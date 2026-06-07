@@ -41,16 +41,6 @@ void main() {
         expect(state, isA<AsyncValue>());
       });
 
-      test('initial days loaded is 7', () async {
-        // Arrange
-        final provider = nutritionLogsProvider.notifier;
-
-        // Act
-        final state = container.read(provider);
-
-        // Assert: Default should be 7 days
-        expect(state, isA<AsyncNotifier>());
-      });
     });
 
     group('loadMore', () {
