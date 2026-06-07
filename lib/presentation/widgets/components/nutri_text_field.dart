@@ -1,5 +1,6 @@
 // lib/presentation/widgets/nutri_text_field.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show TextInputFormatter;
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/components/nutri_label.dart';
 
@@ -51,6 +52,11 @@ class NutriTextField extends StatefulWidget {
   /// Callback chamado quando o utilizador submete a ação do teclado.
   final ValueChanged<String>? onSubmitted;
 
+  /// Formatadores aplicados em tempo real à entrada do utilizador. Útil
+  /// para restringir o que pode ser digitado (ex.: apenas dígitos num
+  /// campo numérico, evitando que o teclado fixo permita pontuação).
+  final List<TextInputFormatter>? inputFormatters;
+
   /// Cria um [NutriTextField].
   const NutriTextField({
     super.key,
@@ -67,6 +73,7 @@ class NutriTextField extends StatefulWidget {
     this.onChanged,
     this.onSubmitted,
     this.value,
+    this.inputFormatters,
   });
 
   @override
@@ -189,6 +196,7 @@ class _NutriTextFieldState extends State<NutriTextField> {
                           textInputAction: widget.textInputAction,
                           onChanged: widget.onChanged,
                           onFieldSubmitted: widget.onSubmitted,
+                          inputFormatters: widget.inputFormatters,
                           cursorColor: theme.colorScheme.secondary,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: AppSizes.fontMd - 1,

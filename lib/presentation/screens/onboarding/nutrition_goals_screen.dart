@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
@@ -111,31 +112,41 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                     NutriTextField(
                       controller: caloriesController,
                       label: 'Calorias (kcal)',
+                      hint: 'ex. 1580',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(height: 12),
                     NutriTextField(
                       controller: proteinController,
                       label: 'Proteína (g)',
+                      hint: 'ex. 150',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(height: 12),
                     NutriTextField(
                       controller: carbsController,
                       label: 'Hidratos (g)',
+                      hint: 'ex. 210',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(height: 12),
                     NutriTextField(
                       controller: fatController,
                       label: 'Gordura (g)',
+                      hint: 'ex. 70',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(height: 12),
                     NutriTextField(
                       controller: waterController,
                       label: 'Água (ml)',
+                      hint: 'ex. 2500',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                   ],
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:nutri_scan/domain/entities/product.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
@@ -66,7 +67,9 @@ class AddMealProductSelected extends StatelessWidget {
         NutriTextField(
           controller: servingsController,
           label: 'Quantidade (g)',
+          hint: 'ex. 100',
           keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         ),
         const SizedBox(height: 16),
         NutriProductNutritionTable(product: product),

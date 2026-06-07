@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuthException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/core/notifications/notification_coordinator.dart';
@@ -13,6 +14,30 @@ import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 /// não existe sessão ativa.  Trata das operações de login, registo, atualização
 /// de objetivos e logout, mantendo a sincronização com o Firestore e o
 /// Firebase Auth.
+/// Traduz erros internos (sobretudo [FirebaseAuthException]) para mensagens
+/// curtas em português próprias para mostrar ao utilizador via snackbar.
+/// Códigos não mapeados caem num fallback genérico para evitar expor
+/// stacktraces ou prefixos `[firebase_auth/...]` na UI.
+String _friendlyAuthMessage(Object error) {
+  if (error is FirebaseAuthException) {
+    return switch (error.code) {
+      'invalid-email' => 'Email inválido.',
+      'user-disabled' => 'Esta conta foi desativada.',
+      'user-not-found' || 'invalid-credential' || 'wrong-password' =>
+        'Email ou password incorretos.',
+      'email-already-in-use' => 'Este email já está em uso.',
+      'weak-password' => 'Password demasiado fraca (mínimo 6 caracteres).',
+      'operation-not-allowed' => 'Método de autenticação não permitido.',
+      'network-request-failed' => 'Sem ligação à internet.',
+      'too-many-requests' =>
+        'Demasiadas tentativas. Aguarda alguns minutos.',
+      _ => 'Erro ao autenticar. Tenta de novo.',
+    };
+  }
+  if (error is String) return error;
+  return 'Algo correu mal. Tenta de novo.';
+}
+
 class AuthNotifier extends AsyncNotifier<AppUser?> {
   AuthRepositoryImpl authRepository = AuthRepositoryImpl();
   UserRepositoryImpl userRepository = UserRepositoryImpl();
@@ -58,7 +83,7 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       return user;
     } catch (e, st) {
       logger.e('AuthNotifier: error during build', error: e, stackTrace: st);
-      state = AsyncValue.error(e, st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
       return null;
     }
   }
@@ -90,7 +115,7 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       state = AsyncValue.data(user);
     } catch (e, st) {
       logger.e('AuthNotifier: login error', error: e, stackTrace: st);
-      state = AsyncValue.error(e, st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
     }
   }
 
@@ -127,7 +152,7 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       }
     } catch (e, st) {
       logger.e('AuthNotifier: updateGoals error', error: e, stackTrace: st);
-      state = AsyncValue.error(e, st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
     }
   }
 
@@ -183,7 +208,7 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       state = AsyncValue.data(userWithGoals);
     } catch (e, st) {
       logger.e('AuthNotifier: register error', error: e, stackTrace: st);
-      state = AsyncValue.error(e, st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
     }
   }
 }
