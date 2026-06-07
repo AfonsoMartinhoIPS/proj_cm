@@ -184,6 +184,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   isLoading: authState.isLoading,
                   onPressed: submit,
                 ),
+                const SizedBox(height: 32),
+                // UI placeholder for Google sign-in — implementation owned
+                // by the frontend team. Button is intentionally inert until
+                // the OAuth flow lands.
+                Row(
+                  children: [
+                    Expanded(
+                      child: NutriButton.transparent(
+                        label: 'Google',
+                        icon: Image.asset(
+                          'assets/logos/google-logo-50.png',
+                          height: 18,
+                        ),
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 40),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
