@@ -167,7 +167,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 20),
                 NutriTextField(
                   label: 'Password',
-                  hint: '••••••••',
                   icon: Icons.lock_outline,
                   obscureText: true,
                   controller: passwordController,

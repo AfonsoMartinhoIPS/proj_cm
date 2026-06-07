@@ -158,7 +158,6 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                     child: NutriTextField(
                       controller: weightController,
                       label: 'Peso (kg)',
-                      hint: 'ex. 62',
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -167,7 +166,6 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                     child: NutriTextField(
                       controller: heightController,
                       label: 'Altura (cm)',
-                      hint: 'ex. 168',
                       keyboardType: TextInputType.number,
                     ),
                   ),

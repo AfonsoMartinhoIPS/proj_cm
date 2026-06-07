@@ -131,7 +131,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               NutriTextField(
                 controller: passwordController,
                 label: 'Password',
-                hint: '••••••••',
                 icon: Icons.lock_outline,
                 obscureText: true,
               ),
@@ -139,7 +138,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               NutriTextField(
                 controller: confirmPasswordController,
                 label: 'Confirmar Password',
-                hint: '••••••••',
                 icon: Icons.lock_reset_outlined,
                 obscureText: true,
               ),

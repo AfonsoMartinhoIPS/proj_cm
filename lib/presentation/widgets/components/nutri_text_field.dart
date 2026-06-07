@@ -13,7 +13,10 @@ class NutriTextField extends StatefulWidget {
   final String label;
 
   /// O texto de ajuda (placeholder) que aparece quando o campo está vazio.
-  final String hint;
+  /// Opcional: passa `null` para esconder o placeholder em campos onde o
+  /// rótulo + tipo de teclado já comunicam o formato esperado (passwords,
+  /// numéricos com unidade no label, etc.).
+  final String? hint;
 
   /// O texto inicial
   final String? value;
@@ -52,7 +55,7 @@ class NutriTextField extends StatefulWidget {
   const NutriTextField({
     super.key,
     required this.label,
-    required this.hint,
+    this.hint,
     this.icon,
     this.obscureText = false,
     this.controller,
@@ -206,8 +209,14 @@ class _NutriTextFieldState extends State<NutriTextField> {
                             contentPadding: EdgeInsets.zero,
                             hintText: widget.hint,
                             hintStyle: TextStyle(
-                              color: hintColor,
+                              // Lighter + italic so hints read as placeholder
+                              // examples ("ex. 62") instead of pre-filled
+                              // values. 0.4 alpha keeps them legible without
+                              // competing with real input text.
+                              color: theme.colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.4),
                               fontSize: AppSizes.fontMd - 1,
+                              fontStyle: FontStyle.italic,
                             ),
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,

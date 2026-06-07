@@ -66,7 +66,6 @@ class AddMealProductSelected extends StatelessWidget {
         NutriTextField(
           controller: servingsController,
           label: 'Quantidade (g)',
-          hint: '100',
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: 16),
