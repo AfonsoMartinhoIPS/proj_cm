@@ -38,18 +38,7 @@ class CreditsScreen extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Icon(
-                    Icons.restaurant_menu,
-                    color: colorScheme.onPrimary,
-                    size: 40,
-                  ),
-                ),
+                const NutriIcon(size: 80, fill: true),
                 const SizedBox(height: 15),
                 NutriLabel.rich(
                   TextSpan(

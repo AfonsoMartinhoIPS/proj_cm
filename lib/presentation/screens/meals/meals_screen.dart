@@ -38,12 +38,10 @@ class MealsScreen extends ConsumerStatefulWidget {
   ConsumerState<MealsScreen> createState() => _MealsScreenState();
 }
 
-/// Estado do [MealsScreen] que gere a pesquisa, a seleção de período e a
-/// lista de registos.
+/// Estado do [MealsScreen] que gere a seleção de período e a lista de
+/// registos.
 class _MealsScreenState extends ConsumerState<MealsScreen> {
-  final _searchController = TextEditingController();
   final _scrollController = ScrollController();
-  String _query = '';
   bool _loadingMore = false;
 
   /// Modo de visualização atualmente selecionado.
@@ -118,7 +116,6 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -138,12 +135,6 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
     } finally {
       if (mounted) setState(() => _loadingMore = false);
     }
-  }
-
-  bool _matchesQuery(NutritionLog log) {
-    if (_query.isEmpty) return true;
-    final q = _query.toLowerCase();
-    return log.entries.any((e) => e.productName.toLowerCase().contains(q));
   }
 
   String _dateKey(DateTime d) =>
@@ -246,57 +237,12 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
   }
 
   /// Vista de pesquisa global.
-  ///
-  /// Exibe uma lista plana de todos os dias que correspondem ao texto de
-  /// pesquisa, independentemente do período selecionado. Se não houver
-  /// resultados, apresenta um estado vazio com opção de limpar a pesquisa.
-  Widget _buildSearchResults(List<NutritionLog> logs) {
-    final filtered = logs.where((l) => _matchesQuery(l)).toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
-
-    if (filtered.isEmpty) {
-      return NutriEmptyState(
-        icon: Icons.search_off,
-        title: 'Nenhum resultado para "$_query"',
-        subtitle: 'Tenta outra pesquisa.',
-        actionLabel: 'Limpar pesquisa',
-        onAction: () {
-          _searchController.clear();
-          setState(() => _query = '');
-        },
-      );
-    }
-
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
-      itemCount: filtered.length + 1,
-      itemBuilder: (context, index) {
-        if (index == filtered.length) {
-          return _loadingMore
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: AppSizes.md),
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              : const SizedBox.shrink();
-        }
-        final log = filtered[index];
-        return DaySummaryCard(
-          log: log,
-          onTap: () => context.push('/meals/day/${log.date}'),
-          onDelete: () async => _deleteLog(log),
-        );
-      },
-    );
-  }
-
   /// Vista para o modo [PeriodMode.day].
   ///
   /// Lista as refeições do dia [_selectedDate]. Se o dia não tiver refeições,
   /// exibe um estado vazio.
   Widget _buildDayView(List<NutritionLog> logs) {
-    final filtered = logs.where((l) => _matchesQuery(l)).toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+    final filtered = [...logs]..sort((a, b) => b.date.compareTo(a.date));
 
     if (filtered.isEmpty) {
       return NutriEmptyState(
@@ -618,22 +564,7 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSizes.md,
-                AppSizes.md,
-                AppSizes.md,
-                AppSizes.sm,
-              ),
-              child: NutriTextField(
-                label: 'Pesquisar',
-                hint: 'Nome do produto…',
-                icon: Icons.search,
-                controller: _searchController,
-                onChanged: (v) => setState(() => _query = v.trim()),
-              ),
-            ),
-            if (_query.isEmpty) _buildPeriodSelector(),
+            _buildPeriodSelector(),
             Expanded(
               child: async.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -645,24 +576,16 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
                   ),
                 ),
                 data: (logs) {
-                  if (_query.isNotEmpty) {
-                    return _buildSearchResults(logs);
-                  }
-
                   final filteredByPeriod = _filterByPeriod(logs);
-                  final searched = filteredByPeriod
-                      .where((l) => _matchesQuery(l))
-                      .toList();
-
                   switch (_periodMode) {
                     case PeriodMode.day:
-                      return _buildDayView(searched);
+                      return _buildDayView(filteredByPeriod);
                     case PeriodMode.week:
-                      return _buildWeekView(searched);
+                      return _buildWeekView(filteredByPeriod);
                     case PeriodMode.month:
-                      return _buildMonthView(searched);
+                      return _buildMonthView(filteredByPeriod);
                     case PeriodMode.year:
-                      return _buildYearView(searched);
+                      return _buildYearView(filteredByPeriod);
                   }
                 },
               ),
