@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/components/nutri_wave_background.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
@@ -55,7 +56,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// Exige que o campo de email esteja preenchido. O Firebase trata o envio
   /// e responde com sucesso mesmo para emails inexistentes (anti-enumeração),
   /// pelo que a mensagem de sucesso é neutra. Erros de formato de email são
-  /// surfaced via [NutriFeedback.showError].
+  /// reportados via [NutriFeedback.showError].
   Future<void> _resetPassword() async {
     final email = emailController.text.trim();
     if (email.isEmpty) {
@@ -78,6 +79,47 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ? 'Email inválido'
             : 'Não foi possível enviar o email. Tenta de novo.',
       );
+    }
+  }
+
+  /// Início de sessão com a conta Google via Firebase Auth.
+  ///
+  /// Implementação trazida do branch `development`. Inicializa o
+  /// `GoogleSignIn`, abre o fluxo de autenticação, troca o `idToken`
+  /// resultante por uma credencial Firebase e faz `signInWithCredential`.
+  /// Falhas são propagadas para o utilizador via snackbar.
+  Future<void> _googleSignIn() async {
+    final googleSignInInstance = GoogleSignIn.instance;
+    final firebaseAuthInstance = FirebaseAuth.instance;
+
+    try {
+      await googleSignInInstance.initialize();
+
+      final googleUser = await googleSignInInstance.authenticate();
+
+      // Se o utilizador cancelar a autenticação, googleUser será nulo.
+      // Saímos sem erro — `Future<void>` deve sempre regressar `null`
+      // implicitamente, nunca `return null` explícito.
+      final googleAuth = googleUser.authentication;
+
+      final credentialGoogle = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final authenticatedUser = await firebaseAuthInstance
+          .signInWithCredential(credentialGoogle);
+      if (authenticatedUser.user == null) {
+        throw Exception('Erro ao autenticar com Google');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      NutriFeedback.showError(
+        context,
+        'Erro de autenticação: ${e.message}',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      NutriFeedback.showError(context, 'Erro inesperado: $e');
     }
   }
 
@@ -197,7 +239,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           'assets/logos/google-logo-50.png',
                           height: 18,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                        _googleSignIn();
+                        },
                       ),
                     ),
                   ],

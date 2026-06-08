@@ -68,9 +68,10 @@ class DefaultFirebaseOptions {
   );
 
   /// Configuração do Firebase para a plataforma Android.
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyATTGeeYrVepWzdVz2KwwLqYvfHlwJESWU',
-    appId: '1:258705131162:android:08b1c7212143da09078123',
+    appId: '1:258705131162:android:b41bd1b55535fa84078123',
     messagingSenderId: '258705131162',
     projectId: 'nutriscan-859af',
     storageBucket: 'nutriscan-859af.firebasestorage.app',
