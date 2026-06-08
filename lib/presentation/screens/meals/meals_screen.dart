@@ -54,9 +54,15 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
   bool _loadingMore = false;
   _Range _range = _Range.week;
 
+  /// Mês mostrado quando `_range == _Range.month`. Default = mês atual.
+  /// Mutado pelos chevrons no `_MonthNavigator`. Não usado nos outros modos.
+  late DateTime _displayMonth;
+
   @override
   void initState() {
     super.initState();
+    final now = DateTime.now();
+    _displayMonth = DateTime(now.year, now.month);
     _scrollController.addListener(_onScroll);
   }
 
@@ -111,9 +117,18 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
 
   /// Filtra a lista bruta de logs pela `_Range` selecionada.
   ///
-  /// `_Range.all` devolve sem alterações; os outros modos cortam por uma
-  /// janela rolante de [_Range.days] dias terminada em "hoje".
+  /// `_Range.month` filtra pelo mês calendário em [_displayMonth] (pode ser
+  /// no passado, navegável via chevrons). Os outros modos usam janela
+  /// rolante terminada em "hoje" (ou tudo no caso de `_Range.all`).
   List<NutritionLog> _filter(List<NutritionLog> logs) {
+    if (_range == _Range.month) {
+      return logs.where((l) {
+        final d = DateTime.tryParse(l.date);
+        return d != null &&
+            d.year == _displayMonth.year &&
+            d.month == _displayMonth.month;
+      }).toList();
+    }
     final days = _range.days;
     if (days == null) return logs;
     final today = DateTime.now();
@@ -124,6 +139,27 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
       if (d == null) return false;
       return !d.isBefore(cutoff);
     }).toList();
+  }
+
+  /// Quando o utilizador navega para um mês passado que ainda não está
+  /// no range carregado, expande o `daysLoaded` do provider para cobrir
+  /// até ao primeiro dia desse mês. Fire-and-forget: se a rede falhar,
+  /// o utilizador vê o estado vazio + pode tentar de novo via
+  /// pull-to-refresh.
+  Future<void> _ensureMonthLoaded(DateTime month) async {
+    final notifier = ref.read(nutritionLogsProvider.notifier);
+    final today = DateTime.now();
+    final firstOfMonth = DateTime(month.year, month.month, 1);
+    final daysBack = today.difference(firstOfMonth).inDays + 1;
+    if (daysBack <= notifier.daysLoaded) return;
+    await notifier.setRange(daysBack);
+  }
+
+  void _shiftMonth(int by) {
+    setState(() {
+      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + by);
+    });
+    _ensureMonthLoaded(_displayMonth);
   }
 
   @override
@@ -169,9 +205,32 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
                     NutriChipSelector<_Range>(
                       items: _Range.values,
                       selected: _range,
-                      onChanged: (r) => setState(() => _range = r),
+                      onChanged: (r) {
+                        setState(() {
+                          _range = r;
+                          // Ao voltar para "Mês", reset para o mês atual
+                          // — evita ficar preso num mês antigo escolhido
+                          // anteriormente.
+                          if (r == _Range.month) {
+                            final now = DateTime.now();
+                            _displayMonth = DateTime(now.year, now.month);
+                          }
+                        });
+                      },
                       label: (r) => r.label,
                     ),
+                    if (_range == _Range.month) ...[
+                      const SizedBox(height: AppSizes.sm),
+                      _MonthNavigator(
+                        month: _displayMonth,
+                        onPrev: () => _shiftMonth(-1),
+                        // Bloqueia avançar para o futuro: não faz sentido
+                        // ver refeições de um mês que ainda não chegou.
+                        onNext: _isCurrentMonth(_displayMonth)
+                            ? null
+                            : () => _shiftMonth(1),
+                      ),
+                    ],
                     const SizedBox(height: AppSizes.md),
                     _PeriodSummary(logs: filtered),
                     const SizedBox(height: AppSizes.md),
@@ -193,6 +252,56 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
           },
         ),
       ),
+    );
+  }
+}
+
+bool _isCurrentMonth(DateTime m) {
+  final now = DateTime.now();
+  return m.year == now.year && m.month == now.month;
+}
+
+/// Barra de navegação por mês (chevrons + nome do mês). Aparece só quando
+/// `_range == _Range.month`. `onNext == null` desativa o chevron direito
+/// (mês atual — não há mais nada para a frente).
+class _MonthNavigator extends StatelessWidget {
+  final DateTime month;
+  final VoidCallback onPrev;
+  final VoidCallback? onNext;
+
+  const _MonthNavigator({
+    required this.month,
+    required this.onPrev,
+    required this.onNext,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.chevron_left),
+          color: colorScheme.onSurface,
+          tooltip: 'Mês anterior',
+          onPressed: onPrev,
+        ),
+        NutriLabel(
+          '${ptMonthsFull[month.month - 1]} ${month.year}',
+          variant: NutriLabelVariant.bodyLarge,
+          fontWeight: FontWeight.bold,
+          color: colorScheme.onSurface,
+        ),
+        IconButton(
+          icon: const Icon(Icons.chevron_right),
+          color: onNext == null
+              ? colorScheme.onSurfaceVariant.withValues(alpha: 0.4)
+              : colorScheme.onSurface,
+          tooltip: 'Mês seguinte',
+          onPressed: onNext,
+        ),
+      ],
     );
   }
 }
