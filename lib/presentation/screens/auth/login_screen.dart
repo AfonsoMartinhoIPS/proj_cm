@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nutri_scan/presentation/widgets/components/nutri_wave_background.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
@@ -46,6 +48,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     ref.read(authProvider.notifier).login(email, password);
+  }
+
+  Future<void> _googleSignIn() async {
+    final GoogleSignIn _googleSignInInstance = GoogleSignIn.instance;
+    final FirebaseAuth _firebaseAuthInstance = FirebaseAuth.instance;
+
+    try {
+      await _googleSignInInstance.initialize();
+
+      final GoogleSignInAccount? googleUser = await _googleSignInInstance
+          .authenticate();
+
+      // Se o utilizador cancelar a autenticação, googleUser será nulo.
+      if (googleUser == null) return null;
+
+      // Obter os tokens de autenticação do Google.
+      final googleAuth = googleUser.authentication;
+
+      final credentialGoogle = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final authenticatedUser = await _firebaseAuthInstance
+          .signInWithCredential(credentialGoogle);
+      if (authenticatedUser.user == null) {
+        throw Exception('Erro ao autenticar com Google');
+      }
+    } on FirebaseAuthException catch (e) {
+      NutriFeedback.showSnackBar(
+        context,
+        'Erro de autenticação: ${e.message}',
+        NutriFeedbackType.error,
+      );
+    } catch (e) {
+      NutriFeedback.showSnackBar(
+        context,
+        'Erro inesperado: $e',
+        NutriFeedbackType.error,
+      );
+    }
   }
 
   @override
@@ -162,7 +204,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           'assets/logos/google-logo-50.png',
                           height: 18,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                        _googleSignIn();
+                        },
                       ),
                     ),
                   ],
