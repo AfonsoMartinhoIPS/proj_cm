@@ -61,10 +61,7 @@ class ProductDetailsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                NutriProductThumbnail(
-                  url: product.imageUrl ?? product.imageThumbnailUrl,
-                  size: 90,
-                ),
+                _ProductHeader(product: product),
                 const SizedBox(height: 24),
                 NutriProductNutritionTable(product: product),
                 const SizedBox(height: 24),
@@ -135,6 +132,66 @@ class _NotFoundState extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Cabeçalho do produto: miniatura + nome, marca, quantidade na embalagem
+/// e código de barras. Repõe a informação descritiva que se tinha perdido
+/// no refactor de componentes (commit 0cb5493) — sem ela o ecrã ficava
+/// só com imagem + tabela nutricional, sem identificar o produto.
+class _ProductHeader extends StatelessWidget {
+  final Product product;
+
+  const _ProductHeader({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        NutriProductThumbnail(
+          url: product.imageUrl ?? product.imageThumbnailUrl,
+          size: 90,
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              NutriLabel(
+                product.name,
+                color: colorScheme.onSurface,
+                variant: NutriLabelVariant.bodyLarge,
+                fontWeight: FontWeight.bold,
+              ),
+              if ((product.brand ?? '').isNotEmpty) ...[
+                const SizedBox(height: 4),
+                NutriLabel(
+                  product.brand!,
+                  color: colorScheme.onSurfaceVariant,
+                  variant: NutriLabelVariant.body,
+                ),
+              ],
+              if ((product.displayQuantity ?? '').isNotEmpty) ...[
+                const SizedBox(height: 4),
+                NutriLabel(
+                  product.displayQuantity!,
+                  variant: NutriLabelVariant.small,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ],
+              const SizedBox(height: 6),
+              NutriLabel(
+                'Cód: ${product.barcode}',
+                color: colorScheme.onSurfaceVariant,
+                variant: NutriLabelVariant.small,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
