@@ -50,21 +50,12 @@ class ProductDetailsScreen extends ConsumerWidget {
       ),
       body: asyncProduct.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
-          child: NutriLabel(
-            'Erro: $e',
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
+        // Errors thrown by the repo (network, parse) and the "not found"
+        // null case both end up here visually — same friendly empty state
+        // with actions, no stacktrace leaks to the UI.
+        error: (e, _) => _NotFoundState(barcode: barcode),
         data: (product) {
-          if (product == null) {
-            return Center(
-              child: NutriLabel(
-                'Produto não encontrado.',
-                color: colorScheme.onSurfaceVariant,
-              ),
-            );
-          }
+          if (product == null) return _NotFoundState(barcode: barcode);
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -87,6 +78,62 @@ class ProductDetailsScreen extends ConsumerWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Estado de produto-não-encontrado. Cobre tanto o caso de o repositório
+/// devolver `null` (404 do OFF, código inválido) como qualquer outro erro
+/// de rede — colapsados na mesma mensagem para evitar expor stacktraces.
+///
+/// Inclui o código que foi tentado para o utilizador confirmar à vista
+/// que digitalizou o que esperava, e um botão "Voltar" para regressar ao
+/// scanner sem ter que carregar na seta da AppBar.
+class _NotFoundState extends StatelessWidget {
+  final String barcode;
+
+  const _NotFoundState({required this.barcode});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 64,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 16),
+            NutriLabel(
+              'Produto não encontrado',
+              variant: NutriLabelVariant.bodyLarge,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            NutriLabel(
+              'Não conseguimos encontrar nada na base de dados para o código $barcode.',
+              variant: NutriLabelVariant.body,
+              color: colorScheme.onSurfaceVariant,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: 220,
+              child: NutriButton(
+                label: 'Voltar',
+                onPressed: () => context.pop(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

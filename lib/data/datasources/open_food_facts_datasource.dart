@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:nutri_scan/core/config/app_config.dart';
+import 'package:nutri_scan/core/utils/logger.dart';
 import 'package:nutri_scan/domain/entities/nutriments.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
 
@@ -33,10 +34,21 @@ class OpenFoodFactsDatasource {
   /// Devolve `null` se o produto não for encontrado ou se a API devolver um
   /// estado diferente de sucesso.
   static Future<Product?> getByBarcode(String barcode) async {
-    final response = await _dio.get(
-      '/product/$barcode.json',
-      queryParameters: {'fields': _fields},
-    );
+    final Response<dynamic> response;
+    try {
+      response = await _dio.get(
+        '/product/$barcode.json',
+        queryParameters: {'fields': _fields},
+      );
+    } on DioException catch (e) {
+      // OFF returns 404 for unknown barcodes — Dio defaults to throwing on
+      // non-2xx. Treat as "not found" instead of bubbling a stacktrace up to
+      // the UI. Network/timeout errors are also collapsed to null; the screen
+      // shows the same "produto não encontrado" empty state regardless of the
+      // underlying cause (the user just wants to know it didn't work).
+      logger.w('OFF getByBarcode failed: ${e.type} ${e.response?.statusCode}');
+      return null;
+    }
 
     final data = response.data as Map<String, dynamic>;
     if (data['status'] != 1) return null;
