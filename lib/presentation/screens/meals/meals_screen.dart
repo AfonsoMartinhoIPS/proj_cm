@@ -93,6 +93,22 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
     await notifier.setRange(notifier.daysLoaded);
   }
 
+  /// Confirma + apaga um dia inteiro via provider. Snackbar de feedback
+  /// no fim. Mantém o ecrã onde está (a remoção propaga via Riverpod).
+  Future<void> _confirmDelete(NutritionLog log) async {
+    final ok = await showNutriConfirmDialog(
+      context,
+      title: 'Apagar dia?',
+      body: 'Vai remover ${log.entries.length} '
+          '${log.entries.length == 1 ? 'refeição' : 'refeições'} '
+          'registadas em ${formatRelativeDate(log.date)}.',
+    );
+    if (!ok || !mounted) return;
+    await ref.read(nutritionLogsProvider.notifier).deleteDay(log.date);
+    if (!mounted) return;
+    NutriFeedback.showInfo(context, 'Dia removido');
+  }
+
   /// Filtra a lista bruta de logs pela `_Range` selecionada.
   ///
   /// `_Range.all` devolve sem alterações; os outros modos cortam por uma
@@ -163,10 +179,7 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
                       logs: filtered,
                       onDayTap: (log) =>
                           context.push('/meals/day/${log.date}'),
-                      onEntryTap: (log, entry) => context.push(
-                        '/meals/edit',
-                        extra: {'entry': entry, 'date': log.date},
-                      ),
+                      onDayDelete: (log) => _confirmDelete(log),
                     ),
                     if (_loadingMore)
                       const Padding(
