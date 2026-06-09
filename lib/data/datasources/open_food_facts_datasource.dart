@@ -1,3 +1,5 @@
+// lib/data/datasources/open_food_facts_datasource.dart
+
 import 'package:dio/dio.dart';
 import 'package:nutri_scan/core/config/app_config.dart';
 import 'package:nutri_scan/core/utils/logger.dart';
@@ -41,11 +43,11 @@ class OpenFoodFactsDatasource {
         queryParameters: {'fields': _fields},
       );
     } on DioException catch (e) {
-      // OFF returns 404 for unknown barcodes — Dio defaults to throwing on
-      // non-2xx. Treat as "not found" instead of bubbling a stacktrace up to
-      // the UI. Network/timeout errors are also collapsed to null; the screen
-      // shows the same "produto não encontrado" empty state regardless of the
-      // underlying cause (the user just wants to know it didn't work).
+      // OFF devolve 404 para códigos de barras desconhecidos — Dio lança por padrão em
+      // respostas não-2xx. Tratar como "não encontrado" em vez de propagar rastreamento para
+      // a UI. Erros de rede/timeout também são colapsos nulos; a tela
+      // mostra o mesmo estado vazio "produto não encontrado" independentemente de
+      // qual é a causa subjacente (o utilizador só quer saber que não funcionou).
       logger.w('OFF getByBarcode failed: ${e.type} ${e.response?.statusCode}');
       return null;
     }

@@ -1,9 +1,12 @@
+// lib/presentation/screens/meals/meals_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
+import 'package:nutri_scan/presentation/screens/history/history_helpers.dart';
 import 'package:nutri_scan/presentation/screens/meals/widgets/meals_timeline.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
@@ -15,7 +18,7 @@ import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 enum _Range {
   today(days: 1, label: 'Hoje'),
   week(days: 7, label: 'Semana'),
-  month(days: 30, label: 'Mês'),
+  month(days: null, label: 'Mês'),
   all(days: null, label: 'Tudo');
 
   const _Range({required this.days, required this.label});
@@ -63,29 +66,21 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
     super.initState();
     final now = DateTime.now();
     _displayMonth = DateTime(now.year, now.month);
-    _scrollController.addListener(_onScroll);
+    setupScrollPagination(
+      controller: _scrollController,
+      isActive: () => _range == _Range.all,
+      onLoadMore: _loadMore,
+    );
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    // Paginação só faz sentido quando estamos a ver "Tudo" — nos outros
-    // modos a janela já está delimitada, não há mais a carregar.
-    if (_range != _Range.all) return;
-    if (_loadingMore) return;
-    if (!_scrollController.hasClients) return;
-    final pos = _scrollController.position;
-    if (pos.pixels >= pos.maxScrollExtent - 200) {
-      _loadMore();
-    }
-  }
-
   Future<void> _loadMore() async {
+    if (_loadingMore) return;
     setState(() => _loadingMore = true);
     try {
       await ref.read(nutritionLogsProvider.notifier).loadMore();
@@ -97,48 +92,6 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
   Future<void> _refresh() async {
     final notifier = ref.read(nutritionLogsProvider.notifier);
     await notifier.setRange(notifier.daysLoaded);
-  }
-
-  /// Confirma + apaga um dia inteiro via provider. Snackbar de feedback
-  /// no fim. Mantém o ecrã onde está (a remoção propaga via Riverpod).
-  Future<void> _confirmDelete(NutritionLog log) async {
-    final ok = await showNutriConfirmDialog(
-      context,
-      title: 'Apagar dia?',
-      body: 'Vai remover ${log.entries.length} '
-          '${log.entries.length == 1 ? 'refeição' : 'refeições'} '
-          'registadas em ${formatRelativeDate(log.date)}.',
-    );
-    if (!ok || !mounted) return;
-    await ref.read(nutritionLogsProvider.notifier).deleteDay(log.date);
-    if (!mounted) return;
-    NutriFeedback.showInfo(context, 'Dia removido');
-  }
-
-  /// Filtra a lista bruta de logs pela `_Range` selecionada.
-  ///
-  /// `_Range.month` filtra pelo mês calendário em [_displayMonth] (pode ser
-  /// no passado, navegável via chevrons). Os outros modos usam janela
-  /// rolante terminada em "hoje" (ou tudo no caso de `_Range.all`).
-  List<NutritionLog> _filter(List<NutritionLog> logs) {
-    if (_range == _Range.month) {
-      return logs.where((l) {
-        final d = DateTime.tryParse(l.date);
-        return d != null &&
-            d.year == _displayMonth.year &&
-            d.month == _displayMonth.month;
-      }).toList();
-    }
-    final days = _range.days;
-    if (days == null) return logs;
-    final today = DateTime.now();
-    final cutoff = DateTime(today.year, today.month, today.day)
-        .subtract(Duration(days: days - 1));
-    return logs.where((l) {
-      final d = DateTime.tryParse(l.date);
-      if (d == null) return false;
-      return !d.isBefore(cutoff);
-    }).toList();
   }
 
   /// Quando o utilizador navega para um mês passado que ainda não está
@@ -160,6 +113,11 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
       _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + by);
     });
     _ensureMonthLoaded(_displayMonth);
+  }
+
+  bool get _isCurrentMonth {
+    final now = DateTime.now();
+    return _displayMonth.year == now.year && _displayMonth.month == now.month;
   }
 
   @override
@@ -187,7 +145,11 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
             ),
           ),
           data: (logs) {
-            final filtered = _filter(logs);
+            final filtered = filterLogs(
+              logs,
+              daysBack: _range.days,
+              month: _range == _Range.month ? _displayMonth : null,
+            );
             return RefreshIndicator(
               onRefresh: _refresh,
               child: SingleChildScrollView(
@@ -226,9 +188,8 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
                         onPrev: () => _shiftMonth(-1),
                         // Bloqueia avançar para o futuro: não faz sentido
                         // ver refeições de um mês que ainda não chegou.
-                        onNext: _isCurrentMonth(_displayMonth)
-                            ? null
-                            : () => _shiftMonth(1),
+                        onNext:
+                            _isCurrentMonth ? null : () => _shiftMonth(1),
                       ),
                     ],
                     const SizedBox(height: AppSizes.md),
@@ -238,7 +199,8 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
                       logs: filtered,
                       onDayTap: (log) =>
                           context.push('/meals/day/${log.date}'),
-                      onDayDelete: (log) => _confirmDelete(log),
+                      onDayDelete: (log) =>
+                          confirmDeleteDay(context, log, ref),
                     ),
                     if (_loadingMore)
                       const Padding(
@@ -254,11 +216,6 @@ class _MealsScreenState extends ConsumerState<MealsScreen> {
       ),
     );
   }
-}
-
-bool _isCurrentMonth(DateTime m) {
-  final now = DateTime.now();
-  return m.year == now.year && m.month == now.month;
 }
 
 /// Barra de navegação por mês (chevrons + nome do mês). Aparece só quando

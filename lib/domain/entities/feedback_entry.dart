@@ -1,3 +1,5 @@
+// lib/domain/entities/feedback_entry.dart
+
 /// Mensagem de feedback ou reporte de problema submetida por um utilizador.
 ///
 /// Captura a mensagem livre escrita pelo utilizador e o contexto do

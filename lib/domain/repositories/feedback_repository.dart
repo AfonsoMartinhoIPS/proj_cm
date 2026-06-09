@@ -1,3 +1,5 @@
+// lib/domain/repositories/feedback_repository.dart
+
 import 'package:nutri_scan/domain/entities/feedback_entry.dart';
 
 /// Interface de persistência para [FeedbackEntry].

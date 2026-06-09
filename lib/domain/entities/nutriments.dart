@@ -1,3 +1,5 @@
+// lib/domain/entities/nutriments.dart
+
 /// Composição nutricional por 100 g ou 100 ml de um produto.
 ///
 /// Fornece os valores típicos por 100 unidades e métodos auxiliares para

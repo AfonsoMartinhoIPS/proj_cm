@@ -1,3 +1,5 @@
+// lib/data/models/nutriments_model.dart
+
 import 'package:nutri_scan/domain/entities/nutriments.dart';
 
 /// Modelo de dados para conversão entre mapas e a entidade [Nutriments].

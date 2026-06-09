@@ -1,3 +1,5 @@
+// lib/domain/repositories/user_repository.dart
+
 import 'package:nutri_scan/domain/entities/app_user.dart';
 
 /// Contrato para operações de persistência do utilizador.

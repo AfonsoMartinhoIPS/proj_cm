@@ -1,3 +1,5 @@
+// lib/data/models/feedback_entry_model.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nutri_scan/domain/entities/feedback_entry.dart';
 

@@ -1,3 +1,5 @@
+// lib/presentation/providers/saved_products_provider.dart
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/data/models/saved_product_model.dart';

@@ -1,3 +1,5 @@
+// lib/data/repositories/product_repository_impl.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/data/datasources/open_food_facts_datasource.dart';

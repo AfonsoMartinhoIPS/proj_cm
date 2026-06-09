@@ -1,3 +1,5 @@
+// lib/core/theme/app_theme.dart
+
 import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
 

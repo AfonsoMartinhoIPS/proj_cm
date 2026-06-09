@@ -1,3 +1,5 @@
+// lib/core/utils/date_key.dart
+
 /// Converte um [DateTime] numa chave de documento no formato `YYYY-MM-DD`.
 ///
 /// Esta chave é utilizada como identificador único para os documentos diários

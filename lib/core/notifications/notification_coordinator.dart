@@ -1,3 +1,5 @@
+// lib/core/notifications/notification_coordinator.dart
+
 import 'package:flutter/material.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/core/notifications/notification_service.dart';

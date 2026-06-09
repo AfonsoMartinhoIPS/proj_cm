@@ -1,3 +1,5 @@
+// lib/presentation/providers/onboarding_provider.dart
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 
@@ -34,6 +36,10 @@ class OnboardingState {
   /// Metas nutricionais diárias calculadas (calorias, macronutrientes, água).
   final NutritionGoals? nutritionGoals;
 
+  /// Indica se o utilizador veio do fluxo de Google Sign-In.
+  /// Quando true, pula o passo de "Criar Conta" e salva diretamente.
+  final bool isFromGoogle;
+
   /// Cria um [OnboardingState] com os valores fornecidos.
   ///
   /// Todos os parâmetros têm valores padrão (vazios ou nulos), permitindo
@@ -48,6 +54,7 @@ class OnboardingState {
     this.height = 0,
     this.objective = Objective.maintainWeight,
     this.nutritionGoals,
+    this.isFromGoogle = false,
   });
 
   /// Cria uma cópia deste estado substituindo apenas os campos fornecidos.
@@ -64,6 +71,7 @@ class OnboardingState {
     int? height,
     Objective? objective,
     NutritionGoals? calculatedGoals,
+    bool? isFromGoogle,
   }) {
     return OnboardingState(
       name: name ?? this.name,
@@ -75,6 +83,7 @@ class OnboardingState {
       height: height ?? this.height,
       objective: objective ?? this.objective,
       nutritionGoals: calculatedGoals ?? nutritionGoals,
+      isFromGoogle: isFromGoogle ?? this.isFromGoogle,
     );
   }
 
@@ -128,6 +137,11 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   /// Define o objetivo principal de peso.
   void setObjective(Objective? objective) {
     state = state.copyWith(objective: objective);
+  }
+
+  /// Define o flag [isFromGoogle] para indicar que o utilizador veio do Google Sign-In.
+  void setFromGoogle(bool value) {
+    state = state.copyWith(isFromGoogle: value);
   }
 
   /// Calcula as metas nutricionais com base nos dados atuais e atualiza o estado.
