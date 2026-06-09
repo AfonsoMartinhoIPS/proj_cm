@@ -1,6 +1,17 @@
+// lib/data/models/nutriments_model.dart
+
 import 'package:nutri_scan/domain/entities/nutriments.dart';
 
+/// Modelo de dados para conversão entre mapas e a entidade [Nutriments].
+///
+/// Responsável por:
+/// - Converter um mapa genérico (vindo do Firestore ou de uma API externa) num [Nutriments] (`fromMap`).
+/// - Converter um [Nutriments] de volta para um mapa pronto para serialização (`toMap`).
 class NutrimentsModel {
+  /// Converte um [Map<String, dynamic>] num [Nutriments].
+  ///
+  /// Cada campo nutricional é extraído como `double?`. Campos ausentes ou
+  /// com tipo inválido resultam em `null`.
   static Nutriments fromMap(Map<String, dynamic> map) {
     return Nutriments(
       caloriesPer100g: (map['caloriesPer100g'] as num?)?.toDouble(),
@@ -14,6 +25,10 @@ class NutrimentsModel {
     );
   }
 
+  /// Converte um [Nutriments] num mapa adequado para escrita no Firestore.
+  ///
+  /// Cada campo nutricional é escrito como o valor original (`double?`),
+  /// permitindo que campos `null` sejam armazenados como ausentes.
   static Map<String, dynamic> toMap(Nutriments n) {
     return {
       'caloriesPer100g': n.caloriesPer100g,

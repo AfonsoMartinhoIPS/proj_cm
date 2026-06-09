@@ -1,127 +1,122 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/theme/app_colors.dart';
-import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/presentation/screens/scanner/widgets/barcode_camera.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
+/// Ecrã de scanner de código de barras com dois modos de funcionamento.
+///
+/// 1. **Modo separador** (padrão, `returnBarcode: false`) — aberto a partir da
+///    navegação inferior. Ao detetar ou inserir um código, navega para
+///    `/products/$barcode`.
+///
+/// 2. **Modo de seleção** (`returnBarcode: true`) — usado por fluxos que
+///    precisam de um código de barras como resultado (ex.: `ProductPicker`).
+///    Ao detetar ou inserir um código, fecha a rota devolvendo o código como
+///    resultado (`context.pop(barcode)`).
+///
+/// Ambos os modos partilham a mesma interface: a câmara ao vivo do
+/// [BarcodeCamera] e o botão para entrada manual.
 class ScanScreen extends StatelessWidget {
-  const ScanScreen({super.key});
+  /// Quando `true`, o scanner termina devolvendo o código de barras.
+  ///
+  /// Quando `false` (padrão), o scanner navega para os detalhes do produto.
+  final bool returnBarcode;
 
+  /// Cria um [ScanScreen].
+  ///
+  /// O parâmetro [returnBarcode] controla o comportamento após a leitura.
+  const ScanScreen({super.key, this.returnBarcode = false});
+
+  /// Trata o código de barras recebido, seja da câmara ou da folha manual.
+  ///
+  /// No modo de seleção, fecha o ecrã com o código; caso contrário, navega
+  /// para a página de detalhes do produto.
+  void _handleBarcode(BuildContext context, String barcode) {
+    logger.d(
+      'ScanScreen: handle barcode=$barcode (returnBarcode=$returnBarcode)',
+    );
+    if (returnBarcode) {
+      context.pop(barcode);
+    } else {
+      context.push('/products/$barcode');
+    }
+  }
+
+  /// Abre a folha inferior para inserção manual de um código de barras.
   void _openManualEntry(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // lets the sheet resize for the keyboard
-      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => const _ManualBarcodeSheet(),
+      builder: (_) => _ManualBarcodeSheet(
+        onBarcode: (code) => _handleBarcode(context, code),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Row(
-              children: [
-                Spacer(),
-                Text('Scan Barcode',
-                    style: TextStyle(color: AppColors.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
-                Spacer(),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D1A10),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Icon(Icons.videocam_off, color: AppColors.border, size: 40),
-                  _buildScannerOverlay(),
-                ],
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      appBar: NutriTopNavBar(
+        showBackButton: returnBarcode,
+        title: 'Scan Barcode',
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              flex: 5,
+              child: BarcodeCamera(
+                onBarcode: (code) => _handleBarcode(context, code),
               ),
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-            child: Text(
-              'Aponta a câmara para o código de barras do produto',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textMuted, fontSize: 14, height: 1.4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+              child: NutriLabel(
+                'Aponta a câmara para o código de barras do produto',
+                textAlign: TextAlign.center,
+                color: colorScheme.onSurfaceVariant,
+                variant: NutriLabelVariant.body,
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: OutlinedButton(
-              onPressed: () => _openManualEntry(context),
-              child: const Text('Inserir código manualmente', style: TextStyle(fontSize: 14)),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: NutriButton.transparent(
+                label: 'Inserir código manualmente',
+                onPressed: () => _openManualEntry(context),
+              ),
             ),
-          ),
-          const Spacer(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildScannerOverlay() {
-    return SizedBox(
-      width: 200,
-      height: 200,
-      child: Stack(
-        children: [
-          _corner(top: 0, left: 0, isTop: true, isLeft: true),
-          _corner(top: 0, right: 0, isTop: true, isLeft: false),
-          _corner(bottom: 0, left: 0, isTop: false, isLeft: true),
-          _corner(bottom: 0, right: 0, isTop: false, isLeft: false),
-          Center(
-            child: Container(
-              width: 180,
-              height: 2,
-              color: AppColors.secondary.withValues(alpha: 0.5),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _corner({double? top, double? bottom, double? left, double? right, required bool isTop, required bool isLeft}) {
-    return Positioned(
-      top: top, bottom: bottom, left: left, right: right,
-      child: Container(
-        width: 25,
-        height: 25,
-        decoration: BoxDecoration(
-          border: Border(
-            top:    isTop    ? const BorderSide(color: AppColors.secondary, width: 3) : BorderSide.none,
-            bottom: !isTop   ? const BorderSide(color: AppColors.secondary, width: 3) : BorderSide.none,
-            left:   isLeft   ? const BorderSide(color: AppColors.secondary, width: 3) : BorderSide.none,
-            right:  !isLeft  ? const BorderSide(color: AppColors.secondary, width: 3) : BorderSide.none,
-          ),
+            const Spacer(),
+          ],
         ),
       ),
     );
   }
 }
 
-/// Bottom sheet for entering a barcode by hand. Owns its controller so it
-/// is created/disposed with the sheet's lifecycle.
+/// Folha inferior para inserção manual de um código de barras.
+///
+/// Contém um campo de texto para o código e um botão para submeter a pesquisa.
+/// A decisão de navegação é delegada ao ecrã principal através de [onBarcode].
 class _ManualBarcodeSheet extends StatefulWidget {
-  const _ManualBarcodeSheet();
+  /// Callback invocado quando o utilizador submete um código de barras válido.
+  final ValueChanged<String> onBarcode;
+
+  /// Cria uma [_ManualBarcodeSheet].
+  ///
+  /// O parâmetro [onBarcode] é obrigatório.
+  const _ManualBarcodeSheet({required this.onBarcode});
 
   @override
   State<_ManualBarcodeSheet> createState() => _ManualBarcodeSheetState();
 }
 
+/// Estado da [_ManualBarcodeSheet] que gere o campo de texto e a submissão.
 class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
   final TextEditingController _barcodeController = TextEditingController();
 
@@ -131,31 +126,36 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
     super.dispose();
   }
 
+  /// Valida e submete o código de barras introduzido.
+  ///
+  /// Se o campo estiver vazio, exibe uma mensagem de erro.
+  /// Caso contrário, fecha a folha e invoca [onBarcode].
   void _submit() {
     final barcode = _barcodeController.text.trim();
     if (barcode.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Introduz um código de barras')),
-      );
+      NutriFeedback.showError(context, 'Introduz um código de barras');
       return;
     }
-    Navigator.of(context).pop();             // close sheet first
-    context.push('/products/$barcode');      // open details screen
+    Navigator.of(context).pop();
+    widget.onBarcode(barcode);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Bottom padding picks up keyboard inset so the field stays visible.
+    final colorScheme = Theme.of(context).colorScheme;
     final viewInsets = MediaQuery.of(context).viewInsets.bottom;
+
     return Padding(
       padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + viewInsets),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
+          NutriLabel(
             'Inserir código de barras',
-            style: TextStyle(color: AppColors.onBackground, fontSize: 16, fontWeight: FontWeight.bold),
+            color: colorScheme.onSurface,
+            variant: NutriLabelVariant.body,
+            fontWeight: FontWeight.bold,
           ),
           const SizedBox(height: 12),
           NutriTextField(
@@ -169,10 +169,7 @@ class _ManualBarcodeSheetState extends State<_ManualBarcodeSheet> {
             onSubmitted: (_) => _submit(),
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _submit,
-            child: const Text('Buscar produto', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-          ),
+          NutriButton(label: 'Procurar produto', onPressed: _submit),
         ],
       ),
     );

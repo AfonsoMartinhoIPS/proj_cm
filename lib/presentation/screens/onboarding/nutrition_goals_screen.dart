@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/theme/app_colors.dart';
-import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
+/// Terceiro passo do fluxo de onboarding — definição dos objetivos nutricionais.
+///
+/// Apresenta campos para o utilizador ajustar as calorias diárias e a
+/// distribuição de macronutrientes (proteínas, hidratos, gordura) e água.
+/// Os valores são pré‑preenchidos com base no perfil introduzido nos passos
+/// anteriores e podem ser alterados livremente.
 class NutritionGoalsScreen extends ConsumerStatefulWidget {
   const NutritionGoalsScreen({super.key});
 
   @override
-  ConsumerState<NutritionGoalsScreen> createState() => _NutritionGoalsScreenState();
+  ConsumerState<NutritionGoalsScreen> createState() =>
+      _NutritionGoalsScreenState();
 }
 
+/// Estado do [NutritionGoalsScreen] que gere os campos de texto e a submissão.
 class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
   final TextEditingController caloriesController = TextEditingController();
   final TextEditingController proteinController = TextEditingController();
@@ -22,17 +30,16 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
   @override
   void initState() {
     super.initState();
-    // calculate defaults if not yet set, so fields prefill
     final notifier = ref.read(onboardingProvider.notifier);
     if (ref.read(onboardingProvider).nutritionGoals == null) {
       notifier.calculateAndSetGoals();
     }
     final goals = ref.read(onboardingProvider).nutritionGoals!;
     caloriesController.text = goals.calories.toStringAsFixed(0);
-    proteinController.text  = goals.protein.toStringAsFixed(0);
-    carbsController.text    = goals.carbs.toStringAsFixed(0);
-    fatController.text      = goals.fat.toStringAsFixed(0);
-    waterController.text    = goals.water.toStringAsFixed(0);
+    proteinController.text = goals.protein.toStringAsFixed(0);
+    carbsController.text = goals.carbs.toStringAsFixed(0);
+    fatController.text = goals.fat.toStringAsFixed(0);
+    waterController.text = goals.water.toStringAsFixed(0);
   }
 
   @override
@@ -45,74 +52,107 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
     super.dispose();
   }
 
+  /// Guarda os valores introduzidos no [onboardingProvider] e avança para a
+  /// confirmação final.
   void submit() {
     final calories = double.tryParse(caloriesController.text.trim()) ?? 0;
-    final protein  = double.tryParse(proteinController.text.trim())  ?? 0;
-    final carbs    = double.tryParse(carbsController.text.trim())    ?? 0;
-    final fat      = double.tryParse(fatController.text.trim())      ?? 0;
-    final water    = double.tryParse(waterController.text.trim())    ?? 0;
+    final protein = double.tryParse(proteinController.text.trim()) ?? 0;
+    final carbs = double.tryParse(carbsController.text.trim()) ?? 0;
+    final fat = double.tryParse(fatController.text.trim()) ?? 0;
+    final water = double.tryParse(waterController.text.trim()) ?? 0;
 
-    ref.read(onboardingProvider.notifier).setGoals(
-      calories: calories,
-      protein: protein,
-      carbs: carbs,
-      fat: fat,
-      water: water,
-    );
+    ref
+        .read(onboardingProvider.notifier)
+        .setGoals(
+          calories: calories,
+          protein: protein,
+          carbs: carbs,
+          fat: fat,
+          water: water,
+        );
 
     context.push('/onboarding/confirm');
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: _stepIndicator('3 / 4'),
-        centerTitle: true,
-      ),
+      backgroundColor: colorScheme.surface,
+      appBar: const NutriTopNavBar(showBackButton: true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const SizedBox(height: 20),
+              const OnboardingStepIndicator(currentStep: 3, totalSteps: 4),
               const SizedBox(height: 30),
-              const Text('Os teus objetivos diários',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.onBackground, fontSize: 24, fontWeight: FontWeight.bold)),
+              NutriLabel(
+                'Os teus objetivos diários',
+                variant: NutriLabelVariant.display,
+              ),
               const SizedBox(height: 12),
-              const Text('Calculados com base no teu perfil. Podes ajustar se quiseres.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 14, height: 1.5)),
+              NutriLabel(
+                'Calculados com base no teu perfil. Podes ajustar se quiseres.',
+                variant: NutriLabelVariant.small,
+              ),
               const SizedBox(height: 40),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceDark,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: AppColors.border),
+              NutriCard(
+                variant: NutriCardVariant.surfaceDark,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 12,
                 ),
+                borderRadius: BorderRadius.circular(25),
                 child: Column(
                   children: [
-                    NutriTextField(controller: caloriesController, label: 'Calorias (kcal)', hint: '1580', keyboardType: TextInputType.number),
+                    NutriTextField(
+                      controller: caloriesController,
+                      label: 'Calorias (kcal)',
+                      hint: 'ex. 1580',
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                     const SizedBox(height: 12),
-                    NutriTextField(controller: proteinController, label: 'Proteína (g)', hint: '150', keyboardType: TextInputType.number),
+                    NutriTextField(
+                      controller: proteinController,
+                      label: 'Proteína (g)',
+                      hint: 'ex. 150',
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                     const SizedBox(height: 12),
-                    NutriTextField(controller: carbsController, label: 'Hidratos (g)', hint: '210', keyboardType: TextInputType.number),
+                    NutriTextField(
+                      controller: carbsController,
+                      label: 'Hidratos (g)',
+                      hint: 'ex. 210',
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                     const SizedBox(height: 12),
-                    NutriTextField(controller: fatController, label: 'Gordura (g)', hint: '70', keyboardType: TextInputType.number),
+                    NutriTextField(
+                      controller: fatController,
+                      label: 'Gordura (g)',
+                      hint: 'ex. 70',
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                     const SizedBox(height: 12),
-                    NutriTextField(controller: waterController, label: 'Água (ml)', hint: '2500', keyboardType: TextInputType.number),
+                    NutriTextField(
+                      controller: waterController,
+                      label: 'Água (ml)',
+                      hint: 'ex. 2500',
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                   ],
                 ),
               ),
               const Spacer(),
-              ElevatedButton(
-                onPressed: submit,
-                child: const Text('Próximo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
+              NutriButton(label: 'Próximo', onPressed: submit, fontSize: 16),
               const SizedBox(height: 20),
             ],
           ),
@@ -120,10 +160,4 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
       ),
     );
   }
-
-  static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
-    child: Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
-  );
 }

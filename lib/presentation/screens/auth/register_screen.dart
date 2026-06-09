@@ -1,11 +1,18 @@
+// lib/presentation/screens/auth/register_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/theme/app_colors.dart';
-import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
+/// Ecrã de registo de uma nova conta.
+///
+/// Recolhe o nome, email e palavra‑passe do utilizador e submete os dados
+/// através do [authProvider] em conjunto com as informações de onboarding
+/// já recolhidas. Inclui validação local para garantir que todos os campos
+/// estão preenchidos e que as palavras‑passe coincidem.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -13,48 +20,69 @@ class RegisterScreen extends ConsumerStatefulWidget {
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
+/// Estado do [RegisterScreen] que gere os campos de texto e a submissão.
+///
+/// Apenas pede email + password (+ confirmação). O nome já foi recolhido
+/// no primeiro passo do onboarding (`PersonalDataScreen`) e vive no
+/// [onboardingProvider]; pedir de novo aqui levaria a duplicação ou
+/// sobreposição silenciosa do valor.
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   @override
   void dispose() {
-    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
   }
 
+  /// Valida os campos e submete o registo.
+  ///
+  /// Verifica se todos os campos estão preenchidos e se as palavras‑passe
+  /// coincidem. Em caso de erro, exibe uma snackbar. Se tudo estiver correto,
+  /// transfere as credenciais para o [onboardingProvider] e invoca o registo
+  /// no [authProvider] com o estado de onboarding já completo (incluindo o
+  /// nome recolhido na `PersonalDataScreen`).
   void submit() {
-    final name = nameController.text.trim();
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
+    final onboarding = ref.read(onboardingProvider);
 
-    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preenche todos os campos')),
+    if (onboarding.name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      NutriFeedback.showSnackBar(
+        context,
+        'Preenche todos os campos',
+        NutriFeedbackType.error,
       );
       return;
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('As passwords não coincidem')),
+      NutriFeedback.showSnackBar(
+        context,
+        'As passwords não coincidem',
+        NutriFeedbackType.error,
       );
       return;
     }
 
-    ref.read(onboardingProvider.notifier).setCredentials(email: email, password: password);
-    final onboarding = ref.read(onboardingProvider).copyWith(name: name);
-    ref.read(authProvider.notifier).register(onboarding);
+    ref
+        .read(onboardingProvider.notifier)
+        .setCredentials(email: email, password: password);
+    ref.read(authProvider.notifier).register(ref.read(onboardingProvider));
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final authState = ref.watch(authProvider);
 
     ref.listen(authProvider, (_, next) {
@@ -62,19 +90,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         data: (user) {
           if (user != null) context.go('/');
         },
-        error: (e, _) => ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        ),
+        error: (e, _) {
+          NutriFeedback.showSnackBar(
+            context,
+            e.toString(),
+            NutriFeedbackType.error,
+          );
+        },
       );
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+      backgroundColor: colorScheme.surface,
+      appBar: const NutriTopNavBar(
+        showBackButton: true,
+        title: 'Cria Conta',
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -83,19 +113,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const Text('Cria Conta',
-                  style: TextStyle(color: AppColors.onBackground, fontSize: 28, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              const Text('Regista-te para começar a monitorizar a tua nutrição.',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
-              const SizedBox(height: 35),
-              NutriTextField(
-                controller: nameController,
-                label: 'Nome Completo',
-                hint: 'Ana Ferreira',
-                icon: Icons.person,
+              NutriLabel(
+                'Cria Conta',
+                variant: NutriLabelVariant.display,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+              NutriLabel(
+                'Regista-te para começar a monitorizar a tua nutrição.',
+                variant: NutriLabelVariant.small,
+              ),
+              const SizedBox(height: 35),
               NutriTextField(
                 controller: emailController,
                 label: 'Email',
@@ -106,7 +133,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               NutriTextField(
                 controller: passwordController,
                 label: 'Password',
-                hint: '••••••••',
                 icon: Icons.lock_outline,
                 obscureText: true,
               ),
@@ -114,37 +140,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               NutriTextField(
                 controller: confirmPasswordController,
                 label: 'Confirmar Password',
-                hint: '••••••••',
                 icon: Icons.lock_reset_outlined,
                 obscureText: true,
               ),
-              const SizedBox(height: 30),
-              Row(
-                children: [
-                  Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: const Icon(Icons.check, size: 14, color: AppColors.secondary),
-                  ),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Text(
-                      'Aceito os Termos de Serviço e a Política de Privacidade.',
-                      style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: authState.isLoading ? null : submit,
-                child: authState.isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Registar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              NutriButton(
+                label: 'Registar',
+                isLoading: authState.isLoading,
+                onPressed: submit,
               ),
               const SizedBox(height: 25),
             ],
@@ -153,5 +156,4 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       ),
     );
   }
-
 }

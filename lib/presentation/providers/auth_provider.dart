@@ -1,19 +1,54 @@
+// lib/presentation/providers/auth_provider.dart
+
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuthException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nutri_scan/core/utils/logger.dart';
+import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/notifications/notification_coordinator.dart';
 import 'package:nutri_scan/data/repositories/auth_repository_impl.dart';
 import 'package:nutri_scan/data/repositories/user_repository_impl.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
+import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
+/// Notifier que gere o estado de autenticação do utilizador.
+///
+/// Expõe um [AppUser] quando o utilizador está autenticado, ou `null` quando
+/// não existe sessão ativa.  Trata das operações de login, registo, atualização
+/// de objetivos e logout, mantendo a sincronização com o Firestore e o
+/// Firebase Auth.
+/// Traduz erros internos (sobretudo [FirebaseAuthException]) para mensagens
+/// curtas em português próprias para mostrar ao utilizador via snackbar.
+/// Códigos não mapeados caem num fallback genérico para evitar expor
+/// stacktraces ou prefixos `[firebase_auth/...]` na UI.
+String _friendlyAuthMessage(Object error) {
+  if (error is FirebaseAuthException) {
+    return switch (error.code) {
+      'invalid-email' => 'Email inválido.',
+      'user-disabled' => 'Esta conta foi desativada.',
+      'user-not-found' || 'invalid-credential' || 'wrong-password' =>
+        'Email ou password incorretos.',
+      'email-already-in-use' => 'Este email já está em uso.',
+      'weak-password' => 'Password demasiado fraca (mínimo 6 caracteres).',
+      'operation-not-allowed' => 'Método de autenticação não permitido.',
+      'network-request-failed' => 'Sem ligação à internet.',
+      'too-many-requests' =>
+        'Demasiadas tentativas. Aguarda alguns minutos.',
+      _ => 'Erro ao autenticar. Tenta de novo.',
+    };
+  }
+  if (error is String) return error;
+  return 'Algo correu mal. Tenta de novo.';
+}
 
 class AuthNotifier extends AsyncNotifier<AppUser?> {
   AuthRepositoryImpl authRepository = AuthRepositoryImpl();
   UserRepositoryImpl userRepository = UserRepositoryImpl();
 
-
+  /// Obtém o documento do utilizador a partir do [uid].
+  ///
+  /// Devolve `null` se o documento não existir no Firestore.
   Future<AppUser?> _getUser(String uid) async {
     try {
-
       logger.d("AuthNotifier: fetching user for uid: $uid");
       final user = await userRepository.getUser(uid);
       if (user == null) {
@@ -24,37 +59,42 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       return user;
     } catch (e, st) {
       logger.e('AuthNotifier: error fetching user', error: e, stackTrace: st);
-      throw e;
+      rethrow;
     }
   }
 
+  /// Constrói o estado inicial verificando se existe uma sessão ativa.
+  ///
+  /// Se existir, carrega o documento do utilizador correspondente; caso
+  /// contrário, define o estado como `null`.
   @override
   Future<AppUser?> build() async {
     logger.d('AuthNotifier: checking existing session');
     state = const AsyncValue.loading();
     try {
-      final uid = await authRepository.getCurrentUser();
+      final uid = authRepository.getCurrentUser();
       if (uid == null) {
         logger.d('AuthNotifier: no existing session found');
         state = const AsyncValue.data(null);
         return null;
       }
-      
+
       logger.d('AuthNotifier: existing session found, loading user: $uid');
       final user = await _getUser(uid);
       state = AsyncValue.data(user);
       return user;
-      
     } catch (e, st) {
       logger.e('AuthNotifier: error during build', error: e, stackTrace: st);
-      state = AsyncValue.error(e, st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
       return null;
     }
-
-    
-    
   }
 
+  /// Inicia sessão com [email] e [password].
+  ///
+  /// Se as credenciais forem válidas, carrega o documento do utilizador e
+  /// atualiza o estado.  Caso o documento não exista, faz logout automático
+  /// e emite um erro.
   Future<void> login(String email, String password) async {
     logger.d('AuthNotifier: login attempt for $email');
     state = const AsyncValue.loading();
@@ -69,17 +109,59 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       if (user == null) {
         logger.w('AuthNotifier: no Firestore doc for uid: $uid');
         await authRepository.logout();
-        state = AsyncValue.error('Conta não encontrada. Regista-te primeiro.', StackTrace.current);
+        state = AsyncValue.error(
+            'Conta não encontrada. Regista-te primeiro.', StackTrace.current);
         return;
       }
       logger.d('AuthNotifier: login success, user loaded: $uid');
       state = AsyncValue.data(user);
     } catch (e, st) {
       logger.e('AuthNotifier: login error', error: e, stackTrace: st);
-      state = AsyncValue.error(e, st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
     }
   }
 
+  /// Atualiza as metas nutricionais do utilizador autenticado.
+  ///
+  /// Persiste as novas metas no Firestore e reflete a alteração no estado
+  /// imediatamente através de [AppUser.copyWith].
+  Future<void> updateGoals(NutritionGoals goals) async {
+    final user = state.value;
+    if (user == null) {
+      logger.w('AuthNotifier: updateGoals called with no user');
+      return;
+    }
+    logger.d('AuthNotifier: updating goals for ${user.uid}');
+    try {
+      await userRepository.updateGoals(user.uid, goals);
+      state = AsyncValue.data(user.copyWith(nutritionGoals: goals));
+
+      // Reagendar notificação de hoje para que o corpo reflita a nova meta
+      // imediatamente em vez de esperar pela próxima atualização do log de refeições.
+      // Best-effort: swallow errors so notification plumbing can't surface
+      // as a goal-save failure.
+      try {
+        final logs = ref.read(nutritionLogsProvider).value ?? [];
+        final today = todayKey();
+        final todayLog = logs.where((l) => l.date == today).firstOrNull;
+        await NotificationCoordinator.reschedule(
+          todayLog: todayLog,
+          goals: goals,
+        );
+      } catch (e, st) {
+        logger.w('AuthNotifier: reschedule after goal change failed',
+            error: e, stackTrace: st);
+      }
+    } catch (e, st) {
+      logger.e('AuthNotifier: updateGoals error', error: e, stackTrace: st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
+    }
+  }
+
+  /// Termina a sessão atual.
+  ///
+  /// Remove o estado de autenticação do Firebase Auth e limpa o estado
+  /// exposto, passando a `null`.
   Future<void> logout() async {
     logger.d('AuthNotifier: logging out');
     await authRepository.logout();
@@ -87,13 +169,15 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     state = const AsyncValue.data(null);
   }
 
-
+  /// Regista um novo utilizador com os dados de [onboarding].
+  ///
+  /// Cria a conta no Firebase Auth e, em seguida, guarda o documento do
+  /// utilizador no Firestore, incluindo as metas nutricionais calculadas
+  /// durante o onboarding.
   Future<void> register(OnboardingState onboarding) async {
     logger.d('AuthNotifier: register attempt for ${onboarding.email}');
     state = const AsyncValue.loading();
     try {
-
-      // Register user in FirebaseAuth
       final user = await authRepository.register(
         email: onboarding.email,
         password: onboarding.password,
@@ -109,7 +193,6 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
         return;
       }
 
-      // Register Firestore user
       final userWithGoals = AppUser(
         uid: user.uid,
         displayName: user.displayName,
@@ -127,10 +210,49 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       state = AsyncValue.data(userWithGoals);
     } catch (e, st) {
       logger.e('AuthNotifier: register error', error: e, stackTrace: st);
-      state = AsyncValue.error(e, st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
+    }
+  }
+
+  /// Completa o registo quando o utilizador vem do Google Sign-In.
+  ///
+  /// Não cria uma nova conta no Firebase (já existe), apenas salva o
+  /// documento do utilizador no Firestore com os dados de onboarding.
+  /// Lê o [uid] da sessão Firebase atual.
+  Future<void> registerFromGoogle(OnboardingState onboarding) async {
+    logger.d('AuthNotifier: registerFromGoogle');
+    state = const AsyncValue.loading();
+    try {
+      final uid = authRepository.getCurrentUser();
+      if (uid == null) {
+        throw Exception('Nenhuma sessão Firebase ativa');
+      }
+
+      final userWithGoals = AppUser(
+        uid: uid,
+        displayName: onboarding.name,
+        email: '', // Email não é usado na app após Google Sign-In
+        gender: onboarding.gender,
+        dateOfBirth: onboarding.dateOfBirth ?? DateTime(2000),
+        height: onboarding.height,
+        weight: onboarding.weight,
+        createdAt: DateTime.now(),
+        nutritionGoals: onboarding.nutritionGoals,
+        objective: onboarding.objective,
+      );
+      await userRepository.saveUser(userWithGoals);
+      logger.d('AuthNotifier: registerFromGoogle success, user saved: $uid');
+      state = AsyncValue.data(userWithGoals);
+    } catch (e, st) {
+      logger.e('AuthNotifier: registerFromGoogle error', error: e, stackTrace: st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
     }
   }
 }
 
-
-final authProvider = AsyncNotifierProvider<AuthNotifier, AppUser?>(() => AuthNotifier());
+/// Provider que expõe o estado de autenticação do utilizador.
+///
+/// Utilizado por todo o sistema de rotas e ecrãs protegidos para determinar
+/// se o utilizador está autenticado e para aceder aos seus dados.
+final authProvider =
+    AsyncNotifierProvider<AuthNotifier, AppUser?>(() => AuthNotifier());

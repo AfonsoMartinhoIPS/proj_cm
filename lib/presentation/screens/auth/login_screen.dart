@@ -1,10 +1,21 @@
+// lib/presentation/screens/auth/login_screen.dart
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/theme/app_colors.dart';
-import 'package:nutri_scan/presentation/widgets/nutri_text_field.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/data/repositories/user_repository_impl.dart';
+import 'package:nutri_scan/presentation/widgets/components/nutri_wave_background.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
+import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
+/// Ecrã de início de sessão.
+///
+/// Permite ao utilizador autenticar‑se com email e palavra‑passe. Inclui
+/// links para recuperação de palavra‑passe e para o ecrã de registo.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -12,6 +23,7 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
+/// Estado do [LoginScreen] que gere os campos de email e palavra‑passe.
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -23,13 +35,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  /// Valida os campos e submete o início de sessão.
+  ///
+  /// Se o email ou a palavra‑passe estiverem vazios, exibe uma snackbar de erro.
+  /// Caso contrário, chama o método de login do [authProvider].
   void submit() {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preenche o email e a password')),
+      NutriFeedback.showSnackBar(
+        context,
+        'Preenche o email e a password',
+        NutriFeedbackType.error,
       );
       return;
     }
@@ -37,130 +55,238 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.read(authProvider.notifier).login(email, password);
   }
 
+  /// Envia um email de recuperação de palavra-passe via Firebase Auth.
+  ///
+  /// Exige que o campo de email esteja preenchido. O Firebase trata o envio
+  /// e responde com sucesso mesmo para emails inexistentes (anti-enumeração),
+  /// pelo que a mensagem de sucesso é neutra. Erros de formato de email são
+  /// reportados via [NutriFeedback.showError].
+  Future<void> _resetPassword() async {
+    final email = emailController.text.trim();
+    if (email.isEmpty) {
+      NutriFeedback.showError(context, 'Introduz o email primeiro');
+      return;
+    }
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      if (!mounted) return;
+      NutriFeedback.showSuccess(
+        context,
+        'Email de recuperação enviado para $email',
+      );
+    } on FirebaseAuthException catch (e) {
+      logger.w('Password reset failed: ${e.code}');
+      if (!mounted) return;
+      NutriFeedback.showError(
+        context,
+        e.code == 'invalid-email'
+            ? 'Email inválido'
+            : 'Não foi possível enviar o email. Tenta de novo.',
+      );
+    }
+  }
+
+  /// Início de sessão com a conta Google via Firebase Auth.
+  ///
+  /// Implementação trazida do branch `development`. Inicializa o
+  /// `GoogleSignIn`, abre o fluxo de autenticação, troca o `idToken`
+  /// resultante por uma credencial Firebase e faz `signInWithCredential`.
+  /// Se o utilizador não tem registo no Firestore, redireciona para onboarding.
+  /// Falhas são propagadas para o utilizador via snackbar.
+  Future<void> _googleSignIn() async {
+    final googleSignInInstance = GoogleSignIn.instance;
+    final firebaseAuthInstance = FirebaseAuth.instance;
+
+    try {
+      await googleSignInInstance.initialize();
+
+      final googleUser = await googleSignInInstance.authenticate();
+
+      final googleAuth = googleUser.authentication;
+
+      final credentialGoogle = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final authenticatedUser = await firebaseAuthInstance
+          .signInWithCredential(credentialGoogle);
+      if (authenticatedUser.user == null) {
+        throw Exception('Erro ao autenticar com Google');
+      }
+
+      // Verifica se o utilizador tem um documento registado no Firestore
+      if (mounted) {
+        final uid = authenticatedUser.user!.uid;
+        final userRepository = UserRepositoryImpl();
+        final user = await userRepository.getUser(uid);
+
+        if (!mounted) return;
+
+        // Se não tem registo, vai para onboarding e marca como vindo do Google
+        if (user == null) {
+          ref.read(onboardingProvider.notifier).setFromGoogle(true);
+          context.go('/onboarding/personal-data');
+        } else {
+          // Se tem registo, invalida o authProvider para notificar listeners
+          ref.invalidate(authProvider);
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      NutriFeedback.showError(
+        context,
+        'Erro de autenticação: ${e.message}',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      NutriFeedback.showError(context, 'Erro inesperado: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     ref.listen(authProvider, (_, next) {
       next.whenOrNull(
         data: (user) {
           if (user != null) context.go('/');
         },
-        error: (e, _) => ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        ),
+        error: (e, _) {
+          NutriFeedback.showSnackBar(
+            context,
+            e.toString(),
+            NutriFeedbackType.error,
+          );
+        },
       );
     });
 
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back),
-        //   onPressed: () => context.pop(),
-        // ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+      extendBodyBehindAppBar: true,
+      resizeToAvoidBottomInset: false,
+      appBar: const NutriTopNavBar(showBackButton: true),
+      body: WaveBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const NutriIcon(fill: true),
                     ),
-                    child: const Icon(Icons.qr_code_scanner, color: AppColors.onBackground, size: 24),
-                  ),
-                  const SizedBox(width: 12),
-                  RichText(
-                    text: const TextSpan(
-                      children: [
-                        TextSpan(text: 'Nutri', style: TextStyle(color: AppColors.onBackground, fontSize: 24, fontWeight: FontWeight.bold)),
-                        TextSpan(text: 'Scan', style: TextStyle(color: AppColors.secondary,    fontSize: 24, fontWeight: FontWeight.bold)),
-                      ],
+                    const SizedBox(width: 12),
+                    NutriLabel.rich(
+                      variant: NutriLabelVariant.headline,
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Nutri',
+                            style: TextStyle(color: colorScheme.onSurface),
+                          ),
+                          TextSpan(
+                            text: 'Scan',
+                            style: TextStyle(color: colorScheme.secondary),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 48),
-              const Text('Bem-vindo de volta!', textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.onBackground, fontSize: 22, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              const Text('Inicia sessão para continuar.', textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.border, fontSize: 14)),
-              const SizedBox(height: 40),
-              NutriTextField(
-                label: 'Email',
-                hint: 'ana@email.com',
-                icon: Icons.email_outlined,
-                controller: emailController,
-              ),
-              const SizedBox(height: 20),
-              NutriTextField(
-                label: 'Password',
-                hint: '••••••••',
-                icon: Icons.lock_outline,
-                obscureText: true,
-                controller: passwordController,
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text('Esqueceste a password?', style: TextStyle(fontSize: 13)),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: authState.isLoading ? null : submit,
-                child: authState.isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Entrar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
-              const SizedBox(height: 32),
-              Row(
-                children: [
-                  const Expanded(child: Divider(color: AppColors.border)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('ou continua com', style: const TextStyle(color: AppColors.border, fontSize: 13)),
+                const SizedBox(height: 48),
+                NutriLabel(
+                  'Bem-vindo de volta!',
+                  variant: NutriLabelVariant.headline,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                NutriLabel(
+                  'Inicia sessão para continuar.',
+                  variant: NutriLabelVariant.body,
+                  textAlign: TextAlign.center,
+                  color: colorScheme.outline,
+                ),
+                const SizedBox(height: 40),
+                NutriTextField(
+                  label: 'Email',
+                  hint: 'ana@email.com',
+                  icon: Icons.email_outlined,
+                  controller: emailController,
+                ),
+                const SizedBox(height: 20),
+                NutriTextField(
+                  label: 'Password',
+                  icon: Icons.lock_outline,
+                  obscureText: true,
+                  controller: passwordController,
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: NutriButton.text(
+                    onPressed: _resetPassword,
+                    label: 'Esqueceste a password?',
                   ),
-                  const Expanded(child: Divider(color: AppColors.border)),
-                ],
-              ),
-              const SizedBox(height: 32),
-              Row(
-                children: [
-                  Expanded(child: OutlinedButton(onPressed: () {}, child: const Text('Google'))),
-                  const SizedBox(width: 16),
-                  Expanded(child: OutlinedButton(onPressed: () {}, child: const Text('Apple'))),
-                ],
-              ),
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Não tens conta? ', style: TextStyle(color: AppColors.secondary, fontSize: 14)),
-                  GestureDetector(
-                    onTap: () => context.push('/register'),
-                    child: const Text('Registar',
-                        style: TextStyle(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 14)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-            ],
+                ),
+                const SizedBox(height: 10),
+                NutriButton(
+                  label: 'Entrar',
+                  isLoading: authState.isLoading,
+                  onPressed: submit,
+                ),
+                const SizedBox(height: 32),
+                // Marcador de posição da UI para o sign-in com Google — implementação propriedade
+                // da equipa de frontend. Botão é intencionalmente inerte até
+                // o fluxo OAuth chegar.
+                Row(
+                  children: [
+                    Expanded(
+                      child: NutriButton.transparent(
+                        label: 'Google',
+                        icon: Image.asset(
+                          'assets/logos/google-logo-50.png',
+                          height: 18,
+                        ),
+                        onPressed: () {
+                        _googleSignIn();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    NutriLabel(
+                      'Não tens conta? ',
+                      variant: NutriLabelVariant.body,
+                    ),
+                    NutriButton.text(
+                      label: 'Registar',
+                      onPressed: () =>
+                          context.push('/onboarding/personal-data'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
 }

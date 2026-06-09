@@ -1,24 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutri_scan/core/theme/app_colors.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
+import 'package:nutri_scan/presentation/providers/auth_provider.dart';
+import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
+/// Quarto e último passo do fluxo de onboarding — confirmação dos dados.
+///
+/// Exibe um resumo de todas as informações recolhidas nos passos anteriores
+/// (dados pessoais, objetivos de peso e objetivos nutricionais) e permite
+/// ao utilizador confirmar e criar a conta.
 class ConfirmScreen extends ConsumerWidget {
   const ConfirmScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final s = ref.watch(onboardingProvider);
 
+    // Se vem do Google, monitoriza o authProvider para saber quando concluir
+    ref.listen(authProvider, (_, next) {
+      if (s.isFromGoogle) {
+        next.whenOrNull(
+          data: (user) {
+            if (user != null) {
+              context.go('/');
+            }
+          },
+          error: (e, _) {
+            NutriFeedback.showError(context, 'Erro ao guardar dados: $e');
+          },
+        );
+      }
+    });
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: _stepIndicator('4 / 4'),
-        centerTitle: true,
-      ),
+      backgroundColor: colorScheme.surface,
+      appBar: const NutriTopNavBar(showBackButton: true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -26,41 +45,53 @@ class ConfirmScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              const Text('Confirma os\nteus dados',
-                  style: TextStyle(color: AppColors.onBackground, fontSize: 28, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              const Text('Confirma os teus dados antes de criar a conta.',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+              const OnboardingStepIndicator(currentStep: 4, totalSteps: 4),
               const SizedBox(height: 30),
-              Container(
+              NutriLabel(
+                'Confirma os\nteus dados',
+                variant: NutriLabelVariant.display,
+              ),
+              const SizedBox(height: 10),
+              NutriLabel(
+                'Confirma os teus dados antes de criar a conta.',
+                variant: NutriLabelVariant.small,
+              ),
+              const SizedBox(height: 30),
+              NutriCard(
+                variant: NutriCardVariant.surfaceDark,
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceDark,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.border),
-                ),
+                borderRadius: BorderRadius.circular(20),
                 child: Column(
                   children: [
-                    _dataRow('Nome', s.name.isEmpty ? '—' : s.name),
-                    _dataRow('Idade', '${s.age} anos'),
-                    _dataRow('Sexo', _genderLabel(s.gender)),
-                    _dataRow('Altura', '${s.height} cm'),
-                    _dataRow('Peso', '${s.weight.toStringAsFixed(0)} kg'),
-                    _dataRow('Objectivo', s.objective?.label ?? '—'),
+                    _dataRow('Nome', s.name.isEmpty ? '-' : s.name, colorScheme),
+                    _dataRow('Idade', '${s.age} anos', colorScheme),
+                    _dataRow('Sexo', _genderLabel(s.gender), colorScheme),
+                    _dataRow('Altura', '${s.height} cm', colorScheme),
+                    _dataRow('Peso', '${s.weight.toStringAsFixed(0)} kg', colorScheme),
+                    _dataRow('Objectivo', s.objective?.label ?? '-', colorScheme),
                     if (s.nutritionGoals != null) ...[
-                      _dataRow('Calorias', '${s.nutritionGoals!.calories.toStringAsFixed(0)} kcal'),
-                      _dataRow('Proteína', '${s.nutritionGoals!.protein.toStringAsFixed(0)} g'),
-                      _dataRow('Hidratos', '${s.nutritionGoals!.carbs.toStringAsFixed(0)} g'),
-                      _dataRow('Gordura', '${s.nutritionGoals!.fat.toStringAsFixed(0)} g'),
-                      _dataRow('Água', '${s.nutritionGoals!.water.toStringAsFixed(0)} ml'),
+                      _dataRow('Calorias', '${s.nutritionGoals!.calories.toStringAsFixed(0)} kcal', colorScheme),
+                      _dataRow('Proteína', '${s.nutritionGoals!.protein.toStringAsFixed(0)} g', colorScheme),
+                      _dataRow('Hidratos', '${s.nutritionGoals!.carbs.toStringAsFixed(0)} g', colorScheme),
+                      _dataRow('Gordura', '${s.nutritionGoals!.fat.toStringAsFixed(0)} g', colorScheme),
+                      _dataRow('Água', '${s.nutritionGoals!.water.toStringAsFixed(0)} ml', colorScheme),
                     ],
                   ],
                 ),
               ),
               const Spacer(),
-              ElevatedButton(
-                onPressed: () => context.push('/register'),
-                child: const Text('Criar Conta', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              NutriButton(
+                label: s.isFromGoogle ? "Concluir" : "Criar Conta",
+                onPressed: () {
+                  if (s.isFromGoogle) {
+                    // Vem do Google: salva os dados e invalida o authProvider
+                    ref.read(authProvider.notifier).registerFromGoogle(s);
+                    // Aguarda a conclusão da navegação via listener no build principal
+                  } else {
+                    // Fluxo normal: vai para RegisterScreen
+                    context.push('/register');
+                  }
+                },
               ),
               const SizedBox(height: 20),
             ],
@@ -70,28 +101,35 @@ class ConfirmScreen extends ConsumerWidget {
     );
   }
 
+  /// Converte um valor do enum [Gender] na sua representação textual em português.
   String _genderLabel(Gender g) => switch (g) {
     Gender.female => 'Feminino',
-    Gender.male   => 'Masculino',
-    Gender.other  => 'Outro',
+    Gender.male => 'Masculino',
+    Gender.other => 'Outro',
   };
 
-  static Widget _dataRow(String label, String value) {
+  /// Constrói uma linha de resumo com um rótulo e um valor.
+  ///
+  /// O [label] é apresentado à esquerda com a cor de texto secundária,
+  /// e o [value] à direita em negrito.
+  static Widget _dataRow(String label, String value, ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 14)),
-          Text(value, style: const TextStyle(color: AppColors.onBackground, fontSize: 14, fontWeight: FontWeight.bold)),
+          NutriLabel(
+            label,
+            variant: NutriLabelVariant.body,
+            color: colorScheme.onSurfaceVariant,
+          ),
+          NutriLabel(
+            value,
+            variant: NutriLabelVariant.body,
+            fontWeight: FontWeight.bold,
+          ),
         ],
       ),
     );
   }
-
-  static Widget _stepIndicator(String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
-    child: Text(label, style: const TextStyle(color: AppColors.secondary, fontSize: 12, fontWeight: FontWeight.bold)),
-  );
 }
