@@ -1,5 +1,6 @@
 // lib/presentation/widgets/nutri_text_field.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show TextInputFormatter;
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/components/nutri_label.dart';
 
@@ -13,7 +14,10 @@ class NutriTextField extends StatefulWidget {
   final String label;
 
   /// O texto de ajuda (placeholder) que aparece quando o campo está vazio.
-  final String hint;
+  /// Opcional: passa `null` para esconder o placeholder em campos onde o
+  /// rótulo + tipo de teclado já comunicam o formato esperado (passwords,
+  /// numéricos com unidade no label, etc.).
+  final String? hint;
 
   /// O texto inicial
   final String? value;
@@ -48,11 +52,16 @@ class NutriTextField extends StatefulWidget {
   /// Callback chamado quando o utilizador submete a ação do teclado.
   final ValueChanged<String>? onSubmitted;
 
+  /// Formatadores aplicados em tempo real à entrada do utilizador. Útil
+  /// para restringir o que pode ser digitado (ex.: apenas dígitos num
+  /// campo numérico, evitando que o teclado fixo permita pontuação).
+  final List<TextInputFormatter>? inputFormatters;
+
   /// Cria um [NutriTextField].
   const NutriTextField({
     super.key,
     required this.label,
-    required this.hint,
+    this.hint,
     this.icon,
     this.obscureText = false,
     this.controller,
@@ -64,6 +73,7 @@ class NutriTextField extends StatefulWidget {
     this.onChanged,
     this.onSubmitted,
     this.value,
+    this.inputFormatters,
   });
 
   @override
@@ -186,6 +196,7 @@ class _NutriTextFieldState extends State<NutriTextField> {
                           textInputAction: widget.textInputAction,
                           onChanged: widget.onChanged,
                           onFieldSubmitted: widget.onSubmitted,
+                          inputFormatters: widget.inputFormatters,
                           cursorColor: theme.colorScheme.secondary,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: AppSizes.fontMd - 1,
@@ -206,8 +217,14 @@ class _NutriTextFieldState extends State<NutriTextField> {
                             contentPadding: EdgeInsets.zero,
                             hintText: widget.hint,
                             hintStyle: TextStyle(
-                              color: hintColor,
+                              // Lighter + italic so hints read as placeholder
+                              // examples ("ex. 62") instead of pre-filled
+                              // values. 0.4 alpha keeps them legible without
+                              // competing with real input text.
+                              color: theme.colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.4),
                               fontSize: AppSizes.fontMd - 1,
+                              fontStyle: FontStyle.italic,
                             ),
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,

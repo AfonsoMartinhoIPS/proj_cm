@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Ecrã de créditos da aplicação.
 ///
 /// Exibe informações sobre a unidade curricular, a instituição, a equipa de
-/// desenvolvimento e o controlo de versão. Inclui um botão para aceder ao
-/// código fonte no GitHub (ainda sem ação associada) e apresenta cada membro
-/// da equipa num card com avatar, nome, número de aluno e ligação ao perfil.
+/// desenvolvimento e a ligação ao repositório do projeto no GitHub. Cada
+/// membro da equipa é apresentado num card com avatar, nome e número de aluno.
 class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});
+
+  static final _repoUrl = Uri.parse('https://github.com/AfonsoMartinhoIPS/proj_cm');
+
+  /// Abre o repositório do projeto no browser externo via [url_launcher].
+  /// Falhas (sem browser instalado, URL inválido) ficam apenas no log para
+  /// não interromper a navegação do utilizador.
+  Future<void> _openRepo() async {
+    try {
+      await launchUrl(_repoUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      logger.w('CreditsScreen: failed to open repo URL: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,18 +38,7 @@ class CreditsScreen extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Icon(
-                    Icons.restaurant_menu,
-                    color: colorScheme.onPrimary,
-                    size: 40,
-                  ),
-                ),
+                const NutriIcon(size: 80, fill: true),
                 const SizedBox(height: 15),
                 NutriLabel.rich(
                   TextSpan(
@@ -87,15 +90,15 @@ class CreditsScreen extends StatelessWidget {
             letterSpacing: 1.2,
           ),
           const SizedBox(height: 15),
-          _memberTile('Afonso Martinho', '202001865', 'AM', colorScheme, onGitTap: () {}),
-          _memberTile('Daniel Pais', '202200286', 'DP', colorScheme, onGitTap: () {}),
-          _memberTile('Fernando Ramalho', '202002203', 'FR', colorScheme, onGitTap: () {}),
-          _memberTile('Samuel Silva', '202200315', 'SS', colorScheme, onGitTap: () {}),
+          _memberTile('Afonso Martinho', '202001865', 'AM', colorScheme),
+          _memberTile('Daniel Pais', '202200286', 'DP', colorScheme),
+          _memberTile('Fernando Ramalho', '202002203', 'FR', colorScheme),
+          _memberTile('Samuel Silva', '202200315', 'SS', colorScheme),
           const SizedBox(height: 30),
           NutriButton.transparent(
             label: 'Ver Código Fonte no GitHub',
             icon: Icon(Icons.code, color: colorScheme.secondary, size: 18),
-            onPressed: () {},
+            onPressed: _openRepo,
           ),
           const SizedBox(height: 40),
           NutriLabel(
@@ -118,9 +121,8 @@ class CreditsScreen extends StatelessWidget {
     String name,
     String id,
     String initials,
-    ColorScheme colorScheme, {
-    required VoidCallback onGitTap,
-  }) {
+    ColorScheme colorScheme,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: NutriCard(
@@ -145,11 +147,6 @@ class CreditsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            NutriButton.text(
-              label: 'GitHub',
-              fontSize: 11,
-              onPressed: onGitTap,
             ),
           ],
         ),

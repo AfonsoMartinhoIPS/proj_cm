@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
@@ -118,36 +119,41 @@ class _GoalsEditorScreenState extends ConsumerState<GoalsEditorScreen> {
                   NutriTextField(
                     controller: _caloriesController,
                     label: 'Calorias (kcal)',
-                    hint: '2000',
+                    hint: 'ex. 2000',
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                   const SizedBox(height: 12),
                   NutriTextField(
                     controller: _proteinController,
                     label: 'Proteína (g)',
-                    hint: '150',
+                    hint: 'ex. 150',
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                   const SizedBox(height: 12),
                   NutriTextField(
                     controller: _carbsController,
                     label: 'Hidratos (g)',
-                    hint: '250',
+                    hint: 'ex. 250',
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                   const SizedBox(height: 12),
                   NutriTextField(
                     controller: _fatController,
                     label: 'Gordura (g)',
-                    hint: '65',
+                    hint: 'ex. 65',
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                   const SizedBox(height: 12),
                   NutriTextField(
                     controller: _waterController,
                     label: 'Água (ml)',
-                    hint: '2500',
+                    hint: 'ex. 2500',
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                 ],
               ),

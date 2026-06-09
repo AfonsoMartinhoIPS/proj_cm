@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/core/notifications/notification_service.dart';
 import 'package:nutri_scan/presentation/providers/theme_provider.dart';
 
 /// Ponto de entrada da aplicação NutriScan.
@@ -12,6 +13,7 @@ import 'package:nutri_scan/presentation/providers/theme_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDatabase();
+  await NotificationService.init();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

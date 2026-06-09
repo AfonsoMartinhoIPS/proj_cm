@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
@@ -160,6 +161,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                       label: 'Peso (kg)',
                       hint: 'ex. 62',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -169,6 +171,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                       label: 'Altura (cm)',
                       hint: 'ex. 168',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                   ),
                 ],

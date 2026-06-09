@@ -10,7 +10,7 @@ import 'package:nutri_scan/presentation/screens/auth/welcome_screen.dart';
 import 'package:nutri_scan/presentation/screens/auth/login_screen.dart';
 import 'package:nutri_scan/presentation/screens/auth/register_screen.dart';
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
-import 'package:nutri_scan/presentation/screens/meals/add_meal/add_meal_screen.dart';
+import 'package:nutri_scan/presentation/screens/meals/add_meal_screen.dart';
 import 'package:nutri_scan/presentation/screens/meals/day_detail_screen.dart';
 
 import 'package:nutri_scan/presentation/screens/onboarding/personal_data_screen.dart';
@@ -19,6 +19,7 @@ import 'package:nutri_scan/presentation/screens/onboarding/calculation_screen.da
 import 'package:nutri_scan/presentation/screens/onboarding/nutrition_goals_screen.dart';
 import 'package:nutri_scan/presentation/screens/onboarding/confirm_screen.dart';
 
+import 'package:nutri_scan/presentation/screens/history/history_screen.dart';
 import 'package:nutri_scan/presentation/screens/home/home_screen.dart';
 import 'package:nutri_scan/presentation/screens/meals/meals_screen.dart';
 import 'package:nutri_scan/presentation/screens/products/products_screen.dart';
@@ -31,6 +32,19 @@ import 'package:nutri_scan/presentation/screens/profile/goals_editor_screen.dart
 import 'package:nutri_scan/presentation/screens/profile/credits_screen.dart';
 
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
+
+/// Global RouteObserver. Subscribed by widgets (e.g. BarcodeCamera) that need
+/// to react when a route is pushed above or popped back to them, beyond what
+/// State lifecycle alone provides. Must be plumbed into [GoRouter.observers].
+final routeObserver = RouteObserver<ModalRoute<dynamic>>();
+
+/// Singleton reference to the live [GoRouter] instance, captured the first
+/// time [routerProvider] resolves. Used by code that lives outside the
+/// widget tree (e.g. `NotificationService._onTap`) to navigate without
+/// needing a `BuildContext`. Null until the first build resolves the
+/// provider, which is fine because cold-launch notifications fall through
+/// to the splash → auth-redirect chain anyway.
+GoRouter? appRouter;
 
 /// Representa uma rota da barra de navegação inferior.
 ///
@@ -133,9 +147,9 @@ class _AuthRefresh extends ChangeNotifier {
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = _AuthRefresh(ref);
 
-  return GoRouter(
+  final router = GoRouter(
     initialLocation: '/splash',
-    observers: [_RouteLogger()],
+    observers: [_RouteLogger(), routeObserver],
     refreshListenable: refresh,
     redirect: (context, state) {
       final auth = ref.read(authProvider);
@@ -187,6 +201,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/profile/goals',
           builder: (_, _) => const GoalsEditorScreen()),
       GoRoute(path: '/credits', builder: (_, _) => const CreditsScreen()),
+      GoRoute(path: '/history', builder: (_, _) => const HistoryScreen()),
 
       // Rotas de refeições
       GoRoute(
@@ -235,4 +250,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  appRouter = router;
+  return router;
 });

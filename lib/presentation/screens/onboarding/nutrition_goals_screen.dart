@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
@@ -113,6 +114,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                       label: 'Calorias (kcal)',
                       hint: 'ex. 1580',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(height: 12),
                     NutriTextField(
@@ -120,6 +122,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                       label: 'Proteína (g)',
                       hint: 'ex. 150',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(height: 12),
                     NutriTextField(
@@ -127,6 +130,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                       label: 'Hidratos (g)',
                       hint: 'ex. 210',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(height: 12),
                     NutriTextField(
@@ -134,6 +138,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                       label: 'Gordura (g)',
                       hint: 'ex. 70',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(height: 12),
                     NutriTextField(
@@ -141,6 +146,7 @@ class _NutritionGoalsScreenState extends ConsumerState<NutritionGoalsScreen> {
                       label: 'Água (ml)',
                       hint: 'ex. 2500',
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                   ],
                 ),

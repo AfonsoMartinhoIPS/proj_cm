@@ -29,14 +29,22 @@ class UserRepositoryImpl implements UserRepository {
   /// Guarda um [AppUser] no Firestore.
   ///
   /// Utiliza `merge: true` para preservar campos existentes que não estejam
-  /// presentes no objeto fornecido.
+  /// presentes no objeto fornecido. Antes de escrever, verifica se o
+  /// documento já existe: caso contrário, instrui o [AppUserModel.toMap] a
+  /// incluir `createdAt: serverTimestamp()` para registar o momento exato
+  /// da criação. Em escritas subsequentes o campo é omitido, preservando o
+  /// timestamp original.
   @override
   Future<void> saveUser(AppUser user) async {
     logger.d('Saving user to Firestore: ${user.uid} (${user.email})');
-    await _db
-        .doc(FirestorePaths.user(user.uid))
-        .set(AppUserModel.toMap(user), SetOptions(merge: true));
-    logger.d('User saved successfully: ${user.uid}');
+    final docRef = _db.doc(FirestorePaths.user(user.uid));
+    final existing = await docRef.get();
+    final isCreate = !existing.exists;
+    await docRef.set(
+      AppUserModel.toMap(user, isCreate: isCreate),
+      SetOptions(merge: true),
+    );
+    logger.d('User saved successfully (isCreate=$isCreate): ${user.uid}');
   }
 
   /// Atualiza as metas nutricionais do utilizador identificado por [uid].

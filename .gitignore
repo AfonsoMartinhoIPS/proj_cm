@@ -72,4 +72,8 @@ CLAUDE*
 # 5. Custom
 # ==========================================
 docs/
+.env
+.env*
+env.json
+env*.json
 .aider*

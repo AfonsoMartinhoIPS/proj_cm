@@ -47,15 +47,21 @@ class AppUserModel {
 
   /// Converte um [AppUser] num mapa adequado para escrita no Firestore.
   ///
-  /// O campo `createdAt` é sempre preenchido com [FieldValue.serverTimestamp].
+  /// Quando [isCreate] é `true` o mapa inclui `createdAt` via
+  /// [FieldValue.serverTimestamp] — usado apenas na primeira gravação
+  /// (registo do utilizador). Em todas as outras escritas o campo é omitido
+  /// para que `set(..., merge: true)` não substitua o timestamp original.
+  ///
   /// Campos com valor `null` (como `objective` ou `nutritionGoals`) são
   /// escritos como `null`, permitindo que o documento seja criado parcialmente
   /// e preenchido ao longo do fluxo de onboarding.
-  static Map<String, dynamic> toMap(AppUser u) {
+  static Map<String, dynamic> toMap(AppUser u, {bool isCreate = false}) {
     return {
       'displayName': u.displayName,
       'email': u.email,
-      'createdAt': FieldValue.serverTimestamp(),
+      // Only set serverTimestamp on first create — subsequent saves keep
+      // the original createdAt by omitting the field.
+      if (isCreate) 'createdAt': FieldValue.serverTimestamp(),
       'gender': u.gender.name,
       'dateOfBirth': Timestamp.fromDate(u.dateOfBirth),
       'height': u.height,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/presentation/widgets/components/nutri_wave_background.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
@@ -50,43 +51,75 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.read(authProvider.notifier).login(email, password);
   }
 
+  /// Envia um email de recuperação de palavra-passe via Firebase Auth.
+  ///
+  /// Exige que o campo de email esteja preenchido. O Firebase trata o envio
+  /// e responde com sucesso mesmo para emails inexistentes (anti-enumeração),
+  /// pelo que a mensagem de sucesso é neutra. Erros de formato de email são
+  /// reportados via [NutriFeedback.showError].
+  Future<void> _resetPassword() async {
+    final email = emailController.text.trim();
+    if (email.isEmpty) {
+      NutriFeedback.showError(context, 'Introduz o email primeiro');
+      return;
+    }
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      if (!mounted) return;
+      NutriFeedback.showSuccess(
+        context,
+        'Email de recuperação enviado para $email',
+      );
+    } on FirebaseAuthException catch (e) {
+      logger.w('Password reset failed: ${e.code}');
+      if (!mounted) return;
+      NutriFeedback.showError(
+        context,
+        e.code == 'invalid-email'
+            ? 'Email inválido'
+            : 'Não foi possível enviar o email. Tenta de novo.',
+      );
+    }
+  }
+
+  /// Início de sessão com a conta Google via Firebase Auth.
+  ///
+  /// Implementação trazida do branch `development`. Inicializa o
+  /// `GoogleSignIn`, abre o fluxo de autenticação, troca o `idToken`
+  /// resultante por uma credencial Firebase e faz `signInWithCredential`.
+  /// Falhas são propagadas para o utilizador via snackbar.
   Future<void> _googleSignIn() async {
-    final GoogleSignIn _googleSignInInstance = GoogleSignIn.instance;
-    final FirebaseAuth _firebaseAuthInstance = FirebaseAuth.instance;
+    final googleSignInInstance = GoogleSignIn.instance;
+    final firebaseAuthInstance = FirebaseAuth.instance;
 
     try {
-      await _googleSignInInstance.initialize();
+      await googleSignInInstance.initialize();
 
-      final GoogleSignInAccount? googleUser = await _googleSignInInstance
-          .authenticate();
+      final googleUser = await googleSignInInstance.authenticate();
 
       // Se o utilizador cancelar a autenticação, googleUser será nulo.
-      if (googleUser == null) return null;
-
-      // Obter os tokens de autenticação do Google.
+      // Saímos sem erro — `Future<void>` deve sempre regressar `null`
+      // implicitamente, nunca `return null` explícito.
       final googleAuth = googleUser.authentication;
 
       final credentialGoogle = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
 
-      final authenticatedUser = await _firebaseAuthInstance
+      final authenticatedUser = await firebaseAuthInstance
           .signInWithCredential(credentialGoogle);
       if (authenticatedUser.user == null) {
         throw Exception('Erro ao autenticar com Google');
       }
     } on FirebaseAuthException catch (e) {
-      NutriFeedback.showSnackBar(
+      if (!mounted) return;
+      NutriFeedback.showError(
         context,
         'Erro de autenticação: ${e.message}',
-        NutriFeedbackType.error,
       );
     } catch (e) {
-      NutriFeedback.showSnackBar(
-        context,
-        'Erro inesperado: $e',
-        NutriFeedbackType.error,
-      );
+      if (!mounted) return;
+      NutriFeedback.showError(context, 'Erro inesperado: $e');
     }
   }
 
@@ -176,7 +209,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 20),
                 NutriTextField(
                   label: 'Password',
-                  hint: '••••••••',
                   icon: Icons.lock_outline,
                   obscureText: true,
                   controller: passwordController,
@@ -184,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: NutriButton.text(
-                    onPressed: () {},
+                    onPressed: _resetPassword,
                     label: 'Esqueceste a password?',
                   ),
                 ),
@@ -195,6 +227,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   onPressed: submit,
                 ),
                 const SizedBox(height: 32),
+                // UI placeholder for Google sign-in — implementation owned
+                // by the frontend team. Button is intentionally inert until
+                // the OAuth flow lands.
                 Row(
                   children: [
                     Expanded(
