@@ -9,7 +9,7 @@ Projeto desenvolvido no âmbito da unidade curricular de **Computação Móvel
 (2025/2026)** — IPS, ESTSetúbal.
 
 > Repositório: https://github.com/AfonsoMartinhoIPS/proj_cm
-> Ficheiros extra: ver pasta partilhada da equipa
+> Ficheiros extra: https://ipsetubal-my.sharepoint.com/:f:/g/personal/202002203_estudantes_ips_pt/IgBfwxjNM_nzRbWJowidQM3yAQWj7XlbNqY6DigO1TJy7mU?e=Klmeir
 
 ---
 
