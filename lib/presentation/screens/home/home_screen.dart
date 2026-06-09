@@ -101,7 +101,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   NutriButton.text(
                     label: 'Ver mais →',
-                    onPressed: () => context.go('/meals?mode=week'),
+                    onPressed: () => context.go('/meals'),
                   ),
                 ],
               ),
