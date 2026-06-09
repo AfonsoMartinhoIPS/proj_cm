@@ -1,3 +1,5 @@
+// lib/data/models/saved_product_model.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nutri_scan/domain/entities/product.dart';
 import 'package:nutri_scan/domain/entities/saved_product.dart';

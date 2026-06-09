@@ -1,3 +1,5 @@
+// lib/core/utils/date_format.dart
+
 /// Dias da semana em português (por extenso).
 const ptWeekdays = [
   'Segunda-feira',

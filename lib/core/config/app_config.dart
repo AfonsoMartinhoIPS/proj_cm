@@ -1,3 +1,5 @@
+// lib/core/config/app_config.dart
+
 /// Configuração global da aplicação baseada em variáveis de ambiente.
 ///
 /// As constantes aqui definidas permitem alterar o comportamento da aplicação

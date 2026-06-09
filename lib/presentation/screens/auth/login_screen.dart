@@ -1,12 +1,16 @@
+// lib/presentation/screens/auth/login_screen.dart
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nutri_scan/core/core.dart';
+import 'package:nutri_scan/data/repositories/user_repository_impl.dart';
 import 'package:nutri_scan/presentation/widgets/components/nutri_wave_background.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 import 'package:nutri_scan/presentation/providers/auth_provider.dart';
+import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
 
 /// Ecrã de início de sessão.
 ///
@@ -87,6 +91,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// Implementação trazida do branch `development`. Inicializa o
   /// `GoogleSignIn`, abre o fluxo de autenticação, troca o `idToken`
   /// resultante por uma credencial Firebase e faz `signInWithCredential`.
+  /// Se o utilizador não tem registo no Firestore, redireciona para onboarding.
   /// Falhas são propagadas para o utilizador via snackbar.
   Future<void> _googleSignIn() async {
     final googleSignInInstance = GoogleSignIn.instance;
@@ -97,9 +102,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       final googleUser = await googleSignInInstance.authenticate();
 
-      // Se o utilizador cancelar a autenticação, googleUser será nulo.
-      // Saímos sem erro — `Future<void>` deve sempre regressar `null`
-      // implicitamente, nunca `return null` explícito.
       final googleAuth = googleUser.authentication;
 
       final credentialGoogle = GoogleAuthProvider.credential(
@@ -110,6 +112,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .signInWithCredential(credentialGoogle);
       if (authenticatedUser.user == null) {
         throw Exception('Erro ao autenticar com Google');
+      }
+
+      // Verifica se o utilizador tem um documento registado no Firestore
+      if (mounted) {
+        final uid = authenticatedUser.user!.uid;
+        final userRepository = UserRepositoryImpl();
+        final user = await userRepository.getUser(uid);
+
+        if (!mounted) return;
+
+        // Se não tem registo, vai para onboarding e marca como vindo do Google
+        if (user == null) {
+          ref.read(onboardingProvider.notifier).setFromGoogle(true);
+          context.go('/onboarding/personal-data');
+        } else {
+          // Se tem registo, invalida o authProvider para notificar listeners
+          ref.invalidate(authProvider);
+        }
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
@@ -227,9 +247,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   onPressed: submit,
                 ),
                 const SizedBox(height: 32),
-                // UI placeholder for Google sign-in — implementation owned
-                // by the frontend team. Button is intentionally inert until
-                // the OAuth flow lands.
+                // Marcador de posição da UI para o sign-in com Google — implementação propriedade
+                // da equipa de frontend. Botão é intencionalmente inerte até
+                // o fluxo OAuth chegar.
                 Row(
                   children: [
                     Expanded(

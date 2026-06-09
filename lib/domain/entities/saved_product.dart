@@ -1,3 +1,5 @@
+// lib/domain/entities/saved_product.dart
+
 /// Uma nota de texto associada a um produto guardado.
 ///
 /// Cada nota contém o texto introduzido pelo utilizador e a data e hora em

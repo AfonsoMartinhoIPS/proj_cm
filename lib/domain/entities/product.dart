@@ -1,3 +1,5 @@
+// lib/domain/entities/product.dart
+
 import 'package:nutri_scan/domain/entities/nutriments.dart';
 
 /// Representa um produto alimentar obtido a partir de um código de barras.

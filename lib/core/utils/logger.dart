@@ -1,3 +1,5 @@
+// lib/core/utils/logger.dart
+
 import 'package:logger/logger.dart';
 
 /// Logger global utilizado em toda a aplicação para debug e diagnóstico.

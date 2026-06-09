@@ -1,3 +1,5 @@
+// lib/domain/entities/meal_entry.dart
+
 /// Tipos de refeição suportados pela aplicação.
 ///
 /// Cada valor tem um rótulo em português associado, utilizado na interface.

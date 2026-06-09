@@ -1,3 +1,5 @@
+// lib/domain/entities/app_user.dart
+
 /// Género do utilizador.
 ///
 /// Cada valor possui um rótulo em português acessível através da propriedade [label].

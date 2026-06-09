@@ -1,3 +1,5 @@
+// lib/core/notifications/notification_service.dart
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -47,8 +49,8 @@ class NotificationService {
 
     const android = AndroidInitializationSettings('@mipmap/launcher_icon');
     const ios = DarwinInitializationSettings(
-      // We ask for permissions explicitly via [requestPermission], not on
-      // init, so the user sees the prompt at a meaningful moment.
+      // Nós pedimos permissões explicitamente via [requestPermission], não em
+      // inicialização, para que o utilizador veja a solicitação num momento apropriado.
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
@@ -122,7 +124,7 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      // Repeat every 24h once the first fire passes.
+      // Repetir a cada 24h após o primeiro disparo.
       matchDateTimeComponents: DateTimeComponents.time,
       payload: '/',
     );

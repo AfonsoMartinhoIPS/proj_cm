@@ -1,3 +1,5 @@
+// lib/data/models/nutrition_log_model.dart
+
 import 'package:nutri_scan/data/models/meal_entry_model.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';

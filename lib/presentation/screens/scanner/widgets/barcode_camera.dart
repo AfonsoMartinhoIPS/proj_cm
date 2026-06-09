@@ -70,8 +70,8 @@ class _BarcodeCameraState extends State<BarcodeCamera>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Subscribe in didChangeDependencies (not initState) because ModalRoute.of
-    // requires an inherited widget that isn't ready in initState.
+    // Subscrever em didChangeDependencies (não initState) porque ModalRoute.of
+    // requer um widget herdado que não está pronto em initState.
     final route = ModalRoute.of(context);
     if (route is PageRoute) routeObserver.subscribe(this, route);
   }

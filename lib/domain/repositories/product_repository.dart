@@ -1,3 +1,5 @@
+// lib/domain/repositories/product_repository.dart
+
 import 'package:nutri_scan/domain/entities/product.dart';
 import 'package:nutri_scan/domain/entities/saved_product.dart';
 

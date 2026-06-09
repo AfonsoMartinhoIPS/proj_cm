@@ -1,3 +1,5 @@
+// lib/data/models/meal_entry_model.dart
+
 import 'package:nutri_scan/domain/entities/meal_entry.dart';
 
 /// Modelo de dados para (des)serialização de entradas de refeição (`MealEntry`).

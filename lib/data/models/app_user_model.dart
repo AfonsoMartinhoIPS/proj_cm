@@ -1,3 +1,5 @@
+// lib/data/models/app_user_model.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 
@@ -59,8 +61,8 @@ class AppUserModel {
     return {
       'displayName': u.displayName,
       'email': u.email,
-      // Only set serverTimestamp on first create — subsequent saves keep
-      // the original createdAt by omitting the field.
+      // Apenas definir serverTimestamp na primeira criação — economias subsequentes mantêm
+      // o original createdAt omitindo o campo.
       if (isCreate) 'createdAt': FieldValue.serverTimestamp(),
       'gender': u.gender.name,
       'dateOfBirth': Timestamp.fromDate(u.dateOfBirth),

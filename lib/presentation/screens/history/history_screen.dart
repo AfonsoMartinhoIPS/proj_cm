@@ -1,21 +1,23 @@
+// lib/presentation/screens/history/history_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/domain/entities/nutrition_log.dart';
 import 'package:nutri_scan/presentation/providers/nutrition_log_provider.dart';
-import 'package:nutri_scan/presentation/screens/meals/widgets/day_summary_card.dart';
+import 'package:nutri_scan/presentation/screens/history/history_helpers.dart';
+import 'package:nutri_scan/presentation/screens/meals/widgets/meals_timeline.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
-/// Nutrition history view.
+/// Ecrã de histórico de nutrição.
 ///
-/// Layout:
-///   1. Range chips (7d / 30d / 90d) drive `setRange` on the provider.
-///   2. Stats card with avg kcal/day, days with entries, total meal entries.
-///   3. Newest-first list of [DaySummaryCard] (empty days filtered out).
+/// Estrutura:
+///   1. Chips de intervalo (7d / 30d / 90d) que accionam `setRange` no provider.
+///   2. Cartão de estatísticas com média de kcal/dia, dias com registos, total de refeições.
+///   3. Lista do mais recente para o mais antigo com [MealsTimeline] (dias vazios são filtrados).
 ///
-/// Reuses every existing piece — no new providers, no new repository calls,
-/// no chart library. Tapping a day opens [DayDetailScreen] via `/meals/day/:date`.
+/// Tocar num dia abre o [DayDetailScreen] via `/meals/day/:date`.
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
@@ -23,8 +25,7 @@ class HistoryScreen extends ConsumerStatefulWidget {
   ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-/// The three range presets exposed in the chip selector. Days values match
-/// what's passed to `setRange`. Keep in sync with [_rangeLabel].
+/// Os três intervalos predefinidos expostos no seletor de chips.
 enum _Range { week, month, quarter }
 
 extension on _Range {
@@ -42,19 +43,28 @@ extension on _Range {
 }
 
 class _HistoryScreenState extends ConsumerState<HistoryScreen> {
+  final _scrollController = ScrollController();
   _Range _range = _Range.week;
 
   @override
   void initState() {
     super.initState();
-    // Sync provider range to whatever the screen opens at. The provider
-    // remembers its window across nav (so meals screen + home see the same
-    // data), but history users typically expect a fresh range on entry.
+    // Sincroniza o intervalo do provider com o estado inicial do ecrã.
+    // O provider mantém a janela entre navegações (para que o ecrã de
+    // refeições e a página inicial vejam os mesmos dados), mas os
+    // utilizadores do histórico geralmente esperam um intervalo novo ao entrar.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setRange(_range, refetch: true);
     });
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Define o intervalo selecionado e opcionalmente recarrega os dados.
   void _setRange(_Range r, {bool refetch = true}) {
     setState(() => _range = r);
     if (refetch) {
@@ -62,18 +72,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     }
   }
 
-  Future<void> _confirmDelete(NutritionLog log) async {
-    final ok = await showNutriConfirmDialog(
-      context,
-      title: 'Apagar dia?',
-      body: 'Vai remover ${log.entries.length} '
-          '${log.entries.length == 1 ? 'refeição' : 'refeições'} '
-          'registadas em ${formatRelativeDate(log.date)}.',
-    );
-    if (!ok) return;
-    await ref.read(nutritionLogsProvider.notifier).deleteDay(log.date);
-    if (!mounted) return;
-    NutriFeedback.showInfo(context, 'Dia removido');
+  /// Força a actualização dos dados mantendo o intervalo actual.
+  Future<void> _refresh() async {
+    final notifier = ref.read(nutritionLogsProvider.notifier);
+    await notifier.setRange(notifier.daysLoaded);
   }
 
   @override
@@ -93,30 +95,38 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             ),
           ),
           data: (logs) {
-            final withEntries = [
-              for (final l in logs) if (l.entries.isNotEmpty) l,
-            ]..sort((a, b) => b.date.compareTo(a.date));
+            // Filtra os logs de acordo com o intervalo selecionado
+            final filtered = filterLogs(logs, daysBack: _range.days);
 
-            return ListView(
-              padding: const EdgeInsets.all(AppSizes.md),
-              children: [
-                _RangePicker(
-                  selected: _range,
-                  onChanged: (r) => _setRange(r),
-                ),
-                const SizedBox(height: AppSizes.md),
-                _StatsRow(logs: withEntries, totalDays: _range.days),
-                const SizedBox(height: AppSizes.md),
-                if (withEntries.isEmpty)
-                  const _EmptyState()
-                else
-                  for (final log in withEntries)
-                    DaySummaryCard(
-                      log: log,
-                      onTap: () => context.push('/meals/day/${log.date}'),
-                      onDelete: () => _confirmDelete(log),
+            return RefreshIndicator(
+              onRefresh: _refresh,
+              child: ListView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(AppSizes.md),
+                children: [
+                  // Seletor de intervalo (7 dias / 30 dias / 90 dias)
+                  _RangePicker(
+                    selected: _range,
+                    onChanged: (r) => _setRange(r),
+                  ),
+                  const SizedBox(height: AppSizes.md),
+                  // Cartão com estatísticas do período
+                  _StatsRow(logs: filtered, totalDays: _range.days),
+                  const SizedBox(height: AppSizes.md),
+                  // Lista de refeições ou estado vazio
+                  if (filtered.isEmpty)
+                    const _EmptyState()
+                  else
+                    MealsTimeline(
+                      logs: filtered,
+                      onDayTap: (log) =>
+                          context.push('/meals/day/${log.date}'),
+                      onDayDelete: (log) =>
+                          confirmDeleteDay(context, log, ref),
                     ),
-              ],
+                ],
+              ),
             );
           },
         ),
@@ -125,6 +135,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 }
 
+/// Seletor de intervalo de tempo com chips.
 class _RangePicker extends StatelessWidget {
   final _Range selected;
   final ValueChanged<_Range> onChanged;
@@ -145,11 +156,12 @@ class _RangePicker extends StatelessWidget {
   }
 }
 
-/// Three stat cards in a row: average kcal/day across days with entries,
-/// adherence (logged days / total days in range), total meals logged.
+/// Três cartões de estatísticas em linha: média de kcal/dia nos dias com
+/// registos, adesão (dias registados / total de dias no período), total de
+/// refeições registadas.
 ///
-/// Average uses only days that have entries — zero-entry days would skew
-/// the mean toward 0 and misrepresent typical intake.
+/// A média utiliza apenas os dias que têm entradas — dias sem entradas
+/// distorceriam a média para 0 e representariam mal a ingestão típica.
 class _StatsRow extends StatelessWidget {
   final List<NutritionLog> logs;
   final int totalDays;
@@ -158,11 +170,15 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loggedDays = logs.length;
-    final totalEntries = logs.fold<int>(0, (s, l) => s + l.entries.length);
+    // Considera apenas os dias que têm pelo menos uma refeição
+    final withEntries = logs.where((l) => l.entries.isNotEmpty).toList();
+    final loggedDays = withEntries.length;
+    final totalEntries =
+        withEntries.fold<int>(0, (s, l) => s + l.entries.length);
     final avgKcal = loggedDays == 0
         ? 0
-        : logs.fold<double>(0, (s, l) => s + l.totalCalories) / loggedDays;
+        : withEntries.fold<double>(0, (s, l) => s + l.totalCalories) /
+            loggedDays;
 
     return Row(
       children: [
@@ -197,6 +213,7 @@ class _StatsRow extends StatelessWidget {
   }
 }
 
+/// Estado vazio apresentado quando não existem refeições no período.
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
 

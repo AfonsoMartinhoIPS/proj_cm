@@ -1,3 +1,5 @@
+// lib/presentation/screens/auth/welcome_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/presentation/widgets/components/nutri_wave_background.dart';

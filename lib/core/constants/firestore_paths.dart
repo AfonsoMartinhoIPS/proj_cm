@@ -1,3 +1,5 @@
+// lib/core/constants/firestore_paths.dart
+
 /// Caminhos normalizados para documentos e coleções do Firestore.
 ///
 /// Centraliza a construção de referências para evitar duplicação de strings

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';
 import 'package:nutri_scan/presentation/providers/onboarding_provider.dart';
+import 'package:nutri_scan/presentation/providers/auth_provider.dart';
 import 'package:nutri_scan/presentation/widgets/widgets_components.dart';
 
 /// Quarto e último passo do fluxo de onboarding — confirmação dos dados.
@@ -17,6 +18,22 @@ class ConfirmScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final s = ref.watch(onboardingProvider);
+
+    // Se vem do Google, monitoriza o authProvider para saber quando concluir
+    ref.listen(authProvider, (_, next) {
+      if (s.isFromGoogle) {
+        next.whenOrNull(
+          data: (user) {
+            if (user != null) {
+              context.go('/');
+            }
+          },
+          error: (e, _) {
+            NutriFeedback.showError(context, 'Erro ao guardar dados: $e');
+          },
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -64,8 +81,17 @@ class ConfirmScreen extends ConsumerWidget {
               ),
               const Spacer(),
               NutriButton(
-                label: "Criar Conta",
-                onPressed: () => context.push('/register'),
+                label: s.isFromGoogle ? "Concluir" : "Criar Conta",
+                onPressed: () {
+                  if (s.isFromGoogle) {
+                    // Vem do Google: salva os dados e invalida o authProvider
+                    ref.read(authProvider.notifier).registerFromGoogle(s);
+                    // Aguarda a conclusão da navegação via listener no build principal
+                  } else {
+                    // Fluxo normal: vai para RegisterScreen
+                    context.push('/register');
+                  }
+                },
               ),
               const SizedBox(height: 20),
             ],

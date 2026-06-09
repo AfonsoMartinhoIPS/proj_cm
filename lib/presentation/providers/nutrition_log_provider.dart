@@ -1,3 +1,5 @@
+// lib/presentation/providers/nutrition_log_provider.dart
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutri_scan/core/core.dart';
 import 'package:nutri_scan/core/notifications/notification_coordinator.dart';
@@ -107,8 +109,8 @@ class NutritionLogsNotifier extends AsyncNotifier<List<NutritionLog>> {
         : ([...filtered, updated]..sort((a, b) => a.date.compareTo(b.date)));
     state = AsyncValue.data(newList);
 
-    // Reschedule today's reminder so its body reflects the latest totals.
-    // No-op when the user hasn't enabled notifications.
+    // Reagendar lembrete de hoje para que o corpo reflita os totais mais recentes.
+    // Sem operação quando o utilizador não ativou notificações.
     await _maybeReschedule(user, newList);
   }
 

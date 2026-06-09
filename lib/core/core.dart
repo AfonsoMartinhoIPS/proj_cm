@@ -12,7 +12,7 @@ export 'package:nutri_scan/core/constants/firestore_paths.dart';
 // Network / Data
 export 'package:nutri_scan/core/network/database.dart';
 
-// Theme
+// Tema
 export 'package:nutri_scan/core/theme/app_theme.dart';
 
 // Utils

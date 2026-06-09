@@ -1,3 +1,5 @@
+// lib/data/repositories/auth_repository_impl.dart
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nutri_scan/core/utils/logger.dart';
 import 'package:nutri_scan/domain/entities/app_user.dart';

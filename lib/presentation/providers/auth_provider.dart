@@ -1,3 +1,5 @@
+// lib/presentation/providers/auth_provider.dart
+
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuthException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutri_scan/core/core.dart';
@@ -134,8 +136,8 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       await userRepository.updateGoals(user.uid, goals);
       state = AsyncValue.data(user.copyWith(nutritionGoals: goals));
 
-      // Reschedule today's notification so its body reflects the new goal
-      // immediately instead of waiting for the next meal log to refresh it.
+      // Reagendar notificação de hoje para que o corpo reflita a nova meta
+      // imediatamente em vez de esperar pela próxima atualização do log de refeições.
       // Best-effort: swallow errors so notification plumbing can't surface
       // as a goal-save failure.
       try {
@@ -208,6 +210,41 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       state = AsyncValue.data(userWithGoals);
     } catch (e, st) {
       logger.e('AuthNotifier: register error', error: e, stackTrace: st);
+      state = AsyncValue.error(_friendlyAuthMessage(e), st);
+    }
+  }
+
+  /// Completa o registo quando o utilizador vem do Google Sign-In.
+  ///
+  /// Não cria uma nova conta no Firebase (já existe), apenas salva o
+  /// documento do utilizador no Firestore com os dados de onboarding.
+  /// Lê o [uid] da sessão Firebase atual.
+  Future<void> registerFromGoogle(OnboardingState onboarding) async {
+    logger.d('AuthNotifier: registerFromGoogle');
+    state = const AsyncValue.loading();
+    try {
+      final uid = authRepository.getCurrentUser();
+      if (uid == null) {
+        throw Exception('Nenhuma sessão Firebase ativa');
+      }
+
+      final userWithGoals = AppUser(
+        uid: uid,
+        displayName: onboarding.name,
+        email: '', // Email não é usado na app após Google Sign-In
+        gender: onboarding.gender,
+        dateOfBirth: onboarding.dateOfBirth ?? DateTime(2000),
+        height: onboarding.height,
+        weight: onboarding.weight,
+        createdAt: DateTime.now(),
+        nutritionGoals: onboarding.nutritionGoals,
+        objective: onboarding.objective,
+      );
+      await userRepository.saveUser(userWithGoals);
+      logger.d('AuthNotifier: registerFromGoogle success, user saved: $uid');
+      state = AsyncValue.data(userWithGoals);
+    } catch (e, st) {
+      logger.e('AuthNotifier: registerFromGoogle error', error: e, stackTrace: st);
       state = AsyncValue.error(_friendlyAuthMessage(e), st);
     }
   }
